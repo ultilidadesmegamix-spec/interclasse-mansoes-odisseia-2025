@@ -307,7 +307,7 @@
       margin-bottom:4px;
     }
 
-    /* Cabeçalho do relatório (tela e impressão) */
+    /* Cabeçalho do relatório (tela) */
     #relatorioCabecalhoImpressao {
       margin-top:4px;
       margin-bottom:4px;
@@ -322,55 +322,75 @@
       color:#555;
     }
 
-    /* ESTILO DE IMPRESSÃO – deixa só o relatório bonitinho */
+    /* ESTILO DE IMPRESSÃO – mostrar SOMENTE a tabela do relatório */
     @media print {
       body {
         background:#fff;
+        margin:0;
+        padding:0;
       }
+
+      /* Esconde tudo que não for a tabela do relatório */
       header,
       #secInscricao,
       #secInscritos,
       #secJogos,
       #emailOverlay,
+      .admin-header,
       .admin-tabs,
       #tab-inscricoes,
       #tab-jogos,
       #tab-config,
-      #btnFecharAdmin {
-        display:none !important;
+      #btnFecharAdmin,
+      #tab-relatorio .admin-bloco,
+      #btnImprimirRelatorio {
+        display: none !important;
       }
+
+      /* Área principal e card sem borda/padding */
       main {
-        margin:0;
-        padding:10px;
+        margin: 0;
+        padding: 0;
       }
       #adminSection {
         display:block !important;
+        margin:0;
+        padding:0;
         border:none;
         box-shadow:none;
-        padding:0;
+        background:#fff;
       }
       .card {
         border:none;
         box-shadow:none;
-        padding:0;
         margin:0;
+        padding:0;
+        background:#fff;
       }
       #tab-relatorio {
         display:block !important;
-      }
-      #tab-relatorio .admin-bloco {
-        border:none;
+        margin:0;
         padding:0;
-        margin-bottom:8px;
       }
-      #btnImprimirRelatorio {
-        display:none !important;
+
+      /* Tabela do relatório ocupa a folha inteira */
+      #tabelaRelatorio {
+        display: table !important;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+        margin: 0;
       }
-      table {
-        font-size:0.78rem;
+      #tabelaRelatorio thead {
+        display: table-header-group;
       }
-      th, td {
-        border:1px solid #000;
+      #tabelaRelatorio tbody {
+        display: table-row-group;
+      }
+      #tabelaRelatorio th,
+      #tabelaRelatorio td {
+        border: 1px solid #000;
+        padding: 4px 6px;
       }
     }
   </style>
