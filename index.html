@@ -347,7 +347,6 @@
         display: none !important;
       }
 
-      /* Área principal e card sem borda/padding */
       main {
         margin: 0;
         padding: 0;
@@ -373,7 +372,6 @@
         padding:0;
       }
 
-      /* Tabela do relatório ocupa a folha inteira */
       #tabelaRelatorio {
         display: table !important;
         width: 100%;
@@ -1477,7 +1475,7 @@ function renderRelatorio(){
     tdSexo.textContent = ins.sexo || "";
     tdTurma.textContent = ins.turma || "";
     tdTurno.textContent = ins.turno || "";
-    tdModalidades.textContent = (ins.modalidades || []).join(", ");
+    tdModalidades.textContent = modalidade; // <<< só a modalidade filtrada
     tdEmail.textContent = ins.email || "";
     tdCamisa.textContent = ins.camisaNumero || "";
     tdObs.textContent = ins.observacoes || "";
