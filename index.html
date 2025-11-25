@@ -265,7 +265,7 @@
       font-size:0.82rem;
     }
     /* jogos */
-    #secInscritos, #secJogos, #secPlacar { display:none; }
+    #secInscritos, #secJogos, #secPlacarAoVivo { display:none; }
     .jogo-bloco {
       border-radius:10px;
       border:1px solid var(--borda);
@@ -273,43 +273,34 @@
       margin-top:6px;
       background:#f9fbff;
     }
-    /* estilos placar público */
+    .placar-card {
+      border-radius:10px;
+      border:1px solid var(--borda);
+      padding:8px 10px;
+      margin-top:6px;
+      background:#f9fbff;
+      font-size:0.85rem;
+    }
+    .placar-linha-principal {
+      font-weight:600;
+      margin-bottom:4px;
+    }
     .placar-status {
       display:inline-block;
-      font-size:0.7rem;
       padding:2px 8px;
       border-radius:999px;
-      margin-bottom:4px;
-      font-weight:600;
-    }
-    .placar-status.prestes {
-      background:#fff3cd;
-      color:#856404;
+      font-size:0.75rem;
+      margin-top:2px;
     }
     .placar-status.andamento {
       background:#e5ffe9;
       color:#0c7a2a;
     }
-    .placar-status.finalizado {
-      background:#e2e3e5;
-      color:#6c757d;
+    .placar-status.prestes {
+      background:#fff4d6;
+      color:#8a6d3b;
     }
-    .placar-linha {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin-top:4px;
-      font-size:0.9rem;
-    }
-    .placar-equipe {
-      flex:1;
-    }
-    .placar-valor {
-      min-width:60px;
-      text-align:center;
-      font-weight:bold;
-      font-size:1.1rem;
-    }
+
     /* overlay e-mail */
     #emailOverlay {
       position:fixed;
@@ -343,6 +334,92 @@
       min-height:14px;
       margin-bottom:4px;
     }
+
+    /* Cabeçalho do relatório (tela) */
+    #relatorioCabecalhoImpressao {
+      margin-top:4px;
+      margin-bottom:4px;
+    }
+    #relatorioCabecalhoImpressao h3 {
+      margin:0;
+      font-size:0.95rem;
+      color:var(--azul);
+    }
+    #relatorioCabecalhoImpressao small {
+      font-size:0.8rem;
+      color:#555;
+    }
+
+    /* ESTILO DE IMPRESSÃO – mostrar SOMENTE a tabela do relatório */
+    @media print {
+      body {
+        background:#fff;
+        margin:0;
+        padding:0;
+      }
+
+      /* Esconde tudo que não for a tabela do relatório */
+      header,
+      #secInscricao,
+      #secInscritos,
+      #secJogos,
+      #secPlacarAoVivo,
+      #emailOverlay,
+      .admin-header,
+      .admin-tabs,
+      #tab-inscricoes,
+      #tab-jogos,
+      #tab-config,
+      #btnFecharAdmin,
+      #tab-relatorio .admin-bloco,
+      #btnImprimirRelatorio {
+        display: none !important;
+      }
+
+      main {
+        margin: 0;
+        padding: 0;
+      }
+      #adminSection {
+        display:block !important;
+        margin:0;
+        padding:0;
+        border:none;
+        box-shadow:none;
+        background:#fff;
+      }
+      .card {
+        border:none;
+        box-shadow:none;
+        margin:0;
+        padding:0;
+        background:#fff;
+      }
+      #tab-relatorio {
+        display:block !important;
+        margin:0;
+        padding:0;
+      }
+
+      #tabelaRelatorio {
+        display: table !important;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+        margin: 0;
+      }
+      #tabelaRelatorio thead {
+        display: table-header-group;
+      }
+      #tabelaRelatorio tbody {
+        display: table-row-group;
+      }
+      #tabelaRelatorio th,
+      #tabelaRelatorio td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -366,7 +443,7 @@
   <div class="header-right">
     <button class="btn btn-primaria" id="btnToggleInscritos">👀 Ver inscritos</button>
     <button class="btn btn-primaria" id="btnVerJogos">🏆 Ver jogos</button>
-    <button class="btn btn-primaria" id="btnVerPlacar">📊 Placar ao vivo</button>
+    <button class="btn btn-primaria" id="btnPlacarAoVivo">⚡ Placar ao vivo</button>
     <button class="btn btn-admin" id="btnAdminArea">🔐 Área administrativa</button>
   </div>
 </header>
@@ -510,10 +587,11 @@
   </section>
 
   <!-- PLACAR AO VIVO (ALUNO) -->
-  <section class="card" id="secPlacar">
+  <section class="card" id="secPlacarAoVivo">
     <h2>Placar ao vivo</h2>
-    <small>Aqui aparecem apenas os jogos <strong>em andamento</strong> ou <strong>prestes a começar</strong>.</small>
-    <div id="listaPlacarPublico" style="margin-top:6px;"></div>
+    <small>Veja os jogos que estão em andamento ou prestes a começar.</small>
+
+    <div id="placarAoVivoContainer"></div>
   </section>
 
   <!-- ADMIN -->
@@ -532,6 +610,7 @@
     <div class="admin-tabs">
       <button class="admin-tab-btn ativo" data-tab="inscricoes">🧑‍🎓 Inscrições</button>
       <button class="admin-tab-btn" data-tab="jogos">🏆 Jogos</button>
+      <button class="admin-tab-btn" data-tab="relatorio">🖨️ Imprimir relatório</button>
       <button class="admin-tab-btn" data-tab="config">⚙️ Configurações</button>
     </div>
 
@@ -561,10 +640,7 @@
 
       <div class="admin-bloco">
         <strong>Cancelar inscrição</strong>
-        <div style="margin-top:4px;">
-          <label for="buscaCancelar">Buscar nome</label>
-          <input type="text" id="buscaCancelar" placeholder="Digite parte do nome para filtrar...">
-        </div>
+        <small style="display:block;margin-top:2px;">Busque pelo nome acima e escolha a modalidade específica para cancelar.</small>
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
           <select id="selectCancelar" style="min-width:220px; flex:1;">
             <option value="">Selecione uma inscrição...</option>
@@ -653,25 +729,64 @@
         </div>
       </div>
 
-      <div class="admin-bloco">
-        <strong>Placar / status dos jogos</strong>
-        <small style="display:block;margin-top:2px;">Atualize aqui o status e o placar dos jogos que estão acontecendo.</small>
-        <table id="tabelaPlacarAdmin">
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Horário</th>
-              <th>Modalidade</th>
-              <th>Jogo</th>
-              <th>Local</th>
-              <th>Status</th>
-              <th>Placar</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      <div class="admin-bloco" id="adminPainelJogos">
+        <strong>Placar ao vivo / Status dos jogos</strong>
+        <small style="display:block;margin-top:2px;">Atualize o status e o placar. As mudanças aparecem em tempo real no site público.</small>
+        <div id="listaAdminJogos" style="margin-top:6px;"></div>
       </div>
+    </div>
+
+    <!-- TAB RELATÓRIO -->
+    <div class="admin-tab-content" id="tab-relatorio">
+      <div class="admin-bloco">
+        <strong>Filtros para relatório</strong>
+        <div class="filtros" style="margin-top:4px;">
+          <div>
+            <label for="relatorioTurno">Turno</label>
+            <select id="relatorioTurno">
+              <option value="">Selecione...</option>
+              <option value="Matutino">Matutino</option>
+              <option value="Vespertino">Vespertino</option>
+              <option value="Noturno">Noturno</option>
+            </select>
+          </div>
+          <div>
+            <label for="relatorioTurma">Turma</label>
+            <select id="relatorioTurma">
+              <option value="">Selecione o turno primeiro...</option>
+            </select>
+          </div>
+          <div>
+            <label for="relatorioModalidade">Modalidade</label>
+            <select id="relatorioModalidade">
+              <option value="">Selecione a modalidade...</option>
+            </select>
+          </div>
+        </div>
+        <div id="relatorioCabecalhoImpressao">
+          <h3 id="relatorioTituloLinha1">Relatório de inscritos – Movimenta Odisseia</h3>
+          <small id="relatorioTituloLinha2">Selecione turno, turma e modalidade para gerar o relatório.</small>
+        </div>
+        <div style="margin-top:6px; display:flex; justify-content:flex-end;">
+          <button class="btn btn-primaria" id="btnImprimirRelatorio">🖨️ Imprimir</button>
+        </div>
+      </div>
+
+      <table id="tabelaRelatorio">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Sexo</th>
+            <th>Turma</th>
+            <th>Turno</th>
+            <th>Modalidades</th>
+            <th>E-mail</th>
+            <th>Nº camisa</th>
+            <th>Obs</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
 
     <!-- TAB CONFIG -->
@@ -878,7 +993,6 @@ function atualizarStatusInscricoes(){
     const p = configEvento.dataLimite.split("-");
     if (p.length === 3){
       const limiteDia = new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
-      // aqui: se HOJE >= dataLimite => fecha (se colocar HOJE, já fecha)
       if (hojeDia.getTime() >= limiteDia.getTime()){
         fechado = true;
       }
@@ -938,7 +1052,6 @@ async function carregarConfiguracoes(){
     console.error("Erro ao carregar configurações:",e);
   }
 
-  // preencher campos de config
   document.getElementById("cfgDataLimite").value = configEvento.dataLimite || "";
   document.getElementById("cfgMsgEncerradas").value = configEvento.msgEncerradas || "";
   document.getElementById("cfgBloquearAgora").checked = !!configEvento.bloquearAgora;
@@ -955,7 +1068,6 @@ async function carregarConfiguracoes(){
   document.getElementById("cfgAnoEvento").value = configEvento.anoEvento || "";
   document.getElementById("cfgTextoInicial").value = configEvento.textoInicial || "";
 
-  // título
   document.getElementById("tituloEvento").textContent = "Inscrições " + (configEvento.nomeEvento || "Movimenta Odisseia");
   if (configEvento.textoInicial){
     document.getElementById("subEvento").textContent = configEvento.textoInicial;
@@ -1141,7 +1253,6 @@ async function handleSubmitInscricao(e){
     return;
   }
 
-  // impedir duplicado nome+turma
   for (const ins of todasInscricoes){
     if (ins.nomeNormalizado === nomeNorm && ins.turma === turma){
       msgForm("Já existe inscrição para este nome nesta turma.", false);
@@ -1149,7 +1260,6 @@ async function handleSubmitInscricao(e){
     }
   }
 
-  // checar limites de vagas
   for (const mod of mods){
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
@@ -1196,7 +1306,7 @@ async function handleSubmitInscricao(e){
   }
 }
 
-/* CANCELAR INSCRIÇÃO (POR MODALIDADE) */
+/* CANCELAR INSCRIÇÃO (POR MODALIDADE OU COMPLETA) */
 
 async function cancelarInscricao(){
   if (!isAdmin){
@@ -1204,38 +1314,39 @@ async function cancelarInscricao(){
     return;
   }
   const sel = document.getElementById("selectCancelar");
-  const valor = sel.value;
-  if (!valor){
-    alert("Selecione uma inscrição/modalidade."); 
-    return;
+  const raw = sel.value;
+  if (!raw){
+    alert("Selecione uma inscrição."); return;
   }
-  const partes = valor.split("||");
-  if (partes.length !== 2){
-    alert("Seleção inválida."); 
-    return;
-  }
+  const partes = raw.split("|||");
   const id = partes[0];
-  const modalidadeEscolhida = partes[1];
+  const modalidadeSelecionada = partes[1] || null;
 
   const ins = todasInscricoes.find(i => i.id === id);
   if (!ins){
-    alert("Inscrição não encontrada."); 
-    return;
+    alert("Inscrição não encontrada."); return;
   }
 
-  if (!confirm('Cancelar a modalidade "'+modalidadeEscolhida+'" do(a) aluno(a) "'+ins.nome+'" da turma '+ins.turma+'?')){
-    return;
+  if (!modalidadeSelecionada){
+    alert("Modalidade inválida."); return;
   }
+
+  const mensagemConfirm = 'Cancelar a modalidade "'+modalidadeSelecionada+'" do aluno "'+ins.nome+'" da turma '+ins.turma+'?\n\nSe esta for a única modalidade, a inscrição inteira será removida.';
+  if (!confirm(mensagemConfirm)) return;
 
   try{
-    const modsAtuais = ins.modalidades || [];
-    if (modsAtuais.length > 1){
-      const novas = modsAtuais.filter(m => m !== modalidadeEscolhida);
-      await db.collection("inscricoes").doc(id).update({ modalidades: novas });
-    } else {
+    const modalidadesAtuais = Array.isArray(ins.modalidades) ? ins.modalidades.slice() : [];
+    const filtradas = modalidadesAtuais.filter(m => m !== modalidadeSelecionada);
+
+    if (filtradas.length === 0){
       await db.collection("inscricoes").doc(id).delete();
+      alert("Inscrição completa cancelada.");
+    } else {
+      await db.collection("inscricoes").doc(id).update({
+        modalidades: filtradas
+      });
+      alert("Modalidade cancelada com sucesso.");
     }
-    alert("Modalidade/inscrição cancelada.");
   }catch(e){
     console.error(e);
     alert("Erro ao cancelar inscrição.");
@@ -1258,7 +1369,6 @@ function renderPublico(){
 
   corpo.innerHTML = "";
 
-  // Regra: só mostra inscrições quando turno, turma e modalidade forem selecionados
   if (!turno || !turma || !mod){
     const tr = document.createElement("tr");
     const td = document.createElement("td");
@@ -1362,6 +1472,93 @@ function renderAdmin(){
   });
 }
 
+/* RELATÓRIO IMPRESSO */
+
+function renderRelatorio(){
+  const tbody = document.querySelector("#tabelaRelatorio tbody");
+  const turnoEl = document.getElementById("relatorioTurno");
+  const turmaEl = document.getElementById("relatorioTurma");
+  const modEl = document.getElementById("relatorioModalidade");
+  const tituloLinha1 = document.getElementById("relatorioTituloLinha1");
+  const tituloLinha2 = document.getElementById("relatorioTituloLinha2");
+
+  if (!tbody || !turnoEl || !turmaEl || !modEl) return;
+
+  const turno = turnoEl.value;
+  const turma = turmaEl.value;
+  const modalidade = modEl.value;
+
+  tbody.innerHTML = "";
+
+  tituloLinha1.textContent = "Relatório de inscritos – " + (configEvento.nomeEvento || "Movimenta Odisseia");
+
+  if (!turno || !turma || !modalidade){
+    tituloLinha2.textContent = "Selecione turno, turma e modalidade para gerar o relatório.";
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Selecione turno, turma e modalidade para gerar o relatório.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  let lista = todasInscricoes.filter(ins => {
+    if (ins.turno !== turno) return false;
+    if (ins.turma !== turma) return false;
+    if (!ins.modalidades || !ins.modalidades.includes(modalidade)) return false;
+    return true;
+  });
+
+  lista = lista.slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
+
+  if (!lista.length){
+    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – 0 inscritos.`;
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Nenhuma inscrição para esses filtros.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – Total: ${lista.length} inscrito(s).`;
+
+  lista.forEach(ins => {
+    const tr = document.createElement("tr");
+
+    const tdNome = document.createElement("td");
+    const tdSexo = document.createElement("td");
+    const tdTurma = document.createElement("td");
+    const tdTurno = document.createElement("td");
+    const tdModalidades = document.createElement("td");
+    const tdEmail = document.createElement("td");
+    const tdCamisa = document.createElement("td");
+    const tdObs = document.createElement("td");
+
+    tdNome.textContent = ins.nome || "";
+    tdSexo.textContent = ins.sexo || "";
+    tdTurma.textContent = ins.turma || "";
+    tdTurno.textContent = ins.turno || "";
+    tdModalidades.textContent = modalidade; // somente a modalidade filtrada
+    tdEmail.textContent = ins.email || "";
+    tdCamisa.textContent = ins.camisaNumero || "";
+    tdObs.textContent = ins.observacoes || "";
+
+    tr.appendChild(tdNome);
+    tr.appendChild(tdSexo);
+    tr.appendChild(tdTurma);
+    tr.appendChild(tdTurno);
+    tr.appendChild(tdModalidades);
+    tr.appendChild(tdEmail);
+    tr.appendChild(tdCamisa);
+    tr.appendChild(tdObs);
+
+    tbody.appendChild(tr);
+  });
+}
+
 /* preencher selects (filtros e cancelar) */
 function atualizarSelectsAdminPublico(){
   const filtroTurma = document.getElementById("filtroTurma");
@@ -1369,16 +1566,10 @@ function atualizarSelectsAdminPublico(){
   const adminTurma = document.getElementById("adminFiltroTurma");
   const adminMod = document.getElementById("adminFiltroModalidade");
   const selectCancel = document.getElementById("selectCancelar");
-  const buscaCancelar = document.getElementById("buscaCancelar");
-  const termoBusca = (buscaCancelar ? buscaCancelar.value : "").toLowerCase();
 
-  // turmas (uniques) apenas para admin/cancelar
   const turmasSet = new Set();
   todasInscricoes.forEach(i => { if (i.turma) turmasSet.add(i.turma); });
   const turmasOrd = Array.from(turmasSet).sort();
-
-  // NÃO mexemos mais no filtroTurma do painel de alunos aqui
-  // (ele é controlado pelo filtro de turno)
 
   adminTurma.innerHTML = '<option value="">Todas</option>';
   turmasOrd.forEach(t => {
@@ -1387,7 +1578,6 @@ function atualizarSelectsAdminPublico(){
     adminTurma.appendChild(opt);
   });
 
-  // modalidades
   filtroMod.innerHTML = '<option value="">Selecione a modalidade...</option>';
   adminMod.innerHTML = '<option value="">Todas</option>';
   MODALIDADES.forEach(m => {
@@ -1399,21 +1589,25 @@ function atualizarSelectsAdminPublico(){
     adminMod.appendChild(o2);
   });
 
-  // cancelar (por modalidade)
+  // select de cancelamento: uma opção por modalidade
+  const nomeFiltro = (document.getElementById("adminFiltroNome").value || "").toLowerCase();
+  const turmaFiltro = document.getElementById("adminFiltroTurma").value;
+
   selectCancel.innerHTML = '<option value="">Selecione uma inscrição...</option>';
   todasInscricoes.forEach(ins => {
-    const nomeLower = (ins.nome || "").toLowerCase();
-    if (termoBusca && !nomeLower.includes(termoBusca)) return;
+    if (nomeFiltro && !(ins.nome || "").toLowerCase().includes(nomeFiltro)) return;
+    if (turmaFiltro && ins.turma !== turmaFiltro) return;
+
     (ins.modalidades || []).forEach(mod => {
       const opt = document.createElement("option");
-      opt.value = ins.id + "||" + mod;
+      opt.value = ins.id + "|||" + mod;
       opt.textContent = ins.nome + " — " + ins.turma + " — " + mod;
       selectCancel.appendChild(opt);
     });
   });
 }
 
-/* ========== JOGOS ========== */
+/* ========== JOGOS (ALUNO) ========== */
 
 function renderJogosAluno(){
   const serie = document.getElementById("filtroSerieJogo").value;
@@ -1451,177 +1645,63 @@ function renderJogosAluno(){
   });
 }
 
-/* PLACAR PÚBLICO */
+/* ========== PLACAR AO VIVO (ALUNO) ========== */
 
-function renderPlacarPublico(){
-  const container = document.getElementById("listaPlacarPublico");
+function renderPlacarAoVivo(){
+  const container = document.getElementById("placarAoVivoContainer");
   if (!container) return;
   container.innerHTML = "";
 
-  const lista = todosJogos.filter(j => j.status === "EM_ANDAMENTO" || j.status === "PRESTES");
+  const statusLabel = {
+    "AGENDADO": "Agendado",
+    "PRESTES": "Prestes a começar",
+    "EM_ANDAMENTO": "Em andamento",
+    "FINALIZADO": "Finalizado"
+  };
 
-  if (!lista.length){
-    container.textContent = "Nenhum jogo ao vivo no momento. Assim que um jogo começar, ele aparecerá aqui.";
+  const jogosAoVivo = todosJogos.filter(j => j.status === "EM_ANDAMENTO" || j.status === "PRESTES");
+
+  if (!jogosAoVivo.length){
+    const p = document.createElement("p");
+    p.textContent = "Nenhum jogo em andamento ou prestes a começar neste momento.";
+    container.appendChild(p);
     return;
   }
 
-  lista.forEach(j => {
-    const div = document.createElement("div");
-    div.className = "jogo-bloco";
+  // Ordena por data + horário
+  jogosAoVivo.sort((a,b) => {
+    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
+    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
+    return da.localeCompare(db);
+  });
 
-    const statusSpan = document.createElement("span");
-    const status = j.status || "AGENDADO";
-    if (status === "EM_ANDAMENTO"){
-      statusSpan.className = "placar-status andamento";
-      statusSpan.textContent = "Em andamento";
-    } else {
-      statusSpan.className = "placar-status prestes";
-      statusSpan.textContent = "Prestes a começar";
-    }
+  jogosAoVivo.forEach(j => {
+    const card = document.createElement("div");
+    card.className = "placar-card";
 
-    const titulo = document.createElement("div");
-    titulo.innerHTML = "<strong>"+(j.modalidade || "-")+"</strong>";
+    const topo = document.createElement("div");
+    topo.className = "placar-linha-principal";
+    topo.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-");
+    card.appendChild(topo);
 
     const info = document.createElement("div");
-    info.style.fontSize = "0.85rem";
-    info.textContent = "Data: "+formatarDataBR(j.dataJogo)+" — Horário: "+(j.horarioJogo || "-")+" — Local: "+(j.localJogo || "-");
+    info.innerHTML =
+      "Local: "+(j.localJogo || "-")+"<br>"+
+      (j.turma1 || "")+" <strong>"+(j.placar1 ?? 0)+"</strong> x <strong>"+(j.placar2 ?? 0)+"</strong> "+(j.turma2 || "");
+    card.appendChild(info);
 
-    const placarLinha = document.createElement("div");
-    placarLinha.className = "placar-linha";
+    const statusSpan = document.createElement("span");
+    statusSpan.className = "placar-status";
+    if (j.status === "EM_ANDAMENTO") statusSpan.classList.add("andamento");
+    if (j.status === "PRESTES") statusSpan.classList.add("prestes");
+    statusSpan.textContent = statusLabel[j.status] || j.status || "–";
+    card.appendChild(statusSpan);
 
-    const equipe1 = document.createElement("div");
-    equipe1.className = "placar-equipe";
-    equipe1.textContent = j.turma1 || "";
-
-    const placar = document.createElement("div");
-    placar.className = "placar-valor";
-    const p1 = (typeof j.placar1 === "number" ? j.placar1 : 0);
-    const p2 = (typeof j.placar2 === "number" ? j.placar2 : 0);
-    placar.textContent = p1 + " x " + p2;
-
-    const equipe2 = document.createElement("div");
-    equipe2.className = "placar-equipe";
-    equipe2.style.textAlign = "right";
-    equipe2.textContent = j.turma2 || "";
-
-    placarLinha.appendChild(equipe1);
-    placarLinha.appendChild(placar);
-    placarLinha.appendChild(equipe2);
-
-    div.appendChild(statusSpan);
-    div.appendChild(titulo);
-    div.appendChild(info);
-    div.appendChild(placarLinha);
-
-    container.appendChild(div);
+    container.appendChild(card);
   });
 }
 
-/* ADMIN PLACAR */
-
-function renderPlacarAdmin(){
-  if (!isAdmin) return;
-  const tabela = document.getElementById("tabelaPlacarAdmin");
-  if (!tabela) return;
-  const tbody = tabela.querySelector("tbody");
-  tbody.innerHTML = "";
-
-  if (!todosJogos.length){
-    const tr = document.createElement("tr");
-    const td = document.createElement("td");
-    td.colSpan = 8;
-    td.textContent = "Nenhum jogo cadastrado.";
-    tr.appendChild(td);
-    tbody.appendChild(tr);
-    return;
-  }
-
-  todosJogos.forEach(j => {
-    const tr = document.createElement("tr");
-    tr.dataset.id = j.id;
-
-    function criaTd(text){
-      const td = document.createElement("td");
-      td.textContent = text || "";
-      return td;
-    }
-
-    tr.appendChild(criaTd(formatarDataBR(j.dataJogo)));
-    tr.appendChild(criaTd(j.horarioJogo || ""));
-    tr.appendChild(criaTd(j.modalidade || ""));
-    tr.appendChild(criaTd((j.turma1 || "")+" x "+(j.turma2 || "")));
-    tr.appendChild(criaTd(j.localJogo || ""));
-
-    // status select
-    const tdStatus = document.createElement("td");
-    const sel = document.createElement("select");
-    sel.className = "campo-status-jogo";
-    const opcoes = [
-      {v:"AGENDADO", t:"Agendado"},
-      {v:"PRESTES", t:"Prestes a começar"},
-      {v:"EM_ANDAMENTO", t:"Em andamento"},
-      {v:"FINALIZADO", t:"Finalizado"}
-    ];
-    const statusAtual = j.status || "AGENDADO";
-    opcoes.forEach(o => {
-      const opt = document.createElement("option");
-      opt.value = o.v; opt.textContent = o.t;
-      if (statusAtual === o.v) opt.selected = true;
-      sel.appendChild(opt);
-    });
-    tdStatus.appendChild(sel);
-    tr.appendChild(tdStatus);
-
-    // placar
-    const tdPlacar = document.createElement("td");
-    const inp1 = document.createElement("input");
-    inp1.type = "number";
-    inp1.min = "0";
-    inp1.className = "campo-placar1";
-    inp1.style.width = "40px";
-    inp1.value = (typeof j.placar1 === "number" ? j.placar1 : 0);
-    const spanX = document.createTextNode(" x ");
-    const inp2 = document.createElement("input");
-    inp2.type = "number";
-    inp2.min = "0";
-    inp2.className = "campo-placar2";
-    inp2.style.width = "40px";
-    inp2.value = (typeof j.placar2 === "number" ? j.placar2 : 0);
-    tdPlacar.appendChild(inp1);
-    tdPlacar.appendChild(spanX);
-    tdPlacar.appendChild(inp2);
-    tr.appendChild(tdPlacar);
-
-    // ações
-    const tdAcoes = document.createElement("td");
-    const btnSalvar = document.createElement("button");
-    btnSalvar.type = "button";
-    btnSalvar.textContent = "Salvar";
-    btnSalvar.className = "btn btn-primaria btnSalvarPlacar";
-    tdAcoes.appendChild(btnSalvar);
-    tr.appendChild(tdAcoes);
-
-    tbody.appendChild(tr);
-  });
-}
-
-async function atualizarJogoPlacar(id, status, placar1, placar2){
-  if (!isAdmin){
-    alert("Apenas o administrador pode atualizar o placar.");
-    return;
-  }
-  try{
-    await db.collection("jogos").doc(id).update({
-      status: status,
-      placar1: placar1,
-      placar2: placar2
-    });
-    alert("Placar atualizado.");
-  }catch(e){
-    console.error(e);
-    alert("Erro ao atualizar placar.");
-  }
-}
+/* ========== JOGOS ADMIN: CADASTRAR / EXCLUIR / EDITAR PLACAR ========== */
 
 async function cadastrarJogo(){
   if (!isAdmin){
@@ -1703,13 +1783,129 @@ async function excluirJogo(){
   }
 }
 
+/* Painel de placar ao vivo / status (admin) */
+
+function renderAdminJogos(){
+  const container = document.getElementById("listaAdminJogos");
+  if (!container) return;
+  container.innerHTML = "";
+
+  if (!todosJogos.length){
+    container.textContent = "Nenhum jogo cadastrado.";
+    return;
+  }
+
+  const statusOptions = ["AGENDADO","PRESTES","EM_ANDAMENTO","FINALIZADO"];
+
+  todosJogos.forEach(j => {
+    const bloco = document.createElement("div");
+    bloco.className = "jogo-bloco";
+
+    const linha1 = document.createElement("div");
+    linha1.innerHTML = "<strong>"+(j.modalidade || "-")+"</strong> — "+formatarDataBR(j.dataJogo)+" às "+(j.horarioJogo || "-");
+    bloco.appendChild(linha1);
+
+    const linha2 = document.createElement("div");
+    linha2.textContent = "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+" — Local: "+(j.localJogo || "-");
+    bloco.appendChild(linha2);
+
+    const controles = document.createElement("div");
+    controles.style.marginTop = "4px";
+    controles.style.display = "flex";
+    controles.style.flexWrap = "wrap";
+    controles.style.gap = "6px";
+    controles.style.alignItems = "center";
+
+    // Status
+    const selStatus = document.createElement("select");
+    selStatus.dataset.id = j.id;
+    statusOptions.forEach(st => {
+      const opt = document.createElement("option");
+      opt.value = st;
+      opt.textContent = st;
+      if (j.status === st) opt.selected = true;
+      selStatus.appendChild(opt);
+    });
+
+    // Placar 1
+    const inpP1 = document.createElement("input");
+    inpP1.type = "number";
+    inpP1.min = "0";
+    inpP1.value = (j.placar1 ?? 0);
+    inpP1.style.width = "60px";
+    inpP1.dataset.id = j.id;
+    inpP1.dataset.tipo = "p1";
+
+    // Placar 2
+    const inpP2 = document.createElement("input");
+    inpP2.type = "number";
+    inpP2.min = "0";
+    inpP2.value = (j.placar2 ?? 0);
+    inpP2.style.width = "60px";
+    inpP2.dataset.id = j.id;
+    inpP2.dataset.tipo = "p2";
+
+    const labelP1 = document.createElement("span");
+    labelP1.textContent = (j.turma1 || "T1")+":";
+    const labelP2 = document.createElement("span");
+    labelP2.textContent = (j.turma2 || "T2")+":";
+
+    const btnSalvar = document.createElement("button");
+    btnSalvar.className = "btn btn-primaria btnSalvarJogo";
+    btnSalvar.textContent = "Salvar";
+    btnSalvar.dataset.id = j.id;
+
+    controles.appendChild(document.createTextNode("Status:"));
+    controles.appendChild(selStatus);
+    controles.appendChild(labelP1);
+    controles.appendChild(inpP1);
+    controles.appendChild(labelP2);
+    controles.appendChild(inpP2);
+    controles.appendChild(btnSalvar);
+
+    bloco.appendChild(controles);
+    container.appendChild(bloco);
+  });
+
+  // Listeners de salvar
+  container.querySelectorAll(".btnSalvarJogo").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (!isAdmin){
+        alert("Apenas o administrador pode atualizar jogos.");
+        return;
+      }
+      const id = btn.dataset.id;
+      const bloco = btn.closest(".jogo-bloco");
+      const selStatus = bloco.querySelector("select");
+      const inpP1 = bloco.querySelector('input[data-tipo="p1"]');
+      const inpP2 = bloco.querySelector('input[data-tipo="p2"]');
+
+      const novoStatus = selStatus.value;
+      const placar1 = parseInt(inpP1.value,10) || 0;
+      const placar2 = parseInt(inpP2.value,10) || 0;
+
+      try{
+        await db.collection("jogos").doc(id).update({
+          status: novoStatus,
+          placar1: placar1,
+          placar2: placar2
+        });
+        alert("Jogo atualizado com sucesso.");
+      }catch(e){
+        console.error(e);
+        alert("Erro ao atualizar jogo.");
+      }
+    });
+  });
+}
+
 /* ========== TROCA DE TELAS ========== */
 
 function mostrarSecao(sec){
   document.getElementById("secInscricao").style.display = (sec==="inscricao"?"block":"none");
   document.getElementById("secInscritos").style.display = (sec==="inscritos"?"block":"none");
   document.getElementById("secJogos").style.display = (sec==="jogos"?"block":"none");
-  document.getElementById("secPlacar").style.display = (sec==="placar"?"block":"none");
+  document.getElementById("secPlacarAoVivo").style.display = (sec==="placar"?"block":"none");
   document.getElementById("adminSection").style.display = (sec==="admin"?"block":"none");
 }
 
@@ -1724,7 +1920,7 @@ function abrirAdmin(){
   }
   mostrarSecao("admin");
   renderAdmin();
-  renderPlacarAdmin();
+  renderAdminJogos();
 }
 
 function fecharAdmin(){
@@ -1784,12 +1980,17 @@ function iniciarListeners(){
     atualizarSelectsAdminPublico();
     renderPublico();
     renderAdmin();
+    renderRelatorio();
   });
 
   db.collection("jogos").orderBy("dataJogo","asc").onSnapshot(snap => {
     todosJogos = [];
     snap.forEach(doc => {
       const d = doc.data();
+      let p1 = d.placar1;
+      let p2 = d.placar2;
+      if (typeof p1 === "string") p1 = parseInt(p1,10);
+      if (typeof p2 === "string") p2 = parseInt(p2,10);
       todosJogos.push({
         id: doc.id,
         turno: d.turno || "",
@@ -1800,21 +2001,20 @@ function iniciarListeners(){
         horarioJogo: d.horarioJogo || "",
         localJogo: d.localJogo || "",
         status: d.status || "AGENDADO",
-        placar1: (typeof d.placar1 === "number" ? d.placar1 : 0),
-        placar2: (typeof d.placar2 === "number" ? d.placar2 : 0)
+        placar1: Number.isFinite(p1) ? p1 : 0,
+        placar2: Number.isFinite(p2) ? p2 : 0
       });
     });
     atualizarSelectExcluirJogo();
     renderJogosAluno();
-    renderPlacarPublico();
-    renderPlacarAdmin();
+    renderPlacarAoVivo();
+    renderAdminJogos();
   });
 }
 
 /* ========== INIT ========== */
 
 function init(){
-  // overlay e-mail
   const overlay = document.getElementById("emailOverlay");
   const emailInput = document.getElementById("emailAluno");
   const msgEmail = document.getElementById("msgEmailOverlay");
@@ -1836,7 +2036,6 @@ function init(){
     }
   });
 
-  // montar modalidades
   const contMods = document.getElementById("modalidadesContainer");
   MODALIDADES.forEach(m => {
     const item = document.createElement("div");
@@ -1860,7 +2059,6 @@ function init(){
     contMods.appendChild(item);
   });
 
-  // limitar até X modalidades por aluno
   contMods.addEventListener("change", e => {
     if (e.target.classList.contains("chkModalidade")){
       const marcados = contMods.querySelectorAll(".chkModalidade:checked");
@@ -1871,7 +2069,6 @@ function init(){
     }
   });
 
-  // selects turno/turma do formulário
   const turnoSel = document.getElementById("turno");
   const turmaSel = document.getElementById("turma");
   turmaSel.disabled = true;
@@ -1899,7 +2096,6 @@ function init(){
   turmaSel.addEventListener("change", atualizarDisponibilidadeModalidades);
   document.getElementById("sexo").addEventListener("change", atualizarDisponibilidadeModalidades);
 
-  // filtros do painel de inscritos (turno/turma/modalidade)
   const filtroTurno = document.getElementById("filtroTurno");
   const filtroTurma = document.getElementById("filtroTurma");
   const filtroModalidade = document.getElementById("filtroModalidade");
@@ -1933,7 +2129,6 @@ function init(){
   filtroTurma.addEventListener("change", renderPublico);
   filtroModalidade.addEventListener("change", renderPublico);
 
-  // jogos (admin) – atualizar turmas quando escolhe turno
   const jogoTurno = document.getElementById("jogoTurno");
   const jogoTurma1 = document.getElementById("jogoTurma1");
   const jogoTurma2 = document.getElementById("jogoTurma2");
@@ -1963,7 +2158,6 @@ function init(){
     });
   });
 
-  // modalidades no cadastro de jogos
   const jogoModalidade = document.getElementById("jogoModalidade");
   MODALIDADES.forEach(m => {
     const opt = document.createElement("option");
@@ -1971,35 +2165,88 @@ function init(){
     jogoModalidade.appendChild(opt);
   });
 
-  // botões topo
+  const relatorioTurno = document.getElementById("relatorioTurno");
+  const relatorioTurma = document.getElementById("relatorioTurma");
+  const relatorioModalidade = document.getElementById("relatorioModalidade");
+
+  if (relatorioModalidade){
+    relatorioModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
+    MODALIDADES.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = m;
+      relatorioModalidade.appendChild(opt);
+    });
+  }
+
+  if (relatorioTurno && relatorioTurma){
+    relatorioTurno.addEventListener("change", () => {
+      const turno = relatorioTurno.value;
+      relatorioTurma.innerHTML = "";
+      const optDefault = document.createElement("option");
+      if (!turno){
+        optDefault.value = "";
+        optDefault.textContent = "Selecione o turno primeiro...";
+        relatorioTurma.appendChild(optDefault);
+      } else {
+        optDefault.value = "";
+        optDefault.textContent = "Selecione a turma...";
+        relatorioTurma.appendChild(optDefault);
+        const turmasTurno = getTurmasPorTurno(turno);
+        turmasTurno.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t;
+          opt.textContent = t;
+          relatorioTurma.appendChild(opt);
+        });
+      }
+      renderRelatorio();
+    });
+
+    relatorioTurma.addEventListener("change", renderRelatorio);
+  }
+
+  if (relatorioModalidade){
+    relatorioModalidade.addEventListener("change", renderRelatorio);
+  }
+
+  const btnImprimirRelatorio = document.getElementById("btnImprimirRelatorio");
+  if (btnImprimirRelatorio){
+    btnImprimirRelatorio.addEventListener("click", () => {
+      window.print();
+    });
+  }
+
   document.getElementById("btnToggleInscritos").addEventListener("click", () => {
     const sec = document.getElementById("secInscritos").style.display === "block";
+    const btn = document.getElementById("btnToggleInscritos");
     if (sec){
       mostrarSecao("inscricao");
-      document.getElementById("btnToggleInscritos").textContent = "👀 Ver inscritos";
+      btn.textContent = "👀 Ver inscritos";
     } else {
       mostrarSecao("inscritos");
-      document.getElementById("btnToggleInscritos").textContent = "⬅ Voltar para inscrição";
+      btn.textContent = "⬅ Voltar para inscrição";
     }
   });
 
   document.getElementById("btnVerJogos").addEventListener("click", () => {
     const sec = document.getElementById("secJogos").style.display === "block";
+    const btn = document.getElementById("btnVerJogos");
     if (sec){
       mostrarSecao("inscricao");
-      document.getElementById("btnVerJogos").textContent = "🏆 Ver jogos";
+      btn.textContent = "🏆 Ver jogos";
     } else {
       mostrarSecao("jogos");
-      document.getElementById("btnVerJogos").textContent = "⬅ Voltar para inscrição";
+      btn.textContent = "⬅ Voltar para inscrição";
     }
   });
 
-  document.getElementById("btnVerPlacar").addEventListener("click", () => {
-    const sec = document.getElementById("secPlacar").style.display === "block";
-    const btn = document.getElementById("btnVerPlacar");
+  document.getElementById("btnPlacarAoVivo").addEventListener("click", () => {
+    const sec = document.getElementById("secPlacarAoVivo").style.display === "block";
+    const btn = document.getElementById("btnPlacarAoVivo");
     if (sec){
       mostrarSecao("inscricao");
-      btn.textContent = "📊 Placar ao vivo";
+      btn.textContent = "⚡ Placar ao vivo";
     } else {
       mostrarSecao("placar");
       btn.textContent = "⬅ Voltar para inscrição";
@@ -2011,35 +2258,21 @@ function init(){
 
   document.getElementById("formInscricao").addEventListener("submit", handleSubmitInscricao);
 
-  document.getElementById("adminFiltroNome").addEventListener("input", renderAdmin);
-  document.getElementById("adminFiltroTurma").addEventListener("change", renderAdmin);
+  document.getElementById("adminFiltroNome").addEventListener("input", () => {
+    renderAdmin();
+    atualizarSelectsAdminPublico();
+  });
+  document.getElementById("adminFiltroTurma").addEventListener("change", () => {
+    renderAdmin();
+    atualizarSelectsAdminPublico();
+  });
   document.getElementById("adminFiltroModalidade").addEventListener("change", renderAdmin);
   document.getElementById("btnCancelarInscricao").addEventListener("click", cancelarInscricao);
-
-  const buscaCancelar = document.getElementById("buscaCancelar");
-  if (buscaCancelar){
-    buscaCancelar.addEventListener("input", atualizarSelectsAdminPublico);
-  }
 
   document.getElementById("filtroSerieJogo").addEventListener("change", renderJogosAluno);
   document.getElementById("filtroDataJogo").addEventListener("change", renderJogosAluno);
   document.getElementById("btnCadastrarJogo").addEventListener("click", cadastrarJogo);
   document.getElementById("btnExcluirJogo").addEventListener("click", excluirJogo);
-
-  // salvar placar admin (delegação de eventos)
-  const tabelaPlacarAdmin = document.getElementById("tabelaPlacarAdmin");
-  if (tabelaPlacarAdmin){
-    tabelaPlacarAdmin.addEventListener("click", e => {
-      if (e.target.classList.contains("btnSalvarPlacar")){
-        const tr = e.target.closest("tr");
-        const id = tr.dataset.id;
-        const status = tr.querySelector(".campo-status-jogo").value;
-        const p1 = parseInt(tr.querySelector(".campo-placar1").value,10) || 0;
-        const p2 = parseInt(tr.querySelector(".campo-placar2").value,10) || 0;
-        atualizarJogoPlacar(id, status, p1, p2);
-      }
-    });
-  }
 
   document.getElementById("btnSalvarConfig").addEventListener("click", e => {
     e.preventDefault();
