@@ -265,8 +265,8 @@
       margin-bottom:8px;
       font-size:0.82rem;
     }
-    /* jogos */
-    #secInscritos, #secJogos, #secPlacarAoVivo { display:none; }
+    /* jogos / placar / classificação */
+    #secInscritos, #secJogos, #secPlacarAoVivo, #secClassificados { display:none; }
     .jogo-bloco {
       border-radius:10px;
       border:1px solid var(--borda);
@@ -365,6 +365,7 @@
       #secInscritos,
       #secJogos,
       #secPlacarAoVivo,
+      #secClassificados,
       #emailOverlay,
       .admin-header,
       .admin-tabs,
@@ -444,6 +445,7 @@
   <div class="header-right">
     <button class="btn btn-primaria" id="btnToggleInscritos">👀 Ver inscritos</button>
     <button class="btn btn-primaria" id="btnVerJogos">🏆 Ver jogos</button>
+    <button class="btn btn-primaria" id="btnClassificados">✅ Classificados</button>
     <button class="btn btn-primaria" id="btnPlacarAoVivo">⚡ Placar ao vivo</button>
     <button class="btn btn-admin" id="btnAdminArea">🔐 Área administrativa</button>
   </div>
@@ -585,6 +587,13 @@
     </div>
 
     <div id="listaJogosContainer"></div>
+  </section>
+
+  <!-- CLASSIFICAÇÃO / CLASSIFICADOS (ALUNO) -->
+  <section class="card" id="secClassificados">
+    <h2>Classificação</h2>
+    <small>Tabela de pontos das turmas com base nos jogos finalizados.</small>
+    <div id="classificacaoContainer"></div>
   </section>
 
   <!-- PLACAR AO VIVO (ALUNO) -->
@@ -1618,7 +1627,7 @@ function renderJogosAluno(){
     return;
   }
 
-  const lista = todosJogos.filter(j => {
+  let lista = todosJogos.filter(j => {
     const s1 = getSerieFromTurma(j.turma1);
     const s2 = getSerieFromTurma(j.turma2);
     if (s1 !== serie && s2 !== serie) return false;
@@ -1630,6 +1639,13 @@ function renderJogosAluno(){
     container.textContent = "Nenhum jogo para esses filtros.";
     return;
   }
+
+  // ORDENAR POR DATA + HORÁRIO (crescente)
+  lista = lista.slice().sort((a,b) => {
+    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
+    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
+    return da.localeCompare(db);
+  });
 
   lista.forEach(j => {
     const div = document.createElement("div");
@@ -1696,6 +1712,120 @@ function renderPlacarAoVivo(){
 
     container.appendChild(card);
   });
+}
+
+/* ========== CLASSIFICAÇÃO (ALUNO) ========== */
+
+function renderClassificacao(){
+  const container = document.getElementById("classificacaoContainer");
+  if (!container) return;
+  container.innerHTML = "";
+
+  if (!todosJogos.length){
+    container.textContent = "Nenhum jogo registrado ainda.";
+    return;
+  }
+
+  const tabela = {};
+
+  function ensureTeam(turma){
+    if (!tabela[turma]){
+      tabela[turma] = {
+        turma,
+        jogos: 0,
+        vitorias: 0,
+        empates: 0,
+        derrotas: 0,
+        golsPro: 0,
+        golsContra: 0,
+        saldo: 0,
+        pontos: 0
+      };
+    }
+    return tabela[turma];
+  }
+
+  todosJogos.forEach(j => {
+    if (j.status !== "FINALIZADO") return;
+    if (!j.turma1 || !j.turma2) return;
+
+    const p1 = j.placar1 ?? 0;
+    const p2 = j.placar2 ?? 0;
+
+    const t1 = ensureTeam(j.turma1);
+    const t2 = ensureTeam(j.turma2);
+
+    t1.jogos++; t2.jogos++;
+    t1.golsPro += p1; t1.golsContra += p2;
+    t2.golsPro += p2; t2.golsContra += p1;
+
+    if (p1 > p2){
+      t1.vitorias++; t1.pontos += 3;
+      t2.derrotas++;
+    } else if (p2 > p1){
+      t2.vitorias++; t2.pontos += 3;
+      t1.derrotas++;
+    } else {
+      t1.empates++; t2.empates++;
+      t1.pontos++; t2.pontos++;
+    }
+
+    t1.saldo = t1.golsPro - t1.golsContra;
+    t2.saldo = t2.golsPro - t2.golsContra;
+  });
+
+  const equipes = Object.values(tabela);
+
+  if (!equipes.length){
+    container.textContent = "Nenhum jogo finalizado ainda para calcular a classificação.";
+    return;
+  }
+
+  equipes.sort((a,b) => {
+    if (b.pontos !== a.pontos) return b.pontos - a.pontos;
+    if (b.saldo !== a.saldo) return b.saldo - a.saldo;
+    if (b.golsPro !== a.golsPro) return b.golsPro - a.golsPro;
+    return a.turma.localeCompare(b.turma,"pt-BR");
+  });
+
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr>
+      <th>#</th>
+      <th>Turma</th>
+      <th>J</th>
+      <th>V</th>
+      <th>E</th>
+      <th>D</th>
+      <th>GP</th>
+      <th>GC</th>
+      <th>SG</th>
+      <th>Pts</th>
+    </tr>`;
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  equipes.forEach((t, idx) => {
+    const tr = document.createElement("tr");
+    if (idx === 0){
+      tr.style.fontWeight = "600"; // líder em destaque
+    }
+    tr.innerHTML =
+      "<td>"+(idx+1)+"</td>"+
+      "<td>"+t.turma+"</td>"+
+      "<td>"+t.jogos+"</td>"+
+      "<td>"+t.vitorias+"</td>"+
+      "<td>"+t.empates+"</td>"+
+      "<td>"+t.derrotas+"</td>"+
+      "<td>"+t.golsPro+"</td>"+
+      "<td>"+t.golsContra+"</td>"+
+      "<td>"+t.saldo+"</td>"+
+      "<td>"+t.pontos+"</td>";
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  container.appendChild(table);
 }
 
 /* ========== JOGOS ADMIN: CADASTRAR / EXCLUIR / EDITAR PLACAR ========== */
@@ -1898,6 +2028,7 @@ function mostrarSecao(sec){
   document.getElementById("secInscricao").style.display = (sec==="inscricao"?"block":"none");
   document.getElementById("secInscritos").style.display = (sec==="inscritos"?"block":"none");
   document.getElementById("secJogos").style.display = (sec==="jogos"?"block":"none");
+  document.getElementById("secClassificados").style.display = (sec==="classificados"?"block":"none");
   document.getElementById("secPlacarAoVivo").style.display = (sec==="placar"?"block":"none");
   document.getElementById("adminSection").style.display = (sec==="admin"?"block":"none");
 }
@@ -2002,6 +2133,7 @@ function iniciarListeners(){
     atualizarSelectExcluirJogo();
     renderJogosAluno();
     renderPlacarAoVivo();
+    renderClassificacao();
     renderAdminJogos();
   });
 }
@@ -2223,6 +2355,18 @@ function init(){
       btn.textContent = "🏆 Ver jogos";
     } else {
       mostrarSecao("jogos");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
+  });
+
+  document.getElementById("btnClassificados").addEventListener("click", () => {
+    const sec = document.getElementById("secClassificados").style.display === "block";
+    const btn = document.getElementById("btnClassificados");
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "✅ Classificados";
+    } else {
+      mostrarSecao("classificados");
       btn.textContent = "⬅ Voltar para inscrição";
     }
   });
