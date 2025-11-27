@@ -674,19 +674,6 @@
         <strong>Cadastrar jogo</strong>
         <div class="grid-2" style="margin-top:4px;">
           <div>
-            <label for="jogoSerie">Série</label>
-            <select id="jogoSerie">
-              <option value="">Selecione...</option>
-              <option value="6">6º ano</option>
-              <option value="7">7º ano</option>
-              <option value="8">8º ano</option>
-              <option value="9">9º ano</option>
-              <option value="1">1º ano</option>
-              <option value="2">2º ano</option>
-              <option value="3">3º ano</option>
-            </select>
-          </div>
-          <div>
             <label for="jogoData">Data</label>
             <input type="date" id="jogoData">
           </div>
@@ -695,13 +682,13 @@
           <div>
             <label for="jogoTurma1">Turma 1</label>
             <select id="jogoTurma1">
-              <option value="">Selecione a série primeiro...</option>
+              <option value="">Selecione a turma 1...</option>
             </select>
           </div>
           <div>
             <label for="jogoTurma2">Turma 2</label>
             <select id="jogoTurma2">
-              <option value="">Selecione a série primeiro...</option>
+              <option value="">Selecione a turma 2...</option>
             </select>
           </div>
         </div>
@@ -908,6 +895,13 @@ const TURMAS_NOTURNO = [
   "3ºA","3ºB","3ºC"
 ];
 
+/* TODAS AS TURMAS (para cadastro de jogos sem depender de turno/série) */
+const TODAS_TURMAS = [
+  ...TURMAS_MATUTINO,
+  ...TURMAS_VESPERTINO,
+  ...TURMAS_NOTURNO
+];
+
 function getTurmasPorTurno(turno) {
   if (turno === "Matutino") return TURMAS_MATUTINO;
   if (turno === "Vespertino") return TURMAS_VESPERTINO;
@@ -918,17 +912,6 @@ function getTurmasPorTurno(turno) {
 function getSerieFromTurma(t){
   if (!t) return "";
   return t.charAt(0);
-}
-
-/* NOVA FUNÇÃO: turmas por SÉRIE (independente do turno) */
-function getTurmasPorSerie(serie){
-  if (!serie) return [];
-  const todas = [
-    ...TURMAS_MATUTINO,
-    ...TURMAS_VESPERTINO,
-    ...TURMAS_NOTURNO
-  ];
-  return todas.filter(t => getSerieFromTurma(t) === serie);
 }
 
 /* limites padrão (podem ser alterados nas configs) */
@@ -1722,7 +1705,6 @@ async function cadastrarJogo(){
     alert("Apenas o administrador pode cadastrar jogos.");
     return;
   }
-  const serie = document.getElementById("jogoSerie").value;
   const dataJogo = document.getElementById("jogoData").value;
   const turma1 = document.getElementById("jogoTurma1").value;
   const turma2 = document.getElementById("jogoTurma2").value;
@@ -1730,7 +1712,7 @@ async function cadastrarJogo(){
   const horario = document.getElementById("jogoHorario").value;
   const local = (document.getElementById("jogoLocal").value || "").trim();
 
-  if (!serie || !dataJogo || !turma1 || !turma2 || !modalidade || !horario || !local){
+  if (!dataJogo || !turma1 || !turma2 || !modalidade || !horario || !local){
     alert("Preencha todos os campos do jogo.");
     return;
   }
@@ -1741,7 +1723,6 @@ async function cadastrarJogo(){
 
   try{
     await db.collection("jogos").add({
-      serie: serie,
       dataJogo: dataJogo,
       turma1: turma1,
       turma2: turma2,
@@ -2142,43 +2123,26 @@ function init(){
   filtroTurma.addEventListener("change", renderPublico);
   filtroModalidade.addEventListener("change", renderPublico);
 
-  /* NOVA LÓGICA: SÉRIE -> TURMAS (JOGOS ADMIN) */
-  const jogoSerie = document.getElementById("jogoSerie");
+  /* NOVA LÓGICA: JOGOS ADMIN SEM SÉRIE – TURMAS LIVRES (QUALQUER TURNO) */
   const jogoTurma1 = document.getElementById("jogoTurma1");
   const jogoTurma2 = document.getElementById("jogoTurma2");
 
-  jogoTurma1.innerHTML = '<option value="">Selecione a série primeiro...</option>';
-  jogoTurma2.innerHTML = '<option value="">Selecione a série primeiro...</option>';
+  if (jogoTurma1 && jogoTurma2){
+    jogoTurma1.innerHTML = '<option value="">Selecione a turma 1...</option>';
+    jogoTurma2.innerHTML = '<option value="">Selecione a turma 2...</option>';
 
-  jogoSerie.addEventListener("change", () => {
-    const serie = jogoSerie.value;
-    jogoTurma1.innerHTML = "";
-    jogoTurma2.innerHTML = "";
-    if (!serie){
-      jogoTurma1.innerHTML = '<option value="">Selecione a série primeiro...</option>';
-      jogoTurma2.innerHTML = '<option value="">Selecione a série primeiro...</option>';
-      return;
-    }
-    const turmasSerie = getTurmasPorSerie(serie);
-    const opt1 = document.createElement("option");
-    opt1.value = "";
-    opt1.textContent = "Selecione a turma 1...";
-    jogoTurma1.appendChild(opt1);
-    const opt2 = document.createElement("option");
-    opt2.value = "";
-    opt2.textContent = "Selecione a turma 2...";
-    jogoTurma2.appendChild(opt2);
-    turmasSerie.forEach(t => {
+    TODAS_TURMAS.forEach(t => {
       const o1 = document.createElement("option");
       o1.value = t;
       o1.textContent = t;
       jogoTurma1.appendChild(o1);
+
       const o2 = document.createElement("option");
       o2.value = t;
       o2.textContent = t;
       jogoTurma2.appendChild(o2);
     });
-  });
+  }
 
   const jogoModalidade = document.getElementById("jogoModalidade");
   MODALIDADES.forEach(m => {
