@@ -302,6 +302,30 @@
       color:#8a6d3b;
     }
 
+    /* NOVO: linha / bolinhas para CLASSIFICADOS */
+    .linha-classificado {
+      display:flex;
+      align-items:center;
+      gap:4px;
+      font-size:0.85rem;
+      margin-top:2px;
+    }
+    .bolinha-resultado {
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      display:inline-block;
+    }
+    .bolinha-verde {
+      background: var(--verde);
+    }
+    .bolinha-vermelha {
+      background: var(--vermelho);
+    }
+    .bolinha-neutra {
+      background:#ccc;
+    }
+
     /* overlay e-mail */
     #emailOverlay {
       position:fixed;
@@ -564,7 +588,7 @@
   <!-- JOGOS (ALUNO) -->
   <section class="card" id="secJogos">
     <h2>Jogos</h2>
-    <small>Selecione a série e, se quiser, uma data específica.</small>
+    <small>Selecione a <strong>série</strong> e a <strong>modalidade</strong>. A data é opcional.</small>
 
     <div class="filtros">
       <div>
@@ -581,6 +605,12 @@
         </select>
       </div>
       <div>
+        <label for="filtroModalidadeJogo">Modalidade</label>
+        <select id="filtroModalidadeJogo">
+          <option value="">Selecione...</option>
+        </select>
+      </div>
+      <div>
         <label for="filtroDataJogo">Data (opcional)</label>
         <input type="date" id="filtroDataJogo">
       </div>
@@ -591,8 +621,8 @@
 
   <!-- CLASSIFICAÇÃO / CLASSIFICADOS (ALUNO) -->
   <section class="card" id="secClassificados">
-    <h2>Classificação</h2>
-    <small>Tabela de pontos das turmas com base nos jogos finalizados.</small>
+    <h2>Classificados</h2>
+    <small>Veja, jogo por jogo, qual turma foi classificada (apenas jogos finalizados).</small>
     <div id="classificacaoContainer"></div>
   </section>
 
@@ -723,6 +753,7 @@
       <div class="admin-bloco">
         <strong>Jogos cadastrados</strong>
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
+          <input type="text" id="filtroExcluirJogo" placeholder="Pesquisar jogo (turma, modalidade, data...)" style="flex:1; min-width:200px;">
           <select id="selectExcluirJogo" style="min-width:220px; flex:1;">
             <option value="">Selecione um jogo...</option>
           </select>
@@ -1617,13 +1648,21 @@ function atualizarSelectsAdminPublico(){
 /* ========== JOGOS (ALUNO) ========== */
 
 function renderJogosAluno(){
-  const serie = document.getElementById("filtroSerieJogo").value;
-  const dataFiltro = document.getElementById("filtroDataJogo").value;
+  const serieEl = document.getElementById("filtroSerieJogo");
+  const modalidadeEl = document.getElementById("filtroModalidadeJogo");
+  const dataEl = document.getElementById("filtroDataJogo");
   const container = document.getElementById("listaJogosContainer");
+
+  if (!serieEl || !modalidadeEl || !dataEl || !container) return;
+
+  const serie = serieEl.value;
+  const modalidade = modalidadeEl.value;
+  const dataFiltro = dataEl.value;
+
   container.innerHTML = "";
 
-  if (!serie){
-    container.textContent = "Selecione uma série para ver os jogos.";
+  if (!serie || !modalidade){
+    container.textContent = "Selecione a série e a modalidade para ver os jogos.";
     return;
   }
 
@@ -1631,6 +1670,7 @@ function renderJogosAluno(){
     const s1 = getSerieFromTurma(j.turma1);
     const s2 = getSerieFromTurma(j.turma2);
     if (s1 !== serie && s2 !== serie) return false;
+    if (j.modalidade !== modalidade) return false;
     if (dataFiltro && j.dataJogo !== dataFiltro) return false;
     return true;
   });
@@ -1714,7 +1754,7 @@ function renderPlacarAoVivo(){
   });
 }
 
-/* ========== CLASSIFICAÇÃO (ALUNO) ========== */
+/* ========== CLASSIFICAÇÃO / CLASSIFICADOS (ALUNO) ========== */
 
 function renderClassificacao(){
   const container = document.getElementById("classificacaoContainer");
@@ -1726,106 +1766,81 @@ function renderClassificacao(){
     return;
   }
 
-  const tabela = {};
+  const finalizados = todosJogos.filter(j => j.status === "FINALIZADO");
 
-  function ensureTeam(turma){
-    if (!tabela[turma]){
-      tabela[turma] = {
-        turma,
-        jogos: 0,
-        vitorias: 0,
-        empates: 0,
-        derrotas: 0,
-        golsPro: 0,
-        golsContra: 0,
-        saldo: 0,
-        pontos: 0
-      };
-    }
-    return tabela[turma];
+  if (!finalizados.length){
+    container.textContent = "Nenhum jogo finalizado ainda para mostrar classificados.";
+    return;
   }
 
-  todosJogos.forEach(j => {
-    if (j.status !== "FINALIZADO") return;
-    if (!j.turma1 || !j.turma2) return;
+  // ordenar por data + horário
+  finalizados.sort((a,b) => {
+    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
+    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
+    return da.localeCompare(db);
+  });
+
+  finalizados.forEach(j => {
+    const card = document.createElement("div");
+    card.className = "jogo-bloco";
+
+    const header = document.createElement("div");
+    header.style.fontWeight = "600";
+    header.style.marginBottom = "4px";
+    header.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-");
+    card.appendChild(header);
 
     const p1 = j.placar1 ?? 0;
     const p2 = j.placar2 ?? 0;
 
-    const t1 = ensureTeam(j.turma1);
-    const t2 = ensureTeam(j.turma2);
+    let vencedor = null;
+    if (p1 > p2) vencedor = "t1";
+    else if (p2 > p1) vencedor = "t2";
 
-    t1.jogos++; t2.jogos++;
-    t1.golsPro += p1; t1.golsContra += p2;
-    t2.golsPro += p2; t2.golsContra += p1;
+    function montarLinha(turma, placar, pos){
+      const linha = document.createElement("div");
+      linha.className = "linha-classificado";
+      const bol = document.createElement("span");
+      bol.className = "bolinha-resultado";
 
-    if (p1 > p2){
-      t1.vitorias++; t1.pontos += 3;
-      t2.derrotas++;
-    } else if (p2 > p1){
-      t2.vitorias++; t2.pontos += 3;
-      t1.derrotas++;
+      if (!vencedor){
+        bol.classList.add("bolinha-neutra");
+      } else if ((vencedor === "t1" && pos === 1) || (vencedor === "t2" && pos === 2)){
+        bol.classList.add("bolinha-verde");
+      } else {
+        bol.classList.add("bolinha-vermelha");
+      }
+
+      const nomeSpan = document.createElement("span");
+      nomeSpan.textContent = turma || "-";
+      nomeSpan.style.marginRight = "6px";
+
+      const placarSpan = document.createElement("strong");
+      placarSpan.textContent = placar;
+
+      linha.appendChild(bol);
+      linha.appendChild(nomeSpan);
+      linha.appendChild(document.createTextNode(" — "));
+      linha.appendChild(placarSpan);
+      return linha;
+    }
+
+    card.appendChild(montarLinha(j.turma1, p1, 1));
+    card.appendChild(montarLinha(j.turma2, p2, 2));
+
+    const info = document.createElement("div");
+    info.style.marginTop = "4px";
+    if (vencedor === "t1"){
+      info.textContent = "Classificado: " + (j.turma1 || "-");
+    } else if (vencedor === "t2"){
+      info.textContent = "Classificado: " + (j.turma2 || "-");
     } else {
-      t1.empates++; t2.empates++;
-      t1.pontos++; t2.pontos++;
+      info.textContent = "Empate – sem classificado definido.";
     }
+    card.appendChild(info);
 
-    t1.saldo = t1.golsPro - t1.golsContra;
-    t2.saldo = t2.golsPro - t2.golsContra;
+    container.appendChild(card);
   });
-
-  const equipes = Object.values(tabela);
-
-  if (!equipes.length){
-    container.textContent = "Nenhum jogo finalizado ainda para calcular a classificação.";
-    return;
-  }
-
-  equipes.sort((a,b) => {
-    if (b.pontos !== a.pontos) return b.pontos - a.pontos;
-    if (b.saldo !== a.saldo) return b.saldo - a.saldo;
-    if (b.golsPro !== a.golsPro) return b.golsPro - a.golsPro;
-    return a.turma.localeCompare(b.turma,"pt-BR");
-  });
-
-  const table = document.createElement("table");
-  const thead = document.createElement("thead");
-  thead.innerHTML = `
-    <tr>
-      <th>#</th>
-      <th>Turma</th>
-      <th>J</th>
-      <th>V</th>
-      <th>E</th>
-      <th>D</th>
-      <th>GP</th>
-      <th>GC</th>
-      <th>SG</th>
-      <th>Pts</th>
-    </tr>`;
-  table.appendChild(thead);
-
-  const tbody = document.createElement("tbody");
-  equipes.forEach((t, idx) => {
-    const tr = document.createElement("tr");
-    if (idx === 0){
-      tr.style.fontWeight = "600"; // líder em destaque
-    }
-    tr.innerHTML =
-      "<td>"+(idx+1)+"</td>"+
-      "<td>"+t.turma+"</td>"+
-      "<td>"+t.jogos+"</td>"+
-      "<td>"+t.vitorias+"</td>"+
-      "<td>"+t.empates+"</td>"+
-      "<td>"+t.derrotas+"</td>"+
-      "<td>"+t.golsPro+"</td>"+
-      "<td>"+t.golsContra+"</td>"+
-      "<td>"+t.saldo+"</td>"+
-      "<td>"+t.pontos+"</td>";
-    tbody.appendChild(tr);
-  });
-  table.appendChild(tbody);
-  container.appendChild(table);
 }
 
 /* ========== JOGOS ADMIN: CADASTRAR / EXCLUIR / EDITAR PLACAR ========== */
@@ -1879,11 +1894,17 @@ async function cadastrarJogo(){
 
 function atualizarSelectExcluirJogo(){
   const sel = document.getElementById("selectExcluirJogo");
+  if (!sel) return;
+  const filtroInput = document.getElementById("filtroExcluirJogo");
+  const termo = filtroInput ? (filtroInput.value || "").toLowerCase() : "";
+
   sel.innerHTML = '<option value="">Selecione um jogo...</option>';
   todosJogos.forEach(j => {
+    const label = (j.modalidade || "")+" — "+formatarDataBR(j.dataJogo)+" "+(j.horarioJogo || "")+" — "+(j.turma1 || "")+" x "+(j.turma2 || "");
+    if (termo && !label.toLowerCase().includes(termo)) return;
     const opt = document.createElement("option");
     opt.value = j.id;
-    opt.textContent = (j.modalidade || "")+" — "+formatarDataBR(j.dataJogo)+" "+(j.horarioJogo || "")+" — "+(j.turma1 || "")+" x "+(j.turma2 || "");
+    opt.textContent = label;
     sel.appendChild(opt);
   });
 }
@@ -1972,7 +1993,7 @@ function renderAdminJogos(){
     const labelP1 = document.createElement("span");
     labelP1.textContent = (j.turma1 || "T1")+":";
     const labelP2 = document.createElement("span");
-    labelP2.textContent = (j.turma2 || "T2")+":";
+    labelP2.textContent = (j.turma2 || "T2")+":"; 
 
     const btnSalvar = document.createElement("button");
     btnSalvar.className = "btn btn-primaria btnSalvarJogo";
@@ -2399,8 +2420,29 @@ function init(){
   document.getElementById("adminFiltroModalidade").addEventListener("change", renderAdmin);
   document.getElementById("btnCancelarInscricao").addEventListener("click", cancelarInscricao);
 
+  // NOVO: preencher modalidades para filtro de jogos (aluno)
+  const filtroModalidadeJogo = document.getElementById("filtroModalidadeJogo");
+  if (filtroModalidadeJogo){
+    filtroModalidadeJogo.innerHTML = '<option value="">Selecione...</option>';
+    MODALIDADES.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = m;
+      filtroModalidadeJogo.appendChild(opt);
+    });
+    filtroModalidadeJogo.addEventListener("change", renderJogosAluno);
+  }
+
+  // filtros jogos (aluno)
   document.getElementById("filtroSerieJogo").addEventListener("change", renderJogosAluno);
   document.getElementById("filtroDataJogo").addEventListener("change", renderJogosAluno);
+
+  // NOVO: filtro de pesquisa para excluir jogo (admin)
+  const filtroExcluirJogo = document.getElementById("filtroExcluirJogo");
+  if (filtroExcluirJogo){
+    filtroExcluirJogo.addEventListener("input", atualizarSelectExcluirJogo);
+  }
+
   document.getElementById("btnCadastrarJogo").addEventListener("click", cadastrarJogo);
   document.getElementById("btnExcluirJogo").addEventListener("click", excluirJogo);
 
