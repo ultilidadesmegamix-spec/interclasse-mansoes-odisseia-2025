@@ -206,6 +206,15 @@
     .filtros > div {
       min-width:150px;
     }
+
+    /* Responsividade tabela inscrições (admin) */
+    #tab-inscricoes {
+      overflow-x: auto;
+    }
+    #tab-inscricoes table {
+      min-width: 700px;
+    }
+
     /* admin */
     #adminSection { display:none; }
     .admin-header {
@@ -851,7 +860,10 @@
         <div class="grid-2" style="margin-top:4px;">
           <div>
             <label for="profSenhaCadastro">Senha</label>
-            <input type="text" id="profSenhaCadastro" placeholder="Senha que ele vai usar">
+            <div style="display:flex; gap:6px; align-items:center;">
+              <input type="text" id="profSenhaCadastro" placeholder="Senha que ele vai usar" style="flex:1;">
+              <button type="button" class="btn btn-primaria" id="btnGerarSenhaProfessor">Gerar senha</button>
+            </div>
           </div>
         </div>
         <button class="btn btn-primaria" style="margin-top:6px;" id="btnAdicionarProfessor">➕ Adicionar acesso</button>
@@ -2842,6 +2854,19 @@ function init(){
     e.preventDefault();
     adicionarProfessorAcesso();
   });
+
+  // Botão Gerar Senha (professores)
+  const btnGerarSenha = document.getElementById("btnGerarSenhaProfessor");
+  if (btnGerarSenha){
+    btnGerarSenha.addEventListener("click", e => {
+      e.preventDefault();
+      let senha = "";
+      for (let i = 0; i < 5; i++) {
+        senha += Math.floor(Math.random() * 10);
+      }
+      document.getElementById("profSenhaCadastro").value = senha;
+    });
+  }
 
   // selects do painel de professores
   const profTurnoSelect = document.getElementById("profTurnoSelect");
