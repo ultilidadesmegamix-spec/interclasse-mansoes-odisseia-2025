@@ -52,6 +52,7 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+      align-items:center;
     }
     .btn {
       border: none;
@@ -72,6 +73,17 @@
       background: transparent;
       border: 1px solid rgba(255,255,255,0.6);
       color: #fff;
+    }
+
+    /* contador estilizado */
+    #contadorInscricoes {
+      background: rgba(255,255,255,0.95);
+      color: var(--azul);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
     }
 
     main {
@@ -485,6 +497,9 @@
     <small id="subEvento">Inscrições para o Movimenta Odisseia</small>
   </div>
   <div class="header-right">
+    <!-- Contador adicionado -->
+    <div id="contadorInscricoes">Inscrições: 0</div>
+
     <button class="btn btn-primaria" id="btnToggleInscritos">👀 Ver inscritos</button>
     <button class="btn btn-primaria" id="btnVerJogos">🏆 Ver jogos</button>
     <button class="btn btn-primaria" id="btnClassificados">✅ Classificados</button>
@@ -2650,6 +2665,12 @@ function configurarAbasAdmin(){
 
 /* ========== LISTENERS FIRESTORE ========== */
 
+function atualizarContadorGlobal(){
+  const el = document.getElementById("contadorInscricoes");
+  if (!el) return;
+  el.textContent = "Inscrições: " + (todasInscricoes.length || 0);
+}
+
 function iniciarListeners(){
   // Professores (acesso)
   db.collection("professoresAcesso").onSnapshot(snap => {
@@ -2699,6 +2720,9 @@ function iniciarListeners(){
         }
       });
     });
+    // atualizar contador visível no topo
+    atualizarContadorGlobal();
+
     atualizarDisponibilidadeModalidades();
     atualizarSelectsAdminPublico();
     renderPublico();
