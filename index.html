@@ -818,9 +818,9 @@
           <h3 id="relatorioTituloLinha1">Relatório de inscritos – Movimenta Odisseia</h3>
           <small id="relatorioTituloLinha2">Selecione turno, turma e modalidade para gerar o relatório.</small>
         </div>
-        <div style="margin-top:6px; display:flex; justify-content:flex-end;">
+        <div style="margin-top:6px; display:flex; justify-content:flex-end; gap:8px;">
           <button class="btn btn-primaria" id="btnImprimirRelatorio">🖨️ Imprimir</button>
-          <button class="btn btn-primaria" id="btnImprimirTodaTurma" style="margin-left:8px;">🖨️ Imprimir Toda Turma</button>
+          <button class="btn btn-primaria" id="btnImprimirTodaTurma">🖨️ Imprimir Toda Turma</button>
         </div>
       </div>
 
@@ -1401,6 +1401,7 @@ function atualizarDisponibilidadeModalidades(){
     const mod = span.dataset.mod;
     if (!turma){
       span.textContent = mod + " (selecione turno e turma)";
+
       span.classList.remove("modalidade-lotado");
       return;
     }
@@ -1769,7 +1770,7 @@ function renderRelatorio(){
   lista = lista.slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
 
   if (!lista.length){
-    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – 0 inscritos.`; 
+    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – 0 inscritos.`;
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 8;
@@ -1815,7 +1816,7 @@ function renderRelatorio(){
   });
 }
 
-/* NOVA FUNÇÃO: renderiza relatório com TODA A TURMA (todas as modalidades listadas por aluno) */
+/* NOVA FUNÇÃO: Relatório de TODA TURMA (todas as modalidades) */
 function renderRelatorioTodaTurma(){
   const tbody = document.querySelector("#tabelaRelatorio tbody");
   const turnoEl = document.getElementById("relatorioTurno");
@@ -1829,21 +1830,19 @@ function renderRelatorioTodaTurma(){
   const turma = turmaEl.value;
 
   tbody.innerHTML = "";
-
-  tituloLinha1.textContent = "Relatório de inscritos – " + (configEvento.nomeEvento || "Movimenta Odisseia");
+  tituloLinha1.textContent = "Relatório completo da turma – " + (configEvento.nomeEvento || "Movimenta Odisseia");
 
   if (!turno || !turma){
-    tituloLinha2.textContent = "Selecione turno e turma para gerar o relatório.";
+    tituloLinha2.textContent = "Selecione turno e turma para gerar o relatório da turma inteira.";
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 8;
-    td.textContent = "Selecione turno e turma para gerar o relatório.";
+    td.textContent = "Selecione turno e turma para gerar o relatório da turma inteira.";
     tr.appendChild(td);
     tbody.appendChild(tr);
     return;
   }
 
-  // pega todas as inscrições da turma (independente de modalidade)
   let lista = todasInscricoes.filter(ins => {
     if (ins.turno !== turno) return false;
     if (ins.turma !== turma) return false;
@@ -1853,11 +1852,11 @@ function renderRelatorioTodaTurma(){
   lista = lista.slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
 
   if (!lista.length){
-    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} – 0 inscritos.`;
+    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} – Total: 0 inscritos.`;
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 8;
-    td.textContent = "Nenhuma inscrição para esses filtros.";
+    td.textContent = "Nenhuma inscrição nesta turma.";
     tr.appendChild(td);
     tbody.appendChild(tr);
     return;
@@ -1881,7 +1880,7 @@ function renderRelatorioTodaTurma(){
     tdSexo.textContent = ins.sexo || "";
     tdTurma.textContent = ins.turma || "";
     tdTurno.textContent = ins.turno || "";
-    tdModalidades.textContent = (ins.modalidades || []).join(", ") || "-";
+    tdModalidades.textContent = (ins.modalidades || []).join(", ");
     tdEmail.textContent = ins.email || "";
     tdCamisa.textContent = ins.camisaNumero || "";
     tdObs.textContent = ins.observacoes || "";
@@ -1992,7 +1991,6 @@ function renderJogosAluno(){
     div.className = "jogo-bloco";
     div.innerHTML =
       "<strong>"+(j.modalidade || "-")+"</strong><br>"+
-
       "Data: "+formatarDataBR(j.dataJogo)+" — Horário: "+(j.horarioJogo || "-")+"<br>"+
       "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+"<br>"+
       "Local: "+(j.localJogo || "-");
