@@ -669,7 +669,6 @@
       <button class="admin-tab-btn" data-tab="jogos">🏆 Jogos</button>
       <button class="admin-tab-btn" data-tab="relatorio">🖨️ Imprimir relatório</button>
       <button class="admin-tab-btn" data-tab="professores">👩‍🏫 Professores</button>
-      <button class="admin-tab-btn" data-tab="autorizacoes">🔓 Autorizações</button>
       <button class="admin-tab-btn" data-tab="config">⚙️ Configurações</button>
     </div>
 
@@ -887,48 +886,6 @@
       </div>
     </div>
 
-    <!-- TAB AUTORIZAÇÕES (NOVO) -->
-    <div class="admin-tab-content" id="tab-autorizacoes">
-      <div class="admin-bloco">
-        <strong>Autorização por turma</strong>
-        <small style="display:block;margin-top:4px;">
-          Se quiser permitir uma modalidade mesmo quando os limites estiverem atingidos, marque <em>Permitir</em>.
-          Use <em>Aplicar independentemente do gênero</em> para que regras por sexo (ex.: Queimada) sejam ignoradas.
-        </small>
-
-        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
-          <div style="min-width:200px;">
-            <label for="authTurnoSelect">Turno</label>
-            <select id="authTurnoSelect">
-              <option value="">Selecione...</option>
-              <option value="Matutino">Matutino</option>
-              <option value="Vespertino">Vespertino</option>
-              <option value="Noturno">Noturno</option>
-            </select>
-          </div>
-          <div style="min-width:200px;">
-            <label for="authTurmaSelect">Turma</label>
-            <select id="authTurmaSelect">
-              <option value="">Selecione o turno primeiro...</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="authListaModalidades" style="margin-top:10px;"></div>
-
-        <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end;">
-          <button class="btn btn-primaria" id="btnSalvarAutorizacoes">💾 Salvar autorizações</button>
-          <button class="btn" id="btnRecarregarAutorizacoes" style="background:#f1f3fb;">🔄 Recarregar</button>
-        </div>
-      </div>
-
-      <div class="admin-bloco">
-        <strong>Autorização atual (visual)</strong>
-        <small style="display:block;margin-top:4px;">Mostra as configurações salvas para a turma selecionada.</small>
-        <div id="authVisual" style="margin-top:6px; font-size:0.9rem;"></div>
-      </div>
-    </div>
-
     <!-- TAB CONFIG -->
     <div class="admin-tab-content" id="tab-config">
       <div class="admin-bloco">
@@ -972,6 +929,17 @@
           <div><label for="cfgTenis">TÊNIS DE MESA</label><input type="number" id="cfgTenis" min="1"></div>
           <div><label for="cfgXadrez">XADREZ</label><input type="number" id="cfgXadrez" min="1"></div>
           <div><label for="cfgVolei">VOLEI</label><input type="number" id="cfgVolei" min="1"></div>
+        </div>
+      </div>
+
+      <div class="admin-bloco">
+        <strong>Autorizações (ignorar limites por turma)</strong>
+        <small style="display:block;margin-top:2px;">Selecione a turma e marque as modalidades que devem ser autorizadas — quando marcada, a modalidade será aceita mesmo que os limites estejam preenchidos (aplica-se à QUEIMADA também).</small>
+        <div style="display:flex; gap:8px; align-items:center; margin-top:6px; flex-wrap:wrap;">
+          <select id="cfgAutTurma" style="min-width:220px;">
+            <option value="">Selecione a turma...</option>
+          </select>
+          <div id="cfgAutModalidadesContainer" style="flex:1;"></div>
         </div>
       </div>
 
@@ -1138,16 +1106,14 @@ let configEvento = {
   bloquearAgora: false,
   nomeEvento: "Movimenta Odisseia",
   anoEvento: "",
-  textoInicial: ""
+  textoInicial: "",
+  autorizacoes: {} // estrutura: { turma: { "FUTSAL": true, "QUEIMADA MISTA": true, ... } }
 };
 
 let inscricoesEncerradas = false;
 let emailAtual = null;
 let isAdmin = false;
 const ADMIN_PASSWORD = "52090949";
-
-/* NOVO: autorizações por turma (lidas do Firestore) */
-let autorizacoesPorTurma = {}; // { turma: { "FUTSAL": {permitido:boolean, ignoraGenero:boolean}, ... } }
 
 /* ========== FUNÇÕES AUXILIARES ========== */
 
@@ -1247,11 +1213,13 @@ async function carregarConfiguracoes(){
       if (d.nomeEvento) configEvento.nomeEvento = d.nomeEvento;
       if (d.anoEdicao) configEvento.anoEvento = d.anoEdicao;
       if (d.textoInicial) configEvento.textoInicial = d.textoInicial;
+      if (d.autorizacoes) configEvento.autorizacoes = d.autorizacoes || {};
     }
   }catch(e){
     console.error("Erro ao carregar configurações:",e);
   }
 
+  // Atualiza campos da UI com config carregada
   document.getElementById("cfgDataLimite").value = configEvento.dataLimite || "";
   document.getElementById("cfgMsgEncerradas").value = configEvento.msgEncerradas || "";
   document.getElementById("cfgBloquearAgora").checked = !!configEvento.bloquearAgora;
@@ -1274,6 +1242,9 @@ async function carregarConfiguracoes(){
   } else if (configEvento.nomeEvento && configEvento.anoEvento){
     document.getElementById("subEvento").textContent = "Inscrições para o " + configEvento.nomeEvento + " " + configEvento.anoEvento;
   }
+
+  // carregar autorizações na UI (se houver)
+  atualizarAutorizacoesUI();
 
   atualizarStatusInscricoes();
   atualizarDisponibilidadeModalidades();
@@ -1314,6 +1285,14 @@ async function salvarConfiguracoes(){
     "VOLEI": limVolei
   };
 
+  // coletar autorizações (estado atual da UI)
+  const autorizacoes = {};
+  const selTurmaAut = document.getElementById("cfgAutTurma");
+  if (selTurmaAut){
+    // vamos usar configEvento.autorizacoes já mantida no código
+    // antes de salvar, atualizamos configEvento.autorizacoes a partir da UI geral
+    // para simplicidade, usamos configEvento.autorizacoes atual (a UI já sincroniza ao selecionar turma)
+  }
   try{
     await db.collection("config").doc("geral").set({
       dataLimiteInscricao: dataLimite || null,
@@ -1325,7 +1304,8 @@ async function salvarConfiguracoes(){
       limitesModalidadeTurma: limitesModalidadeTurma,
       nomeEvento: nomeEvento,
       anoEdicao: anoEvento,
-      textoInicial: textoInicial
+      textoInicial: textoInicial,
+      autorizacoes: configEvento.autorizacoes || {}
     }, { merge:true });
 
     configEvento.dataLimite = dataLimite || null;
@@ -1353,134 +1333,61 @@ async function salvarConfiguracoes(){
   }
 }
 
-/* ========== AUTORIZAÇÕES (NOVO) ==========
-   - salva em collection "autorizacoes" com doc ID = turma
-   - estrutura: { "FUTSAL": { permit: bool, ignoraGenero: bool }, ... }
-*/
+/* ========== AUTORIZAÇÕES UI (novidade) ========== */
 
-function renderAutorizacoesUIForTurma(turma){
-  const container = document.getElementById("authListaModalidades");
-  const visual = document.getElementById("authVisual");
-  container.innerHTML = "";
-  visual.innerHTML = "";
+function atualizarAutorizacoesUI(){
+  // popula select de turmas no bloco de autorizações
+  const sel = document.getElementById("cfgAutTurma");
+  const cont = document.getElementById("cfgAutModalidadesContainer");
+  if (!sel || !cont) return;
+  sel.innerHTML = '<option value="">Selecione a turma...</option>';
+  TODAS_TURMAS.forEach(t => {
+    const o = document.createElement("option");
+    o.value = t; o.textContent = t;
+    sel.appendChild(o);
+  });
 
-  if (!turma){
-    container.textContent = "Selecione uma turma para editar autorizações.";
-    return;
-  }
-
-  const current = autorizacoesPorTurma[turma] || {};
-
+  // construir checkboxes de modalidades (apenas uma vez)
+  cont.innerHTML = "";
   MODALIDADES.forEach(m => {
-    const bloco = document.createElement("div");
-    bloco.style.display = "flex";
-    bloco.style.alignItems = "center";
-    bloco.style.justifyContent = "space-between";
-    bloco.style.padding = "8px";
-    bloco.style.borderRadius = "8px";
-    bloco.style.background = "#fff";
-    bloco.style.border = "1px solid #e6ecfa";
-    bloco.style.marginBottom = "6px";
-
-    const left = document.createElement("div");
-    left.style.display = "flex";
-    left.style.flexDirection = "column";
-
-    const lbl = document.createElement("div");
-    lbl.style.fontWeight = "600";
-    lbl.textContent = m;
-    left.appendChild(lbl);
-
-    const sub = document.createElement("div");
-    sub.style.fontSize = "0.85rem";
-    sub.style.color = "#555";
-    sub.textContent = "Permitir inscrição mesmo com limite atingido. Use com responsabilidade.";
-    left.appendChild(sub);
-
-    const right = document.createElement("div");
-    right.style.display = "flex";
-    right.style.flexDirection = "column";
-    right.style.alignItems = "flex-end";
-    right.style.gap = "6px";
-
-    const chkPermit = document.createElement("label");
-    chkPermit.style.fontSize = "0.85rem";
-    chkPermit.innerHTML = `<input type="checkbox" data-mod="${m}" class="auth-permit"> Permitir`;
-
-    const chkIgnora = document.createElement("label");
-    chkIgnora.style.fontSize = "0.85rem";
-    chkIgnora.innerHTML = `<input type="checkbox" data-mod="${m}" class="auth-ignoragenero"> Aplicar independentemente do gênero`;
-
-    // set current values
-    if (current[m]){
-      if (current[m].permitido) chkPermit.querySelector("input").checked = true;
-      if (current[m].ignoraGenero) chkIgnora.querySelector("input").checked = true;
-    }
-
-    right.appendChild(chkPermit);
-    right.appendChild(chkIgnora);
-
-    bloco.appendChild(left);
-    bloco.appendChild(right);
-    container.appendChild(bloco);
+    const id = "cfgAutChk_" + m.replace(/\s+/g,"_");
+    const wrapper = document.createElement("label");
+    wrapper.style.marginRight = "10px";
+    wrapper.style.fontSize = "0.9rem";
+    wrapper.style.display = "inline-flex";
+    wrapper.style.alignItems = "center";
+    wrapper.style.gap = "6px";
+    const chk = document.createElement("input");
+    chk.type = "checkbox";
+    chk.id = id;
+    chk.dataset.mod = m;
+    chk.className = "cfgAutChk";
+    wrapper.appendChild(chk);
+    const span = document.createElement("span");
+    span.textContent = "Permitir " + m;
+    wrapper.appendChild(span);
+    cont.appendChild(wrapper);
   });
 
-  // visual summary
-  const lines = [];
-  MODALIDADES.forEach(m => {
-    const cur = current[m] || { permitido:false, ignoraGenero:false };
-    lines.push(`${m}: ${cur.permitido ? "PERMITIDO" : "PADRÃO"} ${cur.ignoraGenero ? "(IGNORA GÊNERO)" : ""}`);
+  // quando selecionar turma, preencher checkboxes com configEvento.autorizacoes[turma]
+  sel.addEventListener("change", () => {
+    const turma = sel.value;
+    const autorz = (configEvento.autorizacoes && configEvento.autorizacoes[turma]) || {};
+    const chks = document.querySelectorAll(".cfgAutChk");
+    chks.forEach(chk => {
+      const mod = chk.dataset.mod;
+      chk.checked = !!autorz[mod];
+      // escuta alteração para atualizar configEvento em tempo real
+      chk.onchange = () => {
+        if (!configEvento.autorizacoes) configEvento.autorizacoes = {};
+        if (!configEvento.autorizacoes[turma]) configEvento.autorizacoes[turma] = {};
+        configEvento.autorizacoes[turma][mod] = chk.checked ? true : false;
+      };
+    });
   });
-  visual.innerHTML = "<pre style='white-space:pre-wrap; margin:0; padding:8px; background:#fff; border:1px solid #e6ecfa; border-radius:6px;'>"+lines.join("\n")+"</pre>";
 }
 
-async function salvarAutorizacoesParaTurma(turma){
-  if (!isAdmin){
-    alert("Apenas o administrador pode salvar autorizações.");
-    return;
-  }
-  if (!turma){
-    alert("Selecione a turma.");
-    return;
-  }
-  const container = document.getElementById("authListaModalidades");
-  const permisos = {};
-  container.querySelectorAll(".auth-permit").forEach(el => {
-    const mod = el.dataset.mod;
-    const permitido = el.checked;
-    const ignora = (container.querySelector('.auth-ignoragenero[data-mod="'+mod+'"]') || {}).checked || false;
-    permisos[mod] = { permitido: !!permitido, ignoraGenero: !!ignora };
-  });
-
-  try{
-    await db.collection("autorizacoes").doc(turma).set(permisos, { merge:true });
-    alert("Autorizações salvas para a turma " + turma);
-  }catch(e){
-    console.error(e);
-    alert("Erro ao salvar autorizações.");
-  }
-}
-
-function atualizarVisualAutorizacoes(turma){
-  if (!turma) return;
-  const visual = document.getElementById("authVisual");
-  const current = autorizacoesPorTurma[turma] || {};
-  const lines = [];
-  MODALIDADES.forEach(m => {
-    const cur = current[m] || { permitido:false, ignoraGenero:false };
-    lines.push(`${m}: ${cur.permitido ? "PERMITIDO" : "PADRÃO"} ${cur.ignoraGenero ? "(IGNORA GÊNERO)" : ""}`);
-  });
-  visual.innerHTML = "<pre style='white-space:pre-wrap; margin:0; padding:8px; background:#fff; border:1px solid #e6ecfa; border-radius:6px;'>"+lines.join("\n")+"</pre>";
-}
-
-/* ========== DISPONIBILIDADE MODALIDADES (ATUALIZADO COM AUTORIZAÇÕES) ========== */
-
-function isAutorizadoParaTurmaModalidade(turma, modalidade){
-  if (!turma || !modalidade) return null;
-  const auth = autorizacoesPorTurma[turma];
-  if (!auth || !auth[modalidade]) return null;
-  return auth[modalidade]; // {permitido, ignoraGenero}
-}
+/* ========== DISPONIBILIDADE MODALIDADES ========== */
 
 function atualizarDisponibilidadeModalidades(){
   const turma = document.getElementById("turma").value;
@@ -1496,29 +1403,21 @@ function atualizarDisponibilidadeModalidades(){
       return;
     }
 
-    const auth = isAutorizadoParaTurmaModalidade(turma, mod);
+    // se autorizado para essa turma/ modalidade -> mostrar "AUTORIZADO"
+    const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
 
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
       const gen = countsQueimadaGenero[turma] || {Masculino:0, Feminino:0};
-      span.textContent = mod + " ("+tot+"/"+LIMITE_QUEIMADA_TOTAL+" / Meninos: "+gen.Masculino+"/"+LIMITE_QUEIMADA_POR_SEXO+" / Meninas: "+gen.Feminino+"/"+LIMITE_QUEIMADA_POR_SEXO+")";
-      // se autorizado e permitido, não marca como lotado (override)
-      if (!auth || !auth.permitido){
-        if (tot >= LIMITE_QUEIMADA_TOTAL) span.classList.add("modalidade-lotado");
-        else span.classList.remove("modalidade-lotado");
-      } else {
-        span.classList.remove("modalidade-lotado");
-      }
+      span.textContent = mod + " ("+tot+"/"+LIMITE_QUEIMADA_TOTAL+" / Meninos: "+gen.Masculino+"/"+LIMITE_QUEIMADA_POR_SEXO+" / Meninas: "+gen.Feminino+"/"+LIMITE_QUEIMADA_POR_SEXO+")" + (autorizada ? " — AUTORIZADO" : "");
+      if (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada) span.classList.add("modalidade-lotado");
+      else span.classList.remove("modalidade-lotado");
     } else {
       const lim = LIMITE_MODALIDADE_TURMA[mod] || 0;
       const qtd = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      span.textContent = mod + " ("+qtd+"/"+lim+" vagas)";
-      if (!auth || !auth.permitido){
-        if (qtd >= lim) span.classList.add("modalidade-lotado");
-        else span.classList.remove("modalidade-lotado");
-      } else {
-        span.classList.remove("modalidade-lotado");
-      }
+      span.textContent = mod + " ("+qtd+"/"+lim+" vagas)" + (autorizada ? " — AUTORIZADO" : "");
+      if (qtd >= lim && !autorizada) span.classList.add("modalidade-lotado");
+      else span.classList.remove("modalidade-lotado");
     }
   });
 
@@ -1530,49 +1429,47 @@ function atualizarDisponibilidadeModalidades(){
       return;
     }
 
-    const auth = isAutorizadoParaTurmaModalidade(turma, mod);
+    const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
 
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
       const gen = countsQueimadaGenero[turma] || {Masculino:0, Feminino:0};
-      // Se autorizado e permitido -> libera independente de limites (ou ainda pode desativar apenas ignoraGenero)
-      if (auth && auth.permitido){
-        chk.disabled = false;
-        continue;
-      }
-      if (!sexo || tot >= LIMITE_QUEIMADA_TOTAL){
+      if (!sexo || (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada)){
         chk.disabled = true; chk.checked = false; return;
       }
-      if (sexo === "Masculino" && gen.Masculino >= LIMITE_QUEIMADA_POR_SEXO){
+      if (sexo === "Masculino" && gen.Masculino >= LIMITE_QUEIMADA_POR_SEXO && !autorizada){
         chk.disabled = true; chk.checked = false; return;
       }
-      if (sexo === "Feminino" && gen.Feminino >= LIMITE_QUEIMADA_POR_SEXO){
+      if (sexo === "Feminino" && gen.Feminino >= LIMITE_QUEIMADA_POR_SEXO && !autorizada){
         chk.disabled = true; chk.checked = false; return;
       }
       chk.disabled = false;
     } else {
       const lim = LIMITE_MODALIDADE_TURMA[mod] || 0;
       const qtd = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      if (auth && auth.permitido){
-        chk.disabled = false;
+      if (qtd >= lim && !autorizada){
+        chk.disabled = true; chk.checked = false;
       } else {
-        if (qtd >= lim){
-          chk.disabled = true; chk.checked = false;
-        } else {
-          chk.disabled = false;
-        }
+        chk.disabled = false;
       }
     }
   });
 }
 
-/* ========== INSCRIÇÃO (ATUALIZADO COM AUTORIZAÇÕES) ========== */
+/* ========== INSCRIÇÃO ========== */
 
 async function handleSubmitInscricao(e){
   e.preventDefault();
   if (inscricoesEncerradas){
     msgForm(configEvento.msgEncerradas || "As inscrições foram encerradas.", false);
     return;
+  }
+  // primeiro tente emailAtual -> localStorage fallback
+  if (!emailAtual){
+    try{
+      const fromStorage = localStorage.getItem('insc_email');
+      if (validarEmail(fromStorage)) emailAtual = fromStorage;
+    }catch(e){}
   }
   if (!emailAtual || !validarEmail(emailAtual)){
     alert("Informe um e-mail válido antes de se inscrever.");
@@ -1611,36 +1508,15 @@ async function handleSubmitInscricao(e){
     }
   }
 
+  // verificação por modalidade com consideração de autorizações
   for (const mod of mods){
-    const auth = isAutorizadoParaTurmaModalidade(turma, mod);
+    // se existe autorização para a turma/mod => pular validação
+    const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
+    if (autorizada) continue;
 
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
       const gen = countsQueimadaGenero[turma] || {Masculino:0,Feminino:0};
-
-      // se autorizado com permit:true -> se ignoraGenero true então pula todas as checagens
-      if (auth && auth.permitido && auth.ignoraGenero){
-        // permitido independentemente do gênero e do total
-        continue;
-      }
-
-      // se autorizado com permit:true mas não ignoraGenero -> permite até total mesmo se sexo estiver cheio? We'll allow total override but keep sexo check unless ignoraGenero
-      if (auth && auth.permitido && !auth.ignoraGenero){
-        if (tot >= LIMITE_QUEIMADA_TOTAL){
-          // autorizado para permitir até o total? Here auth.permitido=true means allow beyond limits — we'll allow even if tot >= total.
-          // To keep simple: if permitido e não ignoraGenero, allow beyond total but still enforce sex limit
-        }
-        // enforce sex limit unless ignoraGenero
-        if (sexo === "Masculino" && gen.Masculino >= LIMITE_QUEIMADA_POR_SEXO){
-          msgForm("Limite de meninos na QUEIMADA MISTA da turma "+turma+" já foi atingido.", false); return;
-        }
-        if (sexo === "Feminino" && gen.Feminino >= LIMITE_QUEIMADA_POR_SEXO){
-          msgForm("Limite de meninas na QUEIMADA MISTA da turma "+turma+" já foi atingido.", false); return;
-        }
-        continue;
-      }
-
-      // padrão sem autorização
       if (tot >= LIMITE_QUEIMADA_TOTAL){
         msgForm("QUEIMADA MISTA está lotada para a turma "+turma+".", false); return;
       }
@@ -1653,10 +1529,6 @@ async function handleSubmitInscricao(e){
     } else {
       const lim = LIMITE_MODALIDADE_TURMA[mod] || 0;
       const qtd = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      if (auth && auth.permitido){
-        // permitido: accept even if qtd >= lim
-        continue;
-      }
       if (qtd >= lim){
         msgForm('A modalidade "'+mod+'" está lotada para a turma '+turma+".", false); return;
       }
@@ -2709,19 +2581,6 @@ function iniciarListeners(){
     renderProfessoresAdmin();
   });
 
-  // Autorizações (NOVO) - leitura em tempo real
-  db.collection("autorizacoes").onSnapshot(snap => {
-    autorizacoesPorTurma = {};
-    snap.forEach(doc => {
-      autorizacoesPorTurma[doc.id] = doc.data() || {};
-    });
-    // Atualiza UI se estiver na aba de autorizações
-    const sel = document.getElementById("authTurmaSelect");
-    if (sel && sel.value) renderAutorizacoesUIForTurma(sel.value);
-    // Atualiza disponibilidade de vagas públicas
-    atualizarDisponibilidadeModalidades();
-  });
-
   db.collection("inscricoes").orderBy("timestamp","asc").onSnapshot(snap => {
     todasInscricoes = [];
     countsPorTurmaModalidade = {};
@@ -2799,26 +2658,42 @@ function iniciarListeners(){
 /* ========== INIT ========== */
 
 function init(){
+  // Overlay fallback: se já houver e-mail em localStorage, fecha imediatamente
+  try {
+    const saved = localStorage.getItem('insc_email');
+    if (saved && saved.includes('@')){
+      emailAtual = saved;
+      const ov = document.getElementById('emailOverlay');
+      if (ov) ov.style.display = 'none';
+    }
+  } catch(e){ /* ignore */ }
+
   const overlay = document.getElementById("emailOverlay");
   const emailInput = document.getElementById("emailAluno");
   const msgEmail = document.getElementById("msgEmailOverlay");
 
   function liberarEmail(){
-    const val = (emailInput.value || "").trim();
+    const val = (emailInput.value || '').trim();
     if (!validarEmail(val)){
       msgEmail.textContent = "Digite um e-mail válido.";
       return;
     }
     emailAtual = val;
-    overlay.style.display = "none";
+    try { localStorage.setItem('insc_email', val); } catch(e){}
+    // definir fallback global também (caso outros scripts precisem)
+    try { window._inscricao_email_fallback = val; } catch(e){}
+    if (overlay) overlay.style.display = "none";
   }
-  document.getElementById("btnEntrarEmail").addEventListener("click", liberarEmail);
-  emailInput.addEventListener("keydown", e => {
-    if (e.key === "Enter"){
-      e.preventDefault();
-      liberarEmail();
-    }
-  });
+  const btnEntrar = document.getElementById("btnEntrarEmail");
+  if (btnEntrar) btnEntrar.addEventListener("click", liberarEmail);
+  if (emailInput){
+    emailInput.addEventListener("keydown", e => {
+      if (e.key === "Enter"){
+        e.preventDefault();
+        liberarEmail();
+      }
+    });
+  }
 
   const contMods = document.getElementById("modalidadesContainer");
   MODALIDADES.forEach(m => {
@@ -3119,90 +2994,9 @@ function init(){
     profTurmaSelect.addEventListener("change", renderPainelProfessores);
   }
 
-  // AUTORIZAÇÕES: popular selects e listeners
-  const authTurno = document.getElementById("authTurnoSelect");
-  const authTurma = document.getElementById("authTurmaSelect");
-  if (authTurno && authTurma){
-    authTurno.addEventListener("change", () => {
-      const turno = authTurno.value;
-      authTurma.innerHTML = "";
-      const optDefault = document.createElement("option");
-      if (!turno){
-        optDefault.value = "";
-        optDefault.textContent = "Selecione o turno primeiro...";
-        authTurma.appendChild(optDefault);
-      } else {
-        optDefault.value = "";
-        optDefault.textContent = "Selecione a turma...";
-        authTurma.appendChild(optDefault);
-        const turmasTurno = getTurmasPorTurno(turno);
-        turmasTurno.forEach(t => {
-          const opt = document.createElement("option");
-          opt.value = t;
-          opt.textContent = t;
-          authTurma.appendChild(opt);
-        });
-      }
-    });
-
-    authTurma.addEventListener("change", () => {
-      const turma = authTurma.value;
-      renderAutorizacoesUIForTurma(turma);
-    });
-
-    document.getElementById("btnSalvarAutorizacoes").addEventListener("click", e => {
-      e.preventDefault();
-      const turma = authTurma.value;
-      salvarAutorizacoesParaTurma(turma);
-    });
-
-    document.getElementById("btnRecarregarAutorizacoes").addEventListener("click", e => {
-      e.preventDefault();
-      // reload from in-memory (will be updated by listener)
-      const turma = authTurma.value;
-      renderAutorizacoesUIForTurma(turma);
-      alert("Autorizações recarregadas.");
-    });
-  }
-
   configurarAbasAdmin();
   iniciarListeners();
   carregarConfiguracoes();
-
-  // preencher selects de jogos e relatórios com TODAS_TURMAS
-  const jogoTurma1El = document.getElementById("jogoTurma1");
-  const jogoTurma2El = document.getElementById("jogoTurma2");
-  const authTurmaEl = document.getElementById("authTurmaSelect");
-  const relTurmaEl = document.getElementById("relatorioTurma");
-  const filtroTurmaEl = document.getElementById("filtroTurma");
-  const adminFiltroTurmaEl = document.getElementById("adminFiltroTurma");
-
-  // preencher selects universais
-  [jogoTurma1El, jogoTurma2El].forEach(sel => {
-    if (sel){
-      sel.innerHTML = '<option value="">Selecione a turma...</option>';
-      TODAS_TURMAS.forEach(t => {
-        const opt = document.createElement("option");
-        opt.value = t; opt.textContent = t;
-        sel.appendChild(opt);
-      });
-    }
-  });
-
-  // preencher selects de autorizações: só quando turno selecionado (já implementado)
-  // preencher relatorio turno/turma e filtroTurno handled above
-
-  // preencher filtroModalidadeJogo
-  const filtroModalidadeJogo = document.getElementById("filtroModalidadeJogo");
-  if (filtroModalidadeJogo){
-    filtroModalidadeJogo.innerHTML = '<option value="">Selecione...</option>';
-    MODALIDADES.forEach(m => {
-      const opt = document.createElement("option");
-      opt.value = m;
-      opt.textContent = m;
-      filtroModalidadeJogo.appendChild(opt);
-    });
-  }
 
   mostrarSecao("inscricao");
 }
