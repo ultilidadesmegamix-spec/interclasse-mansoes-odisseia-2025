@@ -8,6 +8,7 @@
   <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
   <style>
     :root {
@@ -22,54 +23,64 @@
     * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     body { margin:0; background:#f0f4fb; color:var(--texto); }
     header { background: linear-gradient(90deg, var(--azul), #007bff); color:#fff; padding:14px 18px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; }
-    header h1 { margin:0; font-size:1.1rem; }
-    header small { display:block; font-size:0.8rem; opacity:.9; }
-    .header-right { display:flex; gap:8px; flex-wrap:wrap; }
-    .btn { border:none; border-radius:999px; padding:7px 14px; cursor:pointer; font-size:0.9rem; display:inline-flex; align-items:center; gap:6px; }
-    .btn-primaria { background:#fff; color:var(--azul); box-shadow:0 2px 6px rgba(0,0,0,0.15); }
-    .btn-admin { background:transparent; border:1px solid rgba(255,255,255,0.6); color:#fff; }
-
-    main { max-width:1100px; margin:18px auto 30px; padding:0 10px; }
-    .card { background:#fff; border-radius:12px; border:1px solid var(--borda); padding:15px; margin-bottom:14px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
-    .card h2 { margin:0 0 8px; font-size:1.05rem; color:var(--azul); }
-    .card small { font-size:0.8rem; color:#555; }
-    .grid-2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-    @media (max-width:768px){ .grid-2{grid-template-columns:1fr;} }
-    label { display:block; font-size:0.85rem; margin-bottom:3px; font-weight:500; }
+    header h1{ margin:0; font-size:1.1rem; } header small{ display:block; font-size:0.8rem; opacity:.9; }
+    .header-right{ display:flex; gap:8px; flex-wrap:wrap; }
+    .btn{ border:none; border-radius:999px; padding:7px 14px; cursor:pointer; font-size:0.9rem; display:inline-flex; align-items:center; gap:6px;}
+    .btn-primaria{ background:#fff; color:var(--azul); box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+    .btn-admin{ background:transparent; border:1px solid rgba(255,255,255,0.6); color:#fff; }
+    main{ max-width:1100px; margin:18px auto 30px; padding:0 10px; }
+    .card{ background:#fff; border-radius:12px; border:1px solid var(--borda); padding:15px; margin-bottom:14px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
+    .card h2{ margin:0 0 8px; font-size:1.05rem; color:var(--azul); }
+    .grid-2{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    @media (max-width:768px){ .grid-2{ grid-template-columns:1fr; } }
+    label{ display:block; font-size:0.85rem; margin-bottom:3px; font-weight:500; }
     input[type="text"], input[type="date"], input[type="time"], input[type="number"], select, textarea { width:100%; padding:7px 8px; border-radius:8px; border:1px solid var(--borda); background:#fafbff; font-size:0.9rem; }
-    textarea { resize:vertical; min-height:60px; }
-    .modalidades-lista { margin-top:6px; display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:6px; }
-    .modalidade-item { display:flex; gap:6px; padding:6px 8px; border-radius:8px; border:1px solid var(--borda); background:var(--azul-claro); font-size:0.8rem; }
-    .modalidade-item input { margin-top:3px; }
-    .modalidade-label { font-weight:600; font-size:0.85rem; }
-    .modalidade-vagas { display:block; font-size:0.75rem; color:#333; }
-    .modalidade-lotado { color:var(--vermelho); font-weight:600; }
-    .alerta { margin-top:4px; font-size:0.8rem; color:#555; }
-    .msg-erro { background:#ffe5e5; color:#b30000; padding:6px 8px; border-radius:8px; font-size:0.8rem; margin-bottom:6px; }
-    .msg-sucesso { background:#e5ffe9; color:#0c7a2a; padding:6px 8px; border-radius:8px; font-size:0.8rem; margin-bottom:6px; }
-    table { width:100%; border-collapse:collapse; margin-top:6px; font-size:0.8rem; }
-    th,td { padding:5px 6px; border-bottom:1px solid #e1e4eb; text-align:left; }
-    th { background:#f2f5ff; font-weight:600; }
-    tr:hover td { background:#f9fbff; }
-
-    /* admin */
+    textarea{ resize:vertical; min-height:60px; }
+    .modalidades-lista{ margin-top:6px; display:grid; grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap:6px; }
+    .modalidade-item{ display:flex; gap:6px; padding:6px 8px; border-radius:8px; border:1px solid var(--borda); background:var(--azul-claro); font-size:0.8rem; }
+    .modalidade-item input{ margin-top:3px; }
+    .modalidade-label{ font-weight:600; font-size:0.85rem; }
+    .modalidade-vagas{ display:block; font-size:0.75rem; color:#333; }
+    .modalidade-lotado{ color:var(--vermelho); font-weight:600; }
+    .alerta{ margin-top:4px; font-size:0.8rem; color:#555; }
+    .msg-erro{ background:#ffe5e5; color:#b30000; padding:6px 8px; border-radius:8px; font-size:0.8rem; margin-bottom:6px; }
+    .msg-sucesso{ background:#e5ffe9; color:#0c7a2a; padding:6px 8px; border-radius:8px; font-size:0.8rem; margin-bottom:6px; }
+    table{ width:100%; border-collapse:collapse; margin-top:6px; font-size:0.8rem; }
+    th,td{ padding:5px 6px; border-bottom:1px solid #e1e4eb; text-align:left; }
+    th{ background:#f2f5ff; font-weight:600; }
+    tr:hover td{ background:#f9fbff; }
+    .filtros{ margin-top:6px; display:flex; flex-wrap:wrap; gap:8px; }
+    .filtros > div{ min-width:150px; }
     #adminSection { display:none; }
-    .admin-header { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
-    .admin-status { font-size:0.75rem; padding:3px 8px; border-radius:999px; background:#e5ffe9; color:#0c7a2a; }
-    .admin-status.fechado { background:#ffe5e5; color:#b30000; }
-
-    /* welcome */
-    #secWelcome { display:none; padding:20px; text-align:center; }
-    #secWelcome img { max-width:160px; margin-bottom:12px; }
-    #welcomeTitulo { font-size:1.6rem; color:var(--azul); margin-bottom:6px; }
-    #welcomeSub { font-size:1rem; color:#333; margin-bottom:10px; }
-    #welcomeTexto { font-size:0.95rem; color:#555; max-width:900px; margin:0 auto; }
-
-    /* printing */
-    @media print { /* similar rules kept */ }
+    .admin-header{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
+    .admin-status{ font-size:0.75rem; padding:3px 8px; border-radius:999px; background:#e5ffe9; color:#0c7a2a; }
+    .admin-status.fechado{ background:#ffe5e5; color:#b30000; }
+    .admin-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; border-bottom:1px solid #e1e4eb; padding-bottom:4px; }
+    .admin-tab-btn{ border:none; border-radius:999px; padding:5px 10px; font-size:0.8rem; background:#f1f3fb; cursor:pointer; }
+    .admin-tab-btn.ativo{ background:var(--azul); color:#fff; }
+    .admin-tab-content{ display:none; }
+    .admin-tab-content.ativo{ display:block; }
+    .admin-bloco{ background:#f9fbff; border-radius:10px; border:1px dashed #c5cde0; padding:8px; margin-bottom:8px; font-size:0.82rem; }
+    /* welcome section */
+    #secWelcome { display:none; }
+    #welcomeLogo { max-width:160px; display:block; margin-bottom:12px; }
+    #welcomeContent { font-size:0.95rem; color:#333; margin-top:6px; }
+    .preview-box { border:1px dashed #c5cde0; padding:8px; border-radius:8px; background:#fff; }
+    .small-note { font-size:0.85rem; color:#555; margin-top:6px; }
   </style>
 </head>
 <body>
+
+<!-- OVERLAY E-MAIL -->
+<div id="emailOverlay">
+  <div id="emailOverlayCard" class="card" style="max-width:360px; margin:18px auto;">
+    <h2>Antes de continuar...</h2>
+    <p>Informe seu <strong>e-mail</strong> para registrar sua inscrição.</p>
+    <div id="msgEmailOverlay"></div>
+    <input type="text" id="emailAluno" placeholder="seuemail@exemplo.com" />
+    <button class="btn btn-primaria" id="btnEntrarEmail">Entrar</button>
+  </div>
+</div>
 
 <header>
   <div>
@@ -87,14 +98,19 @@
 
 <main>
 
-  <!-- WELCOME / PÁGINA INICIAL (exibida quando inscrições encerradas) -->
+  <!-- WELCOME (publico quando inscrições encerradas) -->
   <section class="card" id="secWelcome">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
-      <img id="welcomeLogo" src="" alt="Logo da escola" style="display:none;">
-      <div id="welcomeTitulo">Bem-vindo ao Movimenta Odisseia</div>
-      <div id="welcomeSub">Confira as novidades da nossa edição.</div>
-      <div id="welcomeTexto">Obrigado pelo interesse! As inscrições estão encerradas. Acompanhe a escola para mais informações.</div>
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+      <img id="welcomeLogo" src="" alt="Logo" style="display:none;">
+      <div>
+        <h2 id="welcomeTitle">Bem-vindo</h2>
+        <small id="welcomeSubtitle">Obrigado pelo interesse — confira novidades em breve.</small>
+      </div>
     </div>
+    <div id="welcomeContent" class="preview-box">
+      <!-- conteudo html da pagina inicial -->
+    </div>
+    <div class="small-note">Se você é administrador, use a aba <strong>Configurações → Texto do evento / Página inicial</strong> para editar esta página.</div>
   </section>
 
   <!-- INSCRIÇÃO -->
@@ -205,19 +221,54 @@
     </table>
   </section>
 
-  <!-- (restante das seções: jogos, classificados, placar) mantidas sem alteração de lógica -->
-  <section class="card" id="secJogos"><h2>Jogos</h2><small>Selecione a <strong>série</strong> e a <strong>modalidade</strong>. A data é opcional.</small>
+  <!-- JOGOS (ALUNO) -->
+  <section class="card" id="secJogos">
+    <h2>Jogos</h2>
+    <small>Selecione a <strong>série</strong> e a <strong>modalidade</strong>. A data é opcional.</small>
+
     <div class="filtros">
-      <div><label for="filtroSerieJogo">Série</label><select id="filtroSerieJogo"><option value="">Selecione...</option><option value="6">6º ano</option><option value="7">7º ano</option><option value="8">8º ano</option><option value="9">9º ano</option><option value="1">1º ano</option><option value="2">2º ano</option><option value="3">3º ano</option></select></div>
-      <div><label for="filtroModalidadeJogo">Modalidade</label><select id="filtroModalidadeJogo"><option value="">Selecione...</option></select></div>
-      <div><label for="filtroDataJogo">Data (opcional)</label><input type="date" id="filtroDataJogo"></div>
+      <div>
+        <label for="filtroSerieJogo">Série</label>
+        <select id="filtroSerieJogo">
+          <option value="">Selecione...</option>
+          <option value="6">6º ano</option>
+          <option value="7">7º ano</option>
+          <option value="8">8º ano</option>
+          <option value="9">9º ano</option>
+          <option value="1">1º ano</option>
+          <option value="2">2º ano</option>
+          <option value="3">3º ano</option>
+        </select>
+      </div>
+      <div>
+        <label for="filtroModalidadeJogo">Modalidade</label>
+        <select id="filtroModalidadeJogo">
+          <option value="">Selecione...</option>
+        </select>
+      </div>
+      <div>
+        <label for="filtroDataJogo">Data (opcional)</label>
+        <input type="date" id="filtroDataJogo">
+      </div>
     </div>
+
     <div id="listaJogosContainer"></div>
   </section>
 
-  <section class="card" id="secClassificados"><h2>Classificados</h2><small>Veja, jogo por jogo, qual turma foi classificada (apenas jogos finalizados).</small><div id="classificacaoContainer"></div></section>
+  <!-- CLASSIFICAÇÃO / CLASSIFICADOS (ALUNO) -->
+  <section class="card" id="secClassificados">
+    <h2>Classificados</h2>
+    <small>Veja, jogo por jogo, qual turma foi classificada (apenas jogos finalizados).</small>
+    <div id="classificacaoContainer"></div>
+  </section>
 
-  <section class="card" id="secPlacarAoVivo"><h2>Placar ao vivo</h2><small>Veja os jogos que estão em andamento ou prestes a começar.</small><div id="placarAoVivoContainer"></div></section>
+  <!-- PLACAR AO VIVO (ALUNO) -->
+  <section class="card" id="secPlacarAoVivo">
+    <h2>Placar ao vivo</h2>
+    <small>Veja os jogos que estão em andamento ou prestes a começar.</small>
+
+    <div id="placarAoVivoContainer"></div>
+  </section>
 
   <!-- ADMIN -->
   <section class="card" id="adminSection">
@@ -228,10 +279,7 @@
       </div>
       <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
         <span id="adminStatus" class="admin-status">Verificando...</span>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <div id="adminTotalInscritos" style="font-size:0.9rem; color:#333; font-weight:600;">Inscritos: 0</div>
-          <button class="btn btn-primaria" id="btnFecharAdmin">⬅ Voltar</button>
-        </div>
+        <button class="btn btn-primaria" id="btnFecharAdmin">⬅ Voltar</button>
       </div>
     </div>
 
@@ -243,14 +291,27 @@
       <button class="admin-tab-btn" data-tab="config">⚙️ Configurações</button>
     </div>
 
-    <!-- TAB INSCRIÇÕES (mantida) -->
+    <!-- TAB INSCRIÇÕES -->
     <div class="admin-tab-content ativo" id="tab-inscricoes">
       <div class="admin-bloco">
         <strong>Busca / filtro</strong>
         <div class="filtros" style="margin-top:4px;">
-          <div><label for="adminFiltroNome">Nome</label><input type="text" id="adminFiltroNome" placeholder="Parte do nome..."></div>
-          <div><label for="adminFiltroTurma">Turma</label><select id="adminFiltroTurma"><option value="">Todas</option></select></div>
-          <div><label for="adminFiltroModalidade">Modalidade</label><select id="adminFiltroModalidade"><option value="">Todas</option></select></div>
+          <div>
+            <label for="adminFiltroNome">Nome</label>
+            <input type="text" id="adminFiltroNome" placeholder="Parte do nome...">
+          </div>
+          <div>
+            <label for="adminFiltroTurma">Turma</label>
+            <select id="adminFiltroTurma">
+              <option value="">Todas</option>
+            </select>
+          </div>
+          <div>
+            <label for="adminFiltroModalidade">Modalidade</label>
+            <select id="adminFiltroModalidade">
+              <option value="">Todas</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -258,7 +319,9 @@
         <strong>Cancelar inscrição</strong>
         <small style="display:block;margin-top:2px;">Busque pelo nome acima e escolha a modalidade específica para cancelar.</small>
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
-          <select id="selectCancelar" style="min-width:220px; flex:1;"><option value="">Selecione uma inscrição...</option></select>
+          <select id="selectCancelar" style="min-width:220px; flex:1;">
+            <option value="">Selecione uma inscrição...</option>
+          </select>
           <button class="btn btn-primaria" id="btnCancelarInscricao">Cancelar</button>
         </div>
       </div>
@@ -266,28 +329,64 @@
       <table id="tabelaAdmin">
         <thead>
           <tr>
-            <th>Nome</th><th>E-mail</th><th>Sexo</th><th>Turma</th><th>Turno</th><th>Nº camisa</th><th>Modalidades</th><th>Obs</th><th>Data/Hora</th>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Sexo</th>
+            <th>Turma</th>
+            <th>Turno</th>
+            <th>Nº camisa</th>
+            <th>Modalidades</th>
+            <th>Obs</th>
+            <th>Data/Hora</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
+      <div style="margin-top:8px;">
+        <strong>Total de inscritos:</strong> <span id="totalInscritosAdmin">0</span>
+      </div>
     </div>
 
-    <!-- TAB JOGOS (mantida) -->
+    <!-- TAB JOGOS -->
     <div class="admin-tab-content" id="tab-jogos">
-      <!-- conteúdo mantido (igual ao original) -->
       <div class="admin-bloco">
         <strong>Cadastrar jogo</strong>
         <div class="grid-2" style="margin-top:4px;">
-          <div><label for="jogoData">Data</label><input type="date" id="jogoData"></div>
-          <div><label for="jogoHorario">Horário</label><input type="time" id="jogoHorario"></div>
+          <div>
+            <label for="jogoData">Data</label>
+            <input type="date" id="jogoData">
+          </div>
         </div>
         <div class="grid-2" style="margin-top:4px;">
-          <div><label for="jogoTurma1">Turma 1</label><select id="jogoTurma1"><option value="">Selecione a turma 1...</option></select></div>
-          <div><label for="jogoTurma2">Turma 2</label><select id="jogoTurma2"><option value="">Selecione a turma 2...</option></select></div>
+          <div>
+            <label for="jogoTurma1">Turma 1</label>
+            <select id="jogoTurma1">
+              <option value="">Selecione a turma 1...</option>
+            </select>
+          </div>
+          <div>
+            <label for="jogoTurma2">Turma 2</label>
+            <select id="jogoTurma2">
+              <option value="">Selecione a turma 2...</option>
+            </select>
+          </div>
         </div>
-        <div style="margin-top:4px;"><label for="jogoModalidade">Modalidade</label><select id="jogoModalidade"><option value="">Selecione...</option></select></div>
-        <div style="margin-top:4px;"><label for="jogoLocal">Local</label><input type="text" id="jogoLocal" placeholder="Ex: Quadra principal"></div>
+        <div class="grid-2" style="margin-top:4px;">
+          <div>
+            <label for="jogoModalidade">Modalidade</label>
+            <select id="jogoModalidade">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div>
+            <label for="jogoHorario">Horário</label>
+            <input type="time" id="jogoHorario">
+          </div>
+        </div>
+        <div style="margin-top:4px;">
+          <label for="jogoLocal">Local</label>
+          <input type="text" id="jogoLocal" placeholder="Ex: Quadra principal">
+        </div>
         <button class="btn btn-primaria" style="margin-top:6px;" id="btnCadastrarJogo">Cadastrar jogo</button>
       </div>
 
@@ -295,7 +394,9 @@
         <strong>Jogos cadastrados</strong>
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
           <input type="text" id="filtroExcluirJogo" placeholder="Pesquisar jogo (turma, modalidade, data...)" style="flex:1; min-width:200px;">
-          <select id="selectExcluirJogo" style="min-width:220px; flex:1;"><option value="">Selecione um jogo...</option></select>
+          <select id="selectExcluirJogo" style="min-width:220px; flex:1;">
+            <option value="">Selecione um jogo...</option>
+          </select>
           <button class="btn btn-primaria" id="btnExcluirJogo">Excluir</button>
         </div>
       </div>
@@ -307,14 +408,32 @@
       </div>
     </div>
 
-    <!-- TAB RELATÓRIO (mantida) -->
+    <!-- TAB RELATÓRIO -->
     <div class="admin-tab-content" id="tab-relatorio">
       <div class="admin-bloco">
         <strong>Filtros para relatório</strong>
         <div class="filtros" style="margin-top:4px;">
-          <div><label for="relatorioTurno">Turno</label><select id="relatorioTurno"><option value="">Selecione...</option><option value="Matutino">Matutino</option><option value="Vespertino">Vespertino</option><option value="Noturno">Noturno</option></select></div>
-          <div><label for="relatorioTurma">Turma</label><select id="relatorioTurma"><option value="">Selecione o turno primeiro...</option></select></div>
-          <div><label for="relatorioModalidade">Modalidade</label><select id="relatorioModalidade"><option value="">Selecione a modalidade...</option></select></div>
+          <div>
+            <label for="relatorioTurno">Turno</label>
+            <select id="relatorioTurno">
+              <option value="">Selecione...</option>
+              <option value="Matutino">Matutino</option>
+              <option value="Vespertino">Vespertino</option>
+              <option value="Noturno">Noturno</option>
+            </select>
+          </div>
+          <div>
+            <label for="relatorioTurma">Turma</label>
+            <select id="relatorioTurma">
+              <option value="">Selecione o turno primeiro...</option>
+            </select>
+          </div>
+          <div>
+            <label for="relatorioModalidade">Modalidade</label>
+            <select id="relatorioModalidade">
+              <option value="">Selecione a modalidade...</option>
+            </select>
+          </div>
         </div>
         <div id="relatorioCabecalhoImpressao">
           <h3 id="relatorioTituloLinha1">Relatório de inscritos – Movimenta Odisseia</h3>
@@ -327,23 +446,47 @@
       </div>
 
       <table id="tabelaRelatorio">
-        <thead><tr><th>Nome</th><th>Sexo</th><th>Turma</th><th>Turno</th><th>Modalidades</th><th>E-mail</th><th>Nº camisa</th><th>Obs</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Sexo</th>
+            <th>Turma</th>
+            <th>Turno</th>
+            <th>Modalidades</th>
+            <th>E-mail</th>
+            <th>Nº camisa</th>
+            <th>Obs</th>
+          </tr>
+        </thead>
         <tbody></tbody>
       </table>
     </div>
 
-    <!-- TAB PROFESSORES -->
+    <!-- TAB PROFESSORES (ADMIN GERENCIA SENHAS) -->
     <div class="admin-tab-content" id="tab-professores">
       <div class="admin-bloco">
         <strong>Cadastrar acesso de professor / coordenador / gestor</strong>
         <div class="grid-2" style="margin-top:4px;">
-          <div><label for="profNomeCadastro">Nome</label><input type="text" id="profNomeCadastro" placeholder="Ex: Jean"></div>
-          <div><label for="profTipoCadastro">Tipo de acesso</label><select id="profTipoCadastro"><option value="Professor">Professor</option><option value="Coordenador">Coordenador</option><option value="Gestor">Gestor</option></select></div>
+          <div>
+            <label for="profNomeCadastro">Nome</label>
+            <input type="text" id="profNomeCadastro" placeholder="Ex: Jean">
+          </div>
+          <div>
+            <label for="profTipoCadastro">Tipo de acesso</label>
+            <select id="profTipoCadastro">
+              <option value="Professor">Professor</option>
+              <option value="Coordenador">Coordenador</option>
+              <option value="Gestor">Gestor</option>
+            </select>
+          </div>
         </div>
         <div class="grid-2" style="margin-top:4px;">
           <div>
             <label for="profSenhaCadastro">Senha</label>
-            <div style="display:flex; gap:6px; align-items:center;"><input type="text" id="profSenhaCadastro" placeholder="Senha que ele vai usar" style="flex:1;"><button type="button" class="btn btn-primaria" id="btnGerarSenhaProfessor">Gerar senha</button></div>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <input type="text" id="profSenhaCadastro" placeholder="Senha que ele vai usar" style="flex:1;">
+              <button type="button" class="btn btn-primaria" id="btnGerarSenhaProfessor">Gerar senha</button>
+            </div>
           </div>
         </div>
         <button class="btn btn-primaria" style="margin-top:6px;" id="btnAdicionarProfessor">➕ Adicionar acesso</button>
@@ -353,29 +496,53 @@
         <strong>Acessos cadastrados</strong>
         <small style="display:block;margin-top:2px;">Use para controlar quem pode entrar no painel de professores.</small>
         <table style="margin-top:4px; width:100%; border-collapse:collapse; font-size:0.8rem;">
-          <thead><tr><th>Nome</th><th>Tipo</th><th>Senha</th><th>Ações</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Tipo</th>
+              <th>Senha</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
           <tbody id="tabelaProfessoresAdmin"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- TAB CONFIG (aqui adicionamos edição da página inicial) -->
+    <!-- TAB CONFIG -->
     <div class="admin-tab-content" id="tab-config">
       <div class="admin-bloco">
         <strong>Datas e bloqueio</strong>
         <div class="grid-2" style="margin-top:4px;">
-          <div><label for="cfgDataLimite">Data de encerramento</label><input type="date" id="cfgDataLimite"></div>
-          <div><label><input type="checkbox" id="cfgBloquearAgora"> Bloquear inscrições agora</label></div>
+          <div>
+            <label for="cfgDataLimite">Data de encerramento</label>
+            <input type="date" id="cfgDataLimite">
+          </div>
+          <div>
+            <label><input type="checkbox" id="cfgBloquearAgora"> Bloquear inscrições agora</label>
+          </div>
         </div>
-        <div style="margin-top:4px;"><label for="cfgMsgEncerradas">Mensagem quando estiver encerrado</label><textarea id="cfgMsgEncerradas" placeholder="Ex: As inscrições foram encerradas."></textarea></div>
+        <div style="margin-top:4px;">
+          <label for="cfgMsgEncerradas">Mensagem quando estiver encerrado</label>
+          <textarea id="cfgMsgEncerradas" placeholder="Ex: As inscrições foram encerradas."></textarea>
+        </div>
       </div>
 
       <div class="admin-bloco">
         <strong>Limites</strong>
         <div class="grid-2" style="margin-top:4px;">
-          <div><label for="cfgLimitePorAluno">Máx. modalidades por aluno</label><input type="number" id="cfgLimitePorAluno" min="1"></div>
-          <div><label for="cfgQueimadaTotal">Queimada total (por turma)</label><input type="number" id="cfgQueimadaTotal" min="1"></div>
-          <div><label for="cfgQueimadaSexo">Queimada por sexo</label><input type="number" id="cfgQueimadaSexo" min="1"></div>
+          <div>
+            <label for="cfgLimitePorAluno">Máx. modalidades por aluno</label>
+            <input type="number" id="cfgLimitePorAluno" min="1">
+          </div>
+          <div>
+            <label for="cfgQueimadaTotal">Queimada total (por turma)</label>
+            <input type="number" id="cfgQueimadaTotal" min="1">
+          </div>
+          <div>
+            <label for="cfgQueimadaSexo">Queimada por sexo</label>
+            <input type="number" id="cfgQueimadaSexo" min="1">
+          </div>
         </div>
         <p style="margin:6px 0 4px; font-size:0.8rem;"><strong>Limite por modalidade / turma</strong></p>
         <div class="grid-2">
@@ -392,7 +559,9 @@
         <strong>Autorizações (ignorar limites por turma)</strong>
         <small style="display:block;margin-top:2px;">Selecione a turma e marque as modalidades que devem ser autorizadas — quando marcada, a modalidade será aceita mesmo que os limites estejam preenchidos (aplica-se à QUEIMADA também).</small>
         <div style="display:flex; gap:8px; align-items:center; margin-top:6px; flex-wrap:wrap;">
-          <select id="cfgAutTurma" style="min-width:220px;"><option value="">Selecione a turma...</option></select>
+          <select id="cfgAutTurma" style="min-width:220px;">
+            <option value="">Selecione a turma...</option>
+          </select>
           <div id="cfgAutModalidadesContainer" style="flex:1;"></div>
         </div>
       </div>
@@ -400,41 +569,107 @@
       <div class="admin-bloco">
         <strong>Texto do evento</strong>
         <div class="grid-2" style="margin-top:4px;">
-          <div><label for="cfgNomeEvento">Nome do evento</label><input type="text" id="cfgNomeEvento" placeholder="Movimenta Odisseia"></div>
-          <div><label for="cfgAnoEvento">Ano</label><input type="text" id="cfgAnoEvento" placeholder="2025"></div>
+          <div>
+            <label for="cfgNomeEvento">Nome do evento</label>
+            <input type="text" id="cfgNomeEvento" placeholder="Movimenta Odisseia">
+          </div>
+          <div>
+            <label for="cfgAnoEvento">Ano</label>
+            <input type="text" id="cfgAnoEvento" placeholder="2025">
+          </div>
         </div>
-        <div style="margin-top:4px;"><label for="cfgTextoInicial">Texto abaixo do título</label><textarea id="cfgTextoInicial"></textarea></div>
+        <div style="margin-top:4px;">
+          <label for="cfgTextoInicial">Texto abaixo do título</label>
+          <textarea id="cfgTextoInicial"></textarea>
+        </div>
       </div>
 
+      <!-- NOVO: EDITOR DA PÁGINA INICIAL (WELCOME) -->
       <div class="admin-bloco">
-        <strong>Editar página inicial (Welcome)</strong>
-        <small style="display:block;margin-top:2px;">Altere título, subtítulo, logo e texto que aparecem quando as inscrições estiverem encerradas.</small>
-        <div style="margin-top:6px;">
-          <label for="cfgWelcomeTitle">Título (welcome)</label>
-          <input type="text" id="cfgWelcomeTitle" placeholder="Ex: Bem-vindo ao Movimenta Odisseia">
-          <label for="cfgWelcomeSubtitle" style="margin-top:6px;">Subtítulo</label>
-          <input type="text" id="cfgWelcomeSubtitle" placeholder="Ex: Obrigado por acompanhar nossa edição">
-          <label for="cfgWelcomeLogo" style="margin-top:6px;">URL do logo (opcional)</label>
-          <input type="text" id="cfgWelcomeLogo" placeholder="https://.../logo.png">
-          <label for="cfgWelcomeTexto" style="margin-top:6px;">Texto / descrição</label>
-          <textarea id="cfgWelcomeTexto" placeholder="Texto que aparecerá na página inicial quando encerrado."></textarea>
+        <strong>Editar Página Inicial (Boas-vindas)</strong>
+        <small style="display:block; margin-top:4px;">Se as inscrições estiverem encerradas, o conteúdo abaixo será exibido na página pública.</small>
+
+        <div style="margin-top:8px;">
+          <label for="welcomeTitleInput">Título</label>
+          <input type="text" id="welcomeTitleInput" placeholder="Ex: Bem-vindos ao Movimenta Odisseia">
+        </div>
+        <div style="margin-top:8px;">
+          <label for="welcomeSubtitleInput">Subtítulo</label>
+          <input type="text" id="welcomeSubtitleInput" placeholder="Ex: Obrigado pelo interesse">
+        </div>
+        <div style="margin-top:8px;">
+          <label for="welcomeHtmlInput">Conteúdo (HTML permitido, scripts serão removidos)</label>
+          <textarea id="welcomeHtmlInput" placeholder="<p>Coloque aqui o texto da página inicial...</p>" style="min-height:120px;"></textarea>
+        </div>
+        <div style="margin-top:8px;">
+          <label for="welcomeLogoFile">Logo da escola (opcional)</label>
+          <input type="file" id="welcomeLogoFile" accept="image/*" />
+          <div class="small-note">Ao enviar, a imagem será armazenada no Firebase Storage e o link será salvo nas configs.</div>
+        </div>
+
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+          <button class="btn btn-primaria" id="btnSalvarWelcome">💾 Salvar página inicial</button>
+          <button class="btn" id="btnPreviewWelcome" style="background:#fff;">👁️ Visualizar</button>
+        </div>
+
+        <div style="margin-top:8px;">
+          <strong>Preview atual</strong>
+          <div class="preview-box" id="welcomePreviewBox" style="margin-top:6px;">
+            <img id="welcomePreviewLogo" src="" alt="logo" style="max-width:120px; display:none; margin-bottom:8px;">
+            <h3 id="welcomePreviewTitle"></h3>
+            <small id="welcomePreviewSubtitle"></small>
+            <div id="welcomePreviewHtml" style="margin-top:8px;"></div>
+          </div>
         </div>
       </div>
 
-      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px;">
-        <button class="btn btn-primaria" id="btnSalvarConfig">💾 Salvar configurações</button>
-      </div>
+      <button class="btn btn-primaria" id="btnSalvarConfig">💾 Salvar configurações</button>
     </div>
   </section>
 
-  <!-- PAINEL PARA PROFESSORES (mantido) -->
-  <section class="card" id="professoresSection" style="display:none;">
+  <!-- PAINEL PARA PROFESSORES / COORDENADORES / GESTORES -->
+  <section class="card" id="professoresSection">
     <div class="admin-header">
-      <div><h2>Painel de professores</h2><div class="admin-sub">Seletor de alunos que não podem participar.</div></div>
-      <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;"><span style="font-size:0.8rem;" id="profUsuarioAtivo">Professor logado</span><button class="btn btn-primaria" id="btnFecharProfessores">⬅ Voltar</button></div>
+      <div>
+        <h2>Painel de professores</h2>
+        <div class="admin-sub">
+          Selecione turno e turma para indicar alunos que <strong>não podem participar</strong>.
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
+        <span style="font-size:0.8rem;" id="profUsuarioAtivo">Professor logado</span>
+        <button class="btn btn-primaria" id="btnFecharProfessores">⬅ Voltar</button>
+      </div>
     </div>
-    <div class="admin-bloco"><strong>Filtrar turma</strong><div class="filtros" style="margin-top:4px;"><div><label for="profTurnoSelect">Turno</label><select id="profTurnoSelect"><option value="">Selecione...</option><option value="Matutino">Matutino</option><option value="Vespertino">Vespertino</option><option value="Noturno">Noturno</option></select></div><div><label for="profTurmaSelect">Turma</label><select id="profTurmaSelect"><option value="">Selecione o turno primeiro...</option></select></div></div></div>
-    <div class="admin-bloco"><strong>Alunos inscritos na turma</strong><small style="display:block;margin-top:2px;">Clique para indicar que o aluno <strong>não pode participar</strong>.</small><div id="profListaAlunos" style="margin-top:6px;"></div></div>
+
+    <div class="admin-bloco">
+      <strong>Filtrar turma</strong>
+      <div class="filtros" style="margin-top:4px;">
+        <div>
+          <label for="profTurnoSelect">Turno</label>
+          <select id="profTurnoSelect">
+            <option value="">Selecione...</option>
+            <option value="Matutino">Matutino</option>
+            <option value="Vespertino">Vespertino</option>
+            <option value="Noturno">Noturno</option>
+          </select>
+        </div>
+        <div>
+          <label for="profTurmaSelect">Turma</label>
+          <select id="profTurmaSelect">
+            <option value="">Selecione o turno primeiro...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-bloco">
+      <strong>Alunos inscritos na turma</strong>
+      <small style="display:block;margin-top:2px;">
+        Clique para indicar que o aluno <strong>não deve participar</strong>. Quando dois professores diferentes indicarem o mesmo aluno, a inscrição será cancelada automaticamente.
+      </small>
+      <div id="profListaAlunos" style="margin-top:6px;"></div>
+    </div>
   </section>
 
 </main>
@@ -453,17 +688,38 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const storage = firebase.storage();
 
-/* ========== CONSTANTES / DADOS ========== */
+/* ========== CONSTANTES e ESTADO ========== */
 
 const MODALIDADES = [
-  "FUTSAL","QUEIMADA MISTA","DOMINÓ","FUTMESA","TÊNIS DE MESA","XADREZ","VOLEI"
+  "FUTSAL",
+  "QUEIMADA MISTA",
+  "DOMINÓ",
+  "FUTMESA",
+  "TÊNIS DE MESA",
+  "XADREZ",
+  "VOLEI"
 ];
 
-const TURMAS_MATUTINO = ["7ºA","7ºB","7ºC","7ºD","7ºE","7ºF","8ºF","9ºA","9ºB","9ºC","9ºD","9ºE"];
-const TURMAS_VESPERTINO = ["6ºA","6ºB","6ºC","6ºD","6ºE","6ºF","6ºG","8ºA","8ºB","8ºC","8ºD","8ºE"];
-const TURMAS_NOTURNO = ["1ºA","1ºB","1ºC","1ºD","1ºE","1ºF","2ºA","2ºB","2ºC","3ºA","3ºB","3ºC"];
-const TODAS_TURMAS = [...TURMAS_MATUTINO,...TURMAS_VESPERTINO,...TURMAS_NOTURNO];
+const TURMAS_MATUTINO = [
+  "7ºA","7ºB","7ºC","7ºD","7ºE","7ºF",
+  "8ºF",
+  "9ºA","9ºB","9ºC","9ºD","9ºE"
+];
+
+const TURMAS_VESPERTINO = [
+  "6ºA","6ºB","6ºC","6ºD","6ºE","6ºF","6ºG",
+  "8ºA","8ºB","8ºC","8ºD","8ºE"
+];
+
+const TURMAS_NOTURNO = [
+  "1ºA","1ºB","1ºC","1ºD","1ºE","1ºF",
+  "2ºA","2ºB","2ºC",
+  "3ºA","3ºB","3ºC"
+];
+
+const TODAS_TURMAS = [...TURMAS_MATUTINO, ...TURMAS_VESPERTINO, ...TURMAS_NOTURNO];
 
 function getTurmasPorTurno(turno){
   if (turno === "Matutino") return TURMAS_MATUTINO;
@@ -477,39 +733,68 @@ function getSerieFromTurma(t){ if (!t) return ""; return t.charAt(0); }
 /* limites padrão (podem ser alterados nas configs) */
 let LIMITE_MODALIDADES_POR_ALUNO = 2;
 let LIMITE_MODALIDADE_TURMA = {
-  "FUTSAL":8,"DOMINÓ":2,"FUTMESA":2,"TÊNIS DE MESA":2,"XADREZ":2,"VOLEI":6
+  "FUTSAL": 8,
+  "DOMINÓ": 2,
+  "FUTMESA": 2,
+  "TÊNIS DE MESA": 2,
+  "XADREZ": 2,
+  "VOLEI": 6
 };
 let LIMITE_QUEIMADA_TOTAL = 10;
 let LIMITE_QUEIMADA_POR_SEXO = 5;
 
-/* contadores e arrays */
+/* controle de inscrições por turma/mod e queimada */
 let countsPorTurmaModalidade = {};
 let countsQueimadaGenero = {};
 let todasInscricoes = [];
 let todosJogos = [];
-let todosProfessores = [];
-let currentRole = null;
-let currentProfessor = null;
+
+/* professores e papéis */
+let todosProfessores = []; // {id, nome, tipo, senha}
+let currentRole = null;    // "ADMIN", "Professor", "Coordenador", "Gestor"
+let currentProfessor = null; // objeto do professor logado
+
+/* config evento */
 let configEvento = {
-  dataLimite: null, msgEncerradas:"", bloquearAgora:false, nomeEvento:"Movimenta Odisseia", anoEvento:"", textoInicial:"",
-  autorizacoes:{}, // { turma: { MOD: true } }
-  welcomeTitle: "Bem-vindo ao Movimenta Odisseia",
-  welcomeSubtitle: "Confira as novidades da nossa edição.",
-  welcomeLogo: "",
-  welcomeTexto: "Obrigado pelo interesse! As inscrições estão encerradas. Acompanhe a escola para mais informações."
+  dataLimite: null,
+  msgEncerradas: "",
+  bloquearAgora: false,
+  nomeEvento: "Movimenta Odisseia",
+  anoEvento: "",
+  textoInicial: "",
+  autorizacoes: {},
+  welcomePage: {} // { title, subtitle, html, logoUrl, lastEditedAt, lastEditedBy }
 };
+
 let inscricoesEncerradas = false;
 let emailAtual = null;
 let isAdmin = false;
 const ADMIN_PASSWORD = "52090949";
 
 /* ========== AUX ========== */
-function normalizarNome(str){ return (str||"").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," "); }
-function validarEmail(email){ return email && email.includes("@") && email.includes("."); }
-function msgForm(texto, ok){ const box = document.getElementById("msgForm"); box.innerHTML=""; const div = document.createElement("div"); div.className = ok ? "msg-sucesso":"msg-erro"; div.textContent = texto; box.appendChild(div); }
-function formatarDataBR(yyyyMMdd){ if (!yyyyMMdd) return "-"; const p = yyyyMMdd.split("-"); if (p.length!==3) return yyyyMMdd; return p[2]+"/"+p[1]+"/"+p[0]; }
 
-/* ========== CONTROLE DE FECHAMENTO E ESCOLHA DE TELA INICIAL ========== */
+function normalizarNome(str){
+  return (str || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ");
+}
+function validarEmail(email){ return email && email.includes("@") && email.includes("."); }
+function msgForm(texto, ok){ const box = document.getElementById("msgForm"); box.innerHTML = ""; const div = document.createElement("div"); div.className = ok ? "msg-sucesso" : "msg-erro"; div.textContent = texto; box.appendChild(div); }
+function formatarDataBR(yyyyMMdd){ if (!yyyyMMdd) return "-"; const p = yyyyMMdd.split("-"); if (p.length !== 3) return yyyyMMdd; return p[2] + "/" + p[1] + "/" + p[0]; }
+
+/* sanitize HTML: remove <script> e atributos on* */
+function sanitizeHtml(html){
+  if (!html) return "";
+  // remove <script>...</script>
+  html = html.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
+  // remove on* attributes (onclick, onerror, etc)
+  html = html.replace(/\son\w+="[^"]*"/gi, "");
+  html = html.replace(/\son\w+='[^']*'/gi, "");
+  // remove javascript: in href/src
+  html = html.replace(/(href|src)\s*=\s*"(javascript:[^"]*)"/gi, '$1="#"');
+  html = html.replace(/(href|src)\s*=\s*'(javascript:[^']*)'/gi, "$1='#'");
+  return html;
+}
+
+/* ========== STATUS INSCRIÇÕES E TROCA DE TELAS ========== */
 
 function atualizarStatusInscricoes(){
   const hoje = new Date();
@@ -530,37 +815,37 @@ function atualizarStatusInscricoes(){
 
   inscricoesEncerradas = fechado;
 
-  // desabilita campos do form se fechado
   const form = document.getElementById("formInscricao");
   if (form){
     const campos = form.querySelectorAll("input,select,textarea,button[type='submit']");
     campos.forEach(el => { el.disabled = fechado; });
   }
 
-  // atualiza status admin
   const adminStatus = document.getElementById("adminStatus");
-  if (adminStatus){
-    if (fechado){
+  if (fechado){
+    msgForm(configEvento.msgEncerradas || "As inscrições foram encerradas.", false);
+    if (adminStatus){
       adminStatus.textContent = "Inscrições ENCERRADAS";
       adminStatus.classList.add("fechado");
-    } else {
+    }
+    // mostrar página de boas-vindas pública e ocultar formulário
+    document.getElementById("secInscricao").style.display = "none";
+    document.getElementById("secWelcome").style.display = "block";
+    // popular preview com conteúdo salvo
+    renderWelcomePublic();
+  } else {
+    document.getElementById("msgForm").innerHTML = "";
+    if (adminStatus){
       adminStatus.textContent = "Inscrições ABERTAS";
       adminStatus.classList.remove("fechado");
     }
-  }
-
-  // Escolha qual seção mostrar publicamente: se fechado -> welcome, senão -> inscrição
-  if (fechado){
-    mostrarSecaoPublica("welcome");
-    // mostrar mensagem no form se ainda visível (por segurança)
-    msgForm(configEvento.msgEncerradas || "As inscrições foram encerradas.", false);
-  } else {
-    mostrarSecaoPublica("inscricao");
-    document.getElementById("msgForm").innerHTML = "";
+    // mostrar formulário e ocultar welcome público
+    document.getElementById("secInscricao").style.display = "block";
+    document.getElementById("secWelcome").style.display = "none";
   }
 }
 
-/* ========== CARREGAR / SALVAR CONFIGURACOES (inclui welcome) ========== */
+/* ========== CARREGAR / SALVAR CONFIGS (inclui welcomePage) ========== */
 
 async function carregarConfiguracoes(){
   try{
@@ -577,25 +862,20 @@ async function carregarConfiguracoes(){
       if (d.limitesModalidadeTurma){
         Object.keys(d.limitesModalidadeTurma).forEach(m => {
           const val = d.limitesModalidadeTurma[m];
-          if (typeof val === "number") LIMITE_MODALIDADE_TURMA[m] = val;
+          if (typeof val === "number"){ LIMITE_MODALIDADE_TURMA[m] = val; }
         });
       }
       if (d.nomeEvento) configEvento.nomeEvento = d.nomeEvento;
       if (d.anoEdicao) configEvento.anoEvento = d.anoEdicao;
       if (d.textoInicial) configEvento.textoInicial = d.textoInicial;
       if (d.autorizacoes) configEvento.autorizacoes = d.autorizacoes || {};
-
-      // campos novos: welcome
-      if (d.welcomeTitle) configEvento.welcomeTitle = d.welcomeTitle;
-      if (d.welcomeSubtitle) configEvento.welcomeSubtitle = d.welcomeSubtitle;
-      if (d.welcomeLogo) configEvento.welcomeLogo = d.welcomeLogo;
-      if (d.welcomeTexto) configEvento.welcomeTexto = d.welcomeTexto;
+      if (d.welcomePage) configEvento.welcomePage = d.welcomePage || {};
     }
   }catch(e){
-    console.error("Erro ao carregar configurações:",e);
+    console.error("Erro ao carregar configurações:", e);
   }
 
-  // Atualiza campos da UI com config carregada
+  // Atualiza UI com config carregada
   document.getElementById("cfgDataLimite").value = configEvento.dataLimite || "";
   document.getElementById("cfgMsgEncerradas").value = configEvento.msgEncerradas || "";
   document.getElementById("cfgBloquearAgora").checked = !!configEvento.bloquearAgora;
@@ -612,22 +892,35 @@ async function carregarConfiguracoes(){
   document.getElementById("cfgAnoEvento").value = configEvento.anoEvento || "";
   document.getElementById("cfgTextoInicial").value = configEvento.textoInicial || "";
 
-  // preencher campos do editor welcome
-  document.getElementById("cfgWelcomeTitle").value = configEvento.welcomeTitle || "";
-  document.getElementById("cfgWelcomeSubtitle").value = configEvento.welcomeSubtitle || "";
-  document.getElementById("cfgWelcomeLogo").value = configEvento.welcomeLogo || "";
-  document.getElementById("cfgWelcomeTexto").value = configEvento.welcomeTexto || "";
+  document.getElementById("tituloEvento").textContent = "Inscrições " + (configEvento.nomeEvento || "Movimenta Odisseia");
+  if (configEvento.textoInicial){
+    document.getElementById("subEvento").textContent = configEvento.textoInicial;
+  } else if (configEvento.nomeEvento && configEvento.anoEvento){
+    document.getElementById("subEvento").textContent = "Inscrições para o " + configEvento.nomeEvento + " " + configEvento.anoEvento;
+  }
 
-  // atualizar exibicao public welcome
-  aplicarWelcomePublico();
+  // carregar welcomePage na UI (editor)
+  const wp = configEvento.welcomePage || {};
+  document.getElementById("welcomeTitleInput").value = wp.title || "";
+  document.getElementById("welcomeSubtitleInput").value = wp.subtitle || "";
+  document.getElementById("welcomeHtmlInput").value = wp.html || "";
+  // preview box
+  document.getElementById("welcomePreviewTitle").textContent = wp.title || "";
+  document.getElementById("welcomePreviewSubtitle").textContent = wp.subtitle || "";
+  document.getElementById("welcomePreviewHtml").innerHTML = wp.html ? sanitizeHtml(wp.html) : "";
+  if (wp.logoUrl){
+    document.getElementById("welcomePreviewLogo").src = wp.logoUrl;
+    document.getElementById("welcomePreviewLogo").style.display = "block";
+  } else {
+    document.getElementById("welcomePreviewLogo").style.display = "none";
+  }
 
-  // carregar autorizações na UI (se houver)
   atualizarAutorizacoesUI();
-
   atualizarStatusInscricoes();
   atualizarDisponibilidadeModalidades();
 }
 
+/* salvar configs (mantém welcomePage salvo em config) */
 async function salvarConfiguracoes(){
   if (!isAdmin){
     alert("Apenas o administrador pode salvar as configurações.");
@@ -661,12 +954,6 @@ async function salvarConfiguracoes(){
     "VOLEI": limVolei
   };
 
-  // campos welcome a salvar
-  const welcomeTitle = (document.getElementById("cfgWelcomeTitle").value || "").trim();
-  const welcomeSubtitle = (document.getElementById("cfgWelcomeSubtitle").value || "").trim();
-  const welcomeLogo = (document.getElementById("cfgWelcomeLogo").value || "").trim();
-  const welcomeTexto = (document.getElementById("cfgWelcomeTexto").value || "").trim();
-
   try{
     await db.collection("config").doc("geral").set({
       dataLimiteInscricao: dataLimite || null,
@@ -680,14 +967,10 @@ async function salvarConfiguracoes(){
       anoEdicao: anoEvento,
       textoInicial: textoInicial,
       autorizacoes: configEvento.autorizacoes || {},
-      // welcome
-      welcomeTitle: welcomeTitle || configEvento.welcomeTitle,
-      welcomeSubtitle: welcomeSubtitle || configEvento.welcomeSubtitle,
-      welcomeLogo: welcomeLogo || configEvento.welcomeLogo,
-      welcomeTexto: welcomeTexto || configEvento.welcomeTexto
+      welcomePage: configEvento.welcomePage || {}
     }, { merge:true });
 
-    // atualizar variaveis locais
+    // atualizar local
     configEvento.dataLimite = dataLimite || null;
     configEvento.msgEncerradas = msgEnc;
     configEvento.bloquearAgora = bloquearAgora;
@@ -698,39 +981,16 @@ async function salvarConfiguracoes(){
     configEvento.nomeEvento = nomeEvento;
     configEvento.anoEvento = anoEvento;
     configEvento.textoInicial = textoInicial;
-    configEvento.welcomeTitle = welcomeTitle || configEvento.welcomeTitle;
-    configEvento.welcomeSubtitle = welcomeSubtitle || configEvento.welcomeSubtitle;
-    configEvento.welcomeLogo = welcomeLogo || configEvento.welcomeLogo;
-    configEvento.welcomeTexto = welcomeTexto || configEvento.welcomeTexto;
 
     document.getElementById("tituloEvento").textContent = "Inscrições " + (configEvento.nomeEvento || "Movimenta Odisseia");
-    if (configEvento.textoInicial) document.getElementById("subEvento").textContent = configEvento.textoInicial;
+    if (configEvento.textoInicial){ document.getElementById("subEvento").textContent = configEvento.textoInicial; }
 
-    aplicarWelcomePublico();
     atualizarStatusInscricoes();
     atualizarDisponibilidadeModalidades();
     alert("Configurações salvas com sucesso.");
   }catch(e){
     console.error(e);
     alert("Erro ao salvar configurações.");
-  }
-}
-
-/* atualiza DOM da welcome com valores em configEvento */
-function aplicarWelcomePublico(){
-  const t = document.getElementById("welcomeTitulo");
-  const s = document.getElementById("welcomeSub");
-  const txt = document.getElementById("welcomeTexto");
-  const logo = document.getElementById("welcomeLogo");
-
-  t.textContent = configEvento.welcomeTitle || "Bem-vindo ao Movimenta Odisseia";
-  s.textContent = configEvento.welcomeSubtitle || "";
-  txt.textContent = configEvento.welcomeTexto || "";
-  if (configEvento.welcomeLogo){
-    logo.src = configEvento.welcomeLogo;
-    logo.style.display = "block";
-  } else {
-    logo.style.display = "none";
   }
 }
 
@@ -749,11 +1009,7 @@ function atualizarAutorizacoesUI(){
   MODALIDADES.forEach(m => {
     const id = "cfgAutChk_" + m.replace(/\s+/g,"_");
     const wrapper = document.createElement("label");
-    wrapper.style.marginRight = "10px";
-    wrapper.style.fontSize = "0.9rem";
-    wrapper.style.display = "inline-flex";
-    wrapper.style.alignItems = "center";
-    wrapper.style.gap = "6px";
+    wrapper.style.marginRight = "10px"; wrapper.style.fontSize = "0.9rem"; wrapper.style.display = "inline-flex"; wrapper.style.alignItems = "center"; wrapper.style.gap = "6px";
     const chk = document.createElement("input"); chk.type = "checkbox"; chk.id = id; chk.dataset.mod = m; chk.className = "cfgAutChk";
     wrapper.appendChild(chk);
     const span = document.createElement("span"); span.textContent = "Permitir " + m; wrapper.appendChild(span);
@@ -794,7 +1050,7 @@ function atualizarDisponibilidadeModalidades(){
     const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      const gen = countsQueimadaGenero[turma] || {Masculino:0,Feminino:0};
+      const gen = countsQueimadaGenero[turma] || {Masculino:0, Feminino:0};
       span.textContent = mod + " ("+tot+"/"+LIMITE_QUEIMADA_TOTAL+" / Meninos: "+gen.Masculino+"/"+LIMITE_QUEIMADA_POR_SEXO+" / Meninas: "+gen.Feminino+"/"+LIMITE_QUEIMADA_POR_SEXO+")" + (autorizada ? " — AUTORIZADO" : "");
       if (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada) span.classList.add("modalidade-lotado"); else span.classList.remove("modalidade-lotado");
     } else {
@@ -828,8 +1084,10 @@ function atualizarDisponibilidadeModalidades(){
 
 async function handleSubmitInscricao(e){
   e.preventDefault();
-  if (inscricoesEncerradas){ msgForm(configEvento.msgEncerradas || "As inscrições foram encerradas.", false); return; }
-
+  if (inscricoesEncerradas){
+    msgForm(configEvento.msgEncerradas || "As inscrições foram encerradas.", false);
+    return;
+  }
   if (!emailAtual){
     try{ const fromStorage = localStorage.getItem('insc_email'); if (validarEmail(fromStorage)) emailAtual = fromStorage; }catch(e){}
   }
@@ -841,8 +1099,8 @@ async function handleSubmitInscricao(e){
   const turma = document.getElementById("turma").value;
   const camisaNumero = document.getElementById("camisaNumero").value.trim();
   const observacoes = document.getElementById("observacoes").value.trim();
-  const nomeNorm = normalizarNome(nome);
 
+  const nomeNorm = normalizarNome(nome);
   if (!nome || !sexo || !turno || !turma){ msgForm("Preencha nome, sexo, turno e turma.", false); return; }
 
   const chks = document.querySelectorAll(".chkModalidade:checked");
@@ -897,7 +1155,6 @@ async function handleSubmitInscricao(e){
 }
 
 /* CANCELAR INSCRIÇÃO (ADMIN) */
-
 async function cancelarInscricao(){
   if (!isAdmin){ alert("Apenas o administrador pode cancelar inscrições."); return; }
   const sel = document.getElementById("selectCancelar");
@@ -921,10 +1178,13 @@ async function cancelarInscricao(){
       await db.collection("inscricoes").doc(id).update({ modalidades: filtradas });
       alert("Modalidade cancelada com sucesso.");
     }
-  }catch(e){ console.error(e); alert("Erro ao cancelar inscrição."); }
+  }catch(e){
+    console.error(e);
+    alert("Erro ao cancelar inscrição.");
+  }
 }
 
-/* ========== RENDER / TABELAS / RELATÓRIO ========== */
+/* ========== TABELAS & RENDER ========== */
 
 function renderPublico(){
   const corpo = document.querySelector("#tabelaPublica tbody");
@@ -932,16 +1192,50 @@ function renderPublico(){
   const filtroTurmaEl = document.getElementById("filtroTurma");
   const filtroModEl = document.getElementById("filtroModalidade");
   if (!corpo || !filtroTurnoEl || !filtroTurmaEl || !filtroModEl) return;
+
   const turno = filtroTurnoEl.value;
   const turma = filtroTurmaEl.value;
   const mod = filtroModEl.value;
+
   corpo.innerHTML = "";
+
   if (!turno || !turma || !mod){
-    const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan = 2; td.textContent = "Selecione turno, turma e modalidade para ver os inscritos."; tr.appendChild(td); corpo.appendChild(tr); return;
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 2;
+    td.textContent = "Selecione turno, turma e modalidade para ver os inscritos.";
+    tr.appendChild(td);
+    corpo.appendChild(tr);
+    return;
   }
-  const lista = todasInscricoes.filter(ins => ins.turno === turno && ins.turma === turma && Array.isArray(ins.modalidades) && ins.modalidades.includes(mod));
-  if (!lista.length){ const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan = 2; td.textContent = "Nenhum inscrito para esses filtros."; tr.appendChild(td); corpo.appendChild(tr); return; }
-  lista.forEach(ins => { const tr = document.createElement("tr"); const tdN = document.createElement("td"); const tdT = document.createElement("td"); tdN.textContent = ins.nome; tdT.textContent = ins.turma; tr.appendChild(tdN); tr.appendChild(tdT); corpo.appendChild(tr); });
+
+  const lista = todasInscricoes.filter(ins => {
+    if (ins.turno !== turno) return false;
+    if (ins.turma !== turma) return false;
+    if (!ins.modalidades || !ins.modalidades.includes(mod)) return false;
+    return true;
+  });
+
+  if (!lista.length){
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 2;
+    td.textContent = "Nenhum inscrito para esses filtros.";
+    tr.appendChild(td);
+    corpo.appendChild(tr);
+    return;
+  }
+
+  lista.forEach(ins => {
+    const tr = document.createElement("tr");
+    const tdN = document.createElement("td");
+    const tdT = document.createElement("td");
+    tdN.textContent = ins.nome;
+    tdT.textContent = ins.turma;
+    tr.appendChild(tdN);
+    tr.appendChild(tdT);
+    corpo.appendChild(tr);
+  });
 }
 
 function renderAdmin(){
@@ -951,31 +1245,183 @@ function renderAdmin(){
   const nomeFiltro = (document.getElementById("adminFiltroNome").value || "").toLowerCase();
   const turmaFiltro = document.getElementById("adminFiltroTurma").value;
   const modFiltro = document.getElementById("adminFiltroModalidade").value;
+
   const lista = todasInscricoes.filter(ins => {
     if (nomeFiltro && !(ins.nome || "").toLowerCase().includes(nomeFiltro)) return false;
     if (turmaFiltro && ins.turma !== turmaFiltro) return false;
     if (modFiltro && (!ins.modalidades || !ins.modalidades.includes(modFiltro))) return false;
     return true;
   });
-  if (!lista.length){ const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan = 9; td.textContent = "Nenhuma inscrição com esses filtros."; tr.appendChild(td); corpo.appendChild(tr); return; }
+
+  if (!lista.length){
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 9;
+    td.textContent = "Nenhuma inscrição com esses filtros.";
+    tr.appendChild(td);
+    corpo.appendChild(tr);
+    document.getElementById("totalInscritosAdmin").textContent = todasInscricoes.length;
+    return;
+  }
+
   lista.forEach(ins => {
     const tr = document.createElement("tr");
-    const tdN = document.createElement("td"), tdE=document.createElement("td"), tdS=document.createElement("td"), tdT=document.createElement("td"), tdTu=document.createElement("td"), tdC=document.createElement("td"), tdM=document.createElement("td"), tdO=document.createElement("td"), tdD=document.createElement("td");
-    tdN.textContent = ins.nome || ""; tdE.textContent = ins.email || ""; tdS.textContent = ins.sexo || ""; tdT.textContent = ins.turma || ""; tdTu.textContent = ins.turno || ""; tdC.textContent = ins.camisaNumero || ""; tdM.textContent = (ins.modalidades || []).join(", "); tdO.textContent = ins.observacoes || "";
-    if (ins.timestamp && ins.timestamp.toDate){ const d = ins.timestamp.toDate(); tdD.textContent = d.toLocaleDateString("pt-BR")+" "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); } else tdD.textContent = "-";
-    tr.appendChild(tdN); tr.appendChild(tdE); tr.appendChild(tdS); tr.appendChild(tdT); tr.appendChild(tdTu); tr.appendChild(tdC); tr.appendChild(tdM); tr.appendChild(tdO); tr.appendChild(tdD);
+    const tdN = document.createElement("td");
+    const tdE = document.createElement("td");
+    const tdS = document.createElement("td");
+    const tdT = document.createElement("td");
+    const tdTu = document.createElement("td");
+    const tdC = document.createElement("td");
+    const tdM = document.createElement("td");
+    const tdO = document.createElement("td");
+    const tdD = document.createElement("td");
+
+    tdN.textContent = ins.nome || "";
+    tdE.textContent = ins.email || "";
+    tdS.textContent = ins.sexo || "";
+    tdT.textContent = ins.turma || "";
+    tdTu.textContent = ins.turno || "";
+    tdC.textContent = ins.camisaNumero || "";
+    tdM.textContent = (ins.modalidades || []).join(", ");
+    tdO.textContent = ins.observacoes || "";
+
+    if (ins.timestamp && ins.timestamp.toDate){
+      const d = ins.timestamp.toDate();
+      tdD.textContent = d.toLocaleDateString("pt-BR") + " " + d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+    } else tdD.textContent = "-";
+
+    tr.appendChild(tdN);
+    tr.appendChild(tdE);
+    tr.appendChild(tdS);
+    tr.appendChild(tdT);
+    tr.appendChild(tdTu);
+    tr.appendChild(tdC);
+    tr.appendChild(tdM);
+    tr.appendChild(tdO);
+    tr.appendChild(tdD);
     corpo.appendChild(tr);
+  });
+
+  document.getElementById("totalInscritosAdmin").textContent = todasInscricoes.length;
+}
+
+/* RELATÓRIO e RELATÓRIO TODA TURMA (mesma lógica do seu original) */
+function renderRelatorio(){ /* ... copiar/usar sua implementação já existente ... */ 
+  // por brevidade aqui chamamos a versão completa já implementada abaixo
+  const tbody = document.querySelector("#tabelaRelatorio tbody");
+  const turnoEl = document.getElementById("relatorioTurno");
+  const turmaEl = document.getElementById("relatorioTurma");
+  const modEl = document.getElementById("relatorioModalidade");
+  const tituloLinha1 = document.getElementById("relatorioTituloLinha1");
+  const tituloLinha2 = document.getElementById("relatorioTituloLinha2");
+  if (!tbody || !turnoEl || !turmaEl || !modEl) return;
+  const turno = turnoEl.value;
+  const turma = turmaEl.value;
+  const modalidade = modEl.value;
+  tbody.innerHTML = "";
+  tituloLinha1.textContent = "Relatório de inscritos – " + (configEvento.nomeEvento || "Movimenta Odisseia");
+  if (!turno || !turma || !modalidade){
+    tituloLinha2.textContent = "Selecione turno, turma e modalidade para gerar o relatório.";
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Selecione turno, turma e modalidade para gerar o relatório.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+  let lista = todasInscricoes.filter(ins => ins.turno === turno && ins.turma === turma && ins.modalidades && ins.modalidades.includes(modalidade));
+  lista = lista.slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
+  if (!lista.length){
+    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – 0 inscritos.`;
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Nenhuma inscrição para esses filtros.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+  tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – Total: ${lista.length} inscrito(s).`;
+  lista.forEach(ins => {
+    const tr = document.createElement("tr");
+    const tdNome = document.createElement("td");
+    const tdSexo = document.createElement("td");
+    const tdTurma = document.createElement("td");
+    const tdTurno = document.createElement("td");
+    const tdModalidades = document.createElement("td");
+    const tdEmail = document.createElement("td");
+    const tdCamisa = document.createElement("td");
+    const tdObs = document.createElement("td");
+    tdNome.textContent = ins.nome || "";
+    tdSexo.textContent = ins.sexo || "";
+    tdTurma.textContent = ins.turma || "";
+    tdTurno.textContent = ins.turno || "";
+    tdModalidades.textContent = modalidade;
+    tdEmail.textContent = ins.email || "";
+    tdCamisa.textContent = ins.camisaNumero || "";
+    tdObs.textContent = ins.observacoes || "";
+    tr.appendChild(tdNome); tr.appendChild(tdSexo); tr.appendChild(tdTurma); tr.appendChild(tdTurno);
+    tr.appendChild(tdModalidades); tr.appendChild(tdEmail); tr.appendChild(tdCamisa); tr.appendChild(tdObs);
+    tbody.appendChild(tr);
   });
 }
 
-/* Relatório/relatório toda turma (mantidos — mesmo que no código anterior) */
-function renderRelatorio(){ /* ... (mantém implementação anterior) */ 
-  // por brevidade: chamamos a versão anterior já presente no script (o comportamento é o mesmo).
-  // no init abaixo, o listener que atualiza essas funções já foram carregadas.
+function renderRelatorioTodaTurma(){
+  const tbody = document.querySelector("#tabelaRelatorio tbody");
+  const turnoEl = document.getElementById("relatorioTurno");
+  const turmaEl = document.getElementById("relatorioTurma");
+  const tituloLinha1 = document.getElementById("relatorioTituloLinha1");
+  const tituloLinha2 = document.getElementById("relatorioTituloLinha2");
+  if (!tbody || !turnoEl || !turmaEl) return;
+  const turno = turnoEl.value;
+  const turma = turmaEl.value;
+  tbody.innerHTML = "";
+  tituloLinha1.textContent = "Relatório completo da turma – " + (configEvento.nomeEvento || "Movimenta Odisseia");
+  if (!turno || !turma){
+    tituloLinha2.textContent = "Selecione turno e turma para gerar o relatório da turma inteira.";
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Selecione turno e turma para gerar o relatório da turma inteira.";
+    tr.appendChild(td); tbody.appendChild(tr); return;
+  }
+  let lista = todasInscricoes.filter(ins => ins.turno === turno && ins.turma === turma);
+  lista = lista.slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
+  if (!lista.length){
+    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} – Total: 0 inscritos.`;
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Nenhuma inscrição nesta turma.";
+    tr.appendChild(td); tbody.appendChild(tr); return;
+  }
+  tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} – Total: ${lista.length} inscrito(s).`;
+  lista.forEach(ins => {
+    const tr = document.createElement("tr");
+    const tdNome = document.createElement("td");
+    const tdSexo = document.createElement("td");
+    const tdTurma = document.createElement("td");
+    const tdTurno = document.createElement("td");
+    const tdModalidades = document.createElement("td");
+    const tdEmail = document.createElement("td");
+    const tdCamisa = document.createElement("td");
+    const tdObs = document.createElement("td");
+    tdNome.textContent = ins.nome || "";
+    tdSexo.textContent = ins.sexo || "";
+    tdTurma.textContent = ins.turma || "";
+    tdTurno.textContent = ins.turno || "";
+    tdModalidades.textContent = (ins.modalidades || []).join(", ");
+    tdEmail.textContent = ins.email || "";
+    tdCamisa.textContent = ins.camisaNumero || "";
+    tdObs.textContent = ins.observacoes || "";
+    tr.appendChild(tdNome); tr.appendChild(tdSexo); tr.appendChild(tdTurma); tr.appendChild(tdTurno);
+    tr.appendChild(tdModalidades); tr.appendChild(tdEmail); tr.appendChild(tdCamisa); tr.appendChild(tdObs);
+    tbody.appendChild(tr);
+  });
 }
-function renderRelatorioTodaTurma(){ /* ... */ }
 
-/* preencher selects e selectCancelar atualizado */
+/* preencher selects (filtros e cancelar) */
 function atualizarSelectsAdminPublico(){
   const filtroTurma = document.getElementById("filtroTurma");
   const filtroMod = document.getElementById("filtroModalidade");
@@ -988,7 +1434,9 @@ function atualizarSelectsAdminPublico(){
   const turmasOrd = Array.from(turmasSet).sort();
 
   adminTurma.innerHTML = '<option value="">Todas</option>';
-  turmasOrd.forEach(t => { const opt = document.createElement("option"); opt.value = t; opt.textContent = t; adminTurma.appendChild(opt); });
+  turmasOrd.forEach(t => {
+    const opt = document.createElement("option"); opt.value = t; opt.textContent = t; adminTurma.appendChild(opt);
+  });
 
   filtroMod.innerHTML = '<option value="">Selecione a modalidade...</option>';
   adminMod.innerHTML = '<option value="">Todas</option>';
@@ -1013,14 +1461,260 @@ function atualizarSelectsAdminPublico(){
   });
 }
 
-/* ========== JOGOS / PLACAR / CLASSIFICAÇÃO / ADMIN JOGOS - mantidos ========== */
-/* por brevidade, mantemos as funções do código anterior para cadastrar/excluir/atualizar jogos, renderPlacarAoVivo, renderClassificacao etc. */
-/* (o código completo foi mantido no original e permanece funcional) */
+/* ========== JOGOS / PLACAR / CLASSIFICAÇÃO (mantive suas implementações) ========== */
 
-/* ========== PROFESSORES (ADICIONAR/EXCLUIR) ========== */
-/* mantém lógica anterior (adicionarProfessorAcesso, excluirProfessorAcesso, renderProfessoresAdmin, indicarAlunoNaoParticipa, renderPainelProfessores, etc.) */
+function renderJogosAluno(){ /* implementação similar já existente (usada acima) */
+  const serieEl = document.getElementById("filtroSerieJogo");
+  const modalidadeEl = document.getElementById("filtroModalidadeJogo");
+  const dataEl = document.getElementById("filtroDataJogo");
+  const container = document.getElementById("listaJogosContainer");
+  if (!serieEl || !modalidadeEl || !dataEl || !container) return;
+  const serie = serieEl.value;
+  const modalidade = modalidadeEl.value;
+  const dataFiltro = dataEl.value;
+  container.innerHTML = "";
+  if (!serie || !modalidade){ container.textContent = "Selecione a série e a modalidade para ver os jogos."; return; }
+  let lista = todosJogos.filter(j => {
+    const s1 = getSerieFromTurma(j.turma1);
+    const s2 = getSerieFromTurma(j.turma2);
+    if (s1 !== serie && s2 !== serie) return false;
+    if (j.modalidade !== modalidade) return false;
+    if (dataFiltro && j.dataJogo !== dataFiltro) return false;
+    return true;
+  });
+  if (!lista.length){ container.textContent = "Nenhum jogo para esses filtros."; return; }
+  lista = lista.slice().sort((a,b) => {
+    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
+    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
+    return da.localeCompare(db);
+  });
+  lista.forEach(j => {
+    const div = document.createElement("div");
+    div.className = "jogo-bloco";
+    div.innerHTML =
+      "<strong>"+(j.modalidade || "-")+"</strong><br>"+
+      "Data: "+formatarDataBR(j.dataJogo)+" — Horário: "+(j.horarioJogo || "-")+"<br>"+
+      "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+"<br>"+
+      "Local: "+(j.localJogo || "-");
+    container.appendChild(div);
+  });
+}
 
-/* ========== TROCA DE TELAS (PUBLICA E ADMIN) ========== */
+function renderPlacarAoVivo(){
+  const container = document.getElementById("placarAoVivoContainer");
+  if (!container) return;
+  container.innerHTML = "";
+  const statusLabel = { "AGENDADO": "Agendado", "PRESTES": "Prestes a começar", "EM_ANDAMENTO": "Em andamento", "FINALIZADO": "Finalizado" };
+  const jogosAoVivo = todosJogos.filter(j => j.status === "EM_ANDAMENTO" || j.status === "PRESTES");
+  if (!jogosAoVivo.length){
+    const p = document.createElement("p"); p.textContent = "Nenhum jogo em andamento ou prestes a começar neste momento."; container.appendChild(p); return;
+  }
+  jogosAoVivo.sort((a,b) => ((a.dataJogo||"") + (a.horarioJogo||"")).localeCompare((b.dataJogo||"") + (b.horarioJogo||"")));
+  jogosAoVivo.forEach(j => {
+    const card = document.createElement("div"); card.className = "placar-card";
+    const topo = document.createElement("div"); topo.className = "placar-linha-principal"; topo.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-"); card.appendChild(topo);
+    const info = document.createElement("div"); info.innerHTML = "Local: "+(j.localJogo || "-")+"<br>"+(j.turma1||"")+" <strong>"+(j.placar1 ?? 0)+"</strong> x <strong>"+(j.placar2 ?? 0)+"</strong> "+(j.turma2 || ""); card.appendChild(info);
+    const statusSpan = document.createElement("span"); statusSpan.className = "placar-status"; if (j.status==="EM_ANDAMENTO") statusSpan.classList.add("andamento"); if (j.status==="PRESTES") statusSpan.classList.add("prestes"); statusSpan.textContent = statusLabel[j.status] || j.status || "–"; card.appendChild(statusSpan);
+    container.appendChild(card);
+  });
+}
+
+function renderClassificacao(){
+  const container = document.getElementById("classificacaoContainer");
+  if (!container) return;
+  container.innerHTML = "";
+  if (!todosJogos.length){ container.textContent = "Nenhum jogo registrado ainda."; return; }
+  const finalizados = todosJogos.filter(j => j.status === "FINALIZADO");
+  if (!finalizados.length){ container.textContent = "Nenhum jogo finalizado ainda para mostrar classificados."; return; }
+  finalizados.sort((a,b) => ((a.dataJogo||"") + (a.horarioJogo||"")).localeCompare((b.dataJogo||"") + (b.horarioJogo||"")));
+  finalizados.forEach(j => {
+    const card = document.createElement("div"); card.className = "jogo-bloco";
+    const header = document.createElement("div"); header.style.fontWeight = "600"; header.style.marginBottom = "4px"; header.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-"); card.appendChild(header);
+    const p1 = j.placar1 ?? 0; const p2 = j.placar2 ?? 0;
+    let vencedor = null; if (p1 > p2) vencedor = "t1"; else if (p2 > p1) vencedor = "t2";
+    function montarLinha(turma, placar, pos){
+      const linha = document.createElement("div"); linha.className = "linha-classificado";
+      const bol = document.createElement("span"); bol.className = "bolinha-resultado";
+      if (!vencedor) bol.classList.add("bolinha-neutra"); else if ((vencedor==="t1"&&pos===1)||(vencedor==="t2"&&pos===2)) bol.classList.add("bolinha-verde"); else bol.classList.add("bolinha-vermelha");
+      const nomeSpan = document.createElement("span"); nomeSpan.textContent = turma || "-"; nomeSpan.style.marginRight = "6px";
+      const placarSpan = document.createElement("strong"); placarSpan.textContent = placar;
+      linha.appendChild(bol); linha.appendChild(nomeSpan); linha.appendChild(document.createTextNode(" — ")); linha.appendChild(placarSpan);
+      return linha;
+    }
+    card.appendChild(montarLinha(j.turma1, p1, 1)); card.appendChild(montarLinha(j.turma2, p2, 2));
+    const info = document.createElement("div"); info.style.marginTop = "4px";
+    if (vencedor === "t1") info.textContent = "Classificado: " + (j.turma1 || "-"); else if (vencedor === "t2") info.textContent = "Classificado: " + (j.turma2 || "-"); else info.textContent = "Empate – sem classificado definido.";
+    card.appendChild(info);
+    container.appendChild(card);
+  });
+}
+
+/* ========== JOGOS ADMIN (CADASTRAR/EXCLUIR/ATUALIZAR) ========== */
+
+async function cadastrarJogo(){
+  if (!isAdmin){ alert("Apenas o administrador pode cadastrar jogos."); return; }
+  const dataJogo = document.getElementById("jogoData").value;
+  const turma1 = document.getElementById("jogoTurma1").value;
+  const turma2 = document.getElementById("jogoTurma2").value;
+  const modalidade = document.getElementById("jogoModalidade").value;
+  const horario = document.getElementById("jogoHorario").value;
+  const local = (document.getElementById("jogoLocal").value || "").trim();
+  if (!dataJogo || !turma1 || !turma2 || !modalidade || !horario || !local){ alert("Preencha todos os campos do jogo."); return; }
+  if (turma1 === turma2){ alert("Turma 1 e Turma 2 devem ser diferentes."); return; }
+  try{
+    await db.collection("jogos").add({ dataJogo, turma1, turma2, modalidade, horarioJogo: horario, localJogo: local, status: "AGENDADO", placar1: 0, placar2: 0, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    alert("Jogo cadastrado com sucesso.");
+    document.getElementById("jogoData").value = ""; document.getElementById("jogoTurma1").value = ""; document.getElementById("jogoTurma2").value = ""; document.getElementById("jogoModalidade").value = ""; document.getElementById("jogoHorario").value = ""; document.getElementById("jogoLocal").value = "";
+  }catch(e){ console.error(e); alert("Erro ao cadastrar jogo."); }
+}
+
+function atualizarSelectExcluirJogo(){
+  const sel = document.getElementById("selectExcluirJogo");
+  if (!sel) return;
+  const filtroInput = document.getElementById("filtroExcluirJogo");
+  const termo = filtroInput ? (filtroInput.value || "").toLowerCase() : "";
+  sel.innerHTML = '<option value="">Selecione um jogo...</option>';
+  todosJogos.forEach(j => {
+    const label = (j.modalidade || "")+" — "+formatarDataBR(j.dataJogo)+" "+(j.horarioJogo || "")+" — "+(j.turma1 || "")+" x "+(j.turma2 || "");
+    if (termo && !label.toLowerCase().includes(termo)) return;
+    const opt = document.createElement("option"); opt.value = j.id; opt.textContent = label; sel.appendChild(opt);
+  });
+}
+
+async function excluirJogo(){
+  if (!isAdmin){ alert("Apenas o administrador pode excluir jogos."); return; }
+  const sel = document.getElementById("selectExcluirJogo"); const id = sel.value;
+  if (!id){ alert("Selecione um jogo."); return; }
+  const jogo = todosJogos.find(j => j.id === id);
+  const desc = jogo ? ((jogo.modalidade || "")+" — "+formatarDataBR(jogo.dataJogo)+" "+(jogo.horarioJogo || "")+" — "+(jogo.turma1 || "")+" x "+(jogo.turma2 || "")) : "";
+  if (!confirm("Excluir o jogo: "+desc+" ?")) return;
+  try{ await db.collection("jogos").doc(id).delete(); alert("Jogo excluído."); }catch(e){ console.error(e); alert("Erro ao excluir jogo."); }
+}
+
+function renderAdminJogos(){
+  const container = document.getElementById("listaAdminJogos");
+  if (!container) return;
+  container.innerHTML = "";
+  if (!todosJogos.length){ container.textContent = "Nenhum jogo cadastrado."; return; }
+  const statusOptions = ["AGENDADO","PRESTES","EM_ANDAMENTO","FINALIZADO"];
+  todosJogos.forEach(j => {
+    const bloco = document.createElement("div"); bloco.className = "jogo-bloco";
+    const linha1 = document.createElement("div"); linha1.innerHTML = "<strong>"+(j.modalidade || "-")+"</strong> — "+formatarDataBR(j.dataJogo)+" às "+(j.horarioJogo || "-"); bloco.appendChild(linha1);
+    const linha2 = document.createElement("div"); linha2.textContent = "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+" — Local: "+(j.localJogo || "-"); bloco.appendChild(linha2);
+    const controles = document.createElement("div"); controles.style.marginTop = "4px"; controles.style.display = "flex"; controles.style.flexWrap = "wrap"; controles.style.gap = "6px"; controles.style.alignItems = "center";
+    const selStatus = document.createElement("select"); selStatus.dataset.id = j.id; statusOptions.forEach(st => { const opt = document.createElement("option"); opt.value = st; opt.textContent = st; if (j.status === st) opt.selected = true; selStatus.appendChild(opt); });
+    const inpP1 = document.createElement("input"); inpP1.type = "number"; inpP1.min = "0"; inpP1.value = (j.placar1 ?? 0); inpP1.style.width = "60px"; inpP1.dataset.id = j.id; inpP1.dataset.tipo = "p1";
+    const inpP2 = document.createElement("input"); inpP2.type = "number"; inpP2.min = "0"; inpP2.value = (j.placar2 ?? 0); inpP2.style.width = "60px"; inpP2.dataset.id = j.id; inpP2.dataset.tipo = "p2";
+    const labelP1 = document.createElement("span"); labelP1.textContent = (j.turma1 || "T1")+":";
+    const labelP2 = document.createElement("span"); labelP2.textContent = (j.turma2 || "T2")+":";
+    const btnSalvar = document.createElement("button"); btnSalvar.className = "btn btn-primaria btnSalvarJogo"; btnSalvar.textContent = "Salvar"; btnSalvar.dataset.id = j.id;
+    controles.appendChild(document.createTextNode("Status:")); controles.appendChild(selStatus); controles.appendChild(labelP1); controles.appendChild(inpP1); controles.appendChild(labelP2); controles.appendChild(inpP2); controles.appendChild(btnSalvar);
+    bloco.appendChild(controles); container.appendChild(bloco);
+  });
+
+  container.querySelectorAll(".btnSalvarJogo").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (!isAdmin){ alert("Apenas o administrador pode atualizar jogos."); return; }
+      const id = btn.dataset.id;
+      const bloco = btn.closest(".jogo-bloco");
+      const selStatus = bloco.querySelector("select"); const inpP1 = bloco.querySelector('input[data-tipo="p1"]'); const inpP2 = bloco.querySelector('input[data-tipo="p2"]');
+      const novoStatus = selStatus.value; const placar1 = parseInt(inpP1.value,10) || 0; const placar2 = parseInt(inpP2.value,10) || 0;
+      try{ await db.collection("jogos").doc(id).update({ status: novoStatus, placar1: placar1, placar2: placar2 }); alert("Jogo atualizado com sucesso."); }catch(e){ console.error(e); alert("Erro ao atualizar jogo."); }
+    });
+  });
+}
+
+/* ========== PROFESSORES (ACESSOS) ========== */
+
+async function adicionarProfessorAcesso(){
+  if (!isAdmin){ alert("Apenas o administrador pode cadastrar acessos de professores."); return; }
+  const nome = (document.getElementById("profNomeCadastro").value || "").trim();
+  const tipo = document.getElementById("profTipoCadastro").value || "Professor";
+  const senha = (document.getElementById("profSenhaCadastro").value || "").trim();
+  if (!nome || !senha){ alert("Preencha nome e senha."); return; }
+  try{ await db.collection("professoresAcesso").add({ nome: nome, tipo: tipo, senha: senha }); alert("Acesso cadastrado com sucesso."); document.getElementById("profNomeCadastro").value = ""; document.getElementById("profSenhaCadastro").value = ""; document.getElementById("profTipoCadastro").value = "Professor"; }catch(e){ console.error(e); alert("Erro ao cadastrar acesso."); }
+}
+
+async function excluirProfessorAcesso(id){
+  if (!isAdmin){ alert("Apenas o administrador pode excluir acessos."); return; }
+  if (!confirm("Excluir este acesso de professor?")) return;
+  try{ await db.collection("professoresAcesso").doc(id).delete(); alert("Acesso excluído."); }catch(e){ console.error(e); alert("Erro ao excluir acesso."); }
+}
+
+function renderProfessoresAdmin(){
+  const tbody = document.getElementById("tabelaProfessoresAdmin");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (!todosProfessores.length){
+    const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan = 4; td.textContent = "Nenhum acesso cadastrado."; tr.appendChild(td); tbody.appendChild(tr); return;
+  }
+  todosProfessores.forEach(p => {
+    const tr = document.createElement("tr");
+    const tdNome = document.createElement("td"); const tdTipo = document.createElement("td"); const tdSenha = document.createElement("td"); const tdAcoes = document.createElement("td");
+    tdNome.textContent = p.nome || ""; tdTipo.textContent = p.tipo || ""; tdSenha.textContent = p.senha || "";
+    const btn = document.createElement("button"); btn.className = "btn btn-primaria"; btn.style.padding = "3px 8px"; btn.textContent = "Excluir"; btn.addEventListener("click", () => excluirProfessorAcesso(p.id));
+    tdAcoes.appendChild(btn);
+    tr.appendChild(tdNome); tr.appendChild(tdTipo); tr.appendChild(tdSenha); tr.appendChild(tdAcoes);
+    tbody.appendChild(tr);
+  });
+}
+
+/* ========== PAINEL PROFESSORES (MARCAR) ========== */
+
+function renderPainelProfessores(){
+  const listaDiv = document.getElementById("profListaAlunos");
+  const turnoSel = document.getElementById("profTurnoSelect");
+  const turmaSel = document.getElementById("profTurmaSelect");
+  const labelProf = document.getElementById("profUsuarioAtivo");
+  if (!listaDiv || !turnoSel || !turmaSel) return;
+  if (currentProfessor && labelProf){ labelProf.textContent = currentProfessor.nome + " (" + currentProfessor.tipo + ")"; }
+  const turno = turnoSel.value; const turma = turmaSel.value;
+  listaDiv.innerHTML = "";
+  if (!turno || !turma){ listaDiv.textContent = "Selecione turno e turma para ver os alunos inscritos."; return; }
+  const lista = todasInscricoes.filter(ins => ins.turno === turno && ins.turma === turma);
+  if (!lista.length){ listaDiv.textContent = "Nenhum inscrito nesta turma para estes filtros."; return; }
+  lista.forEach(ins => {
+    const bloqueios = Array.isArray(ins.naoAutorizadoPor) ? ins.naoAutorizadoPor : [];
+    const jaIndicou = currentProfessor ? bloqueios.includes(currentProfessor.id) : false;
+    const card = document.createElement("div"); card.className = "jogo-bloco";
+    const nome = document.createElement("div"); nome.innerHTML = "<strong>"+(ins.nome || "")+"</strong>"; card.appendChild(nome);
+    const detalhe = document.createElement("div"); detalhe.style.fontSize = "0.8rem"; detalhe.innerHTML = "Turma: "+(ins.turma || "-")+" — Turno: "+(ins.turno || "-")+"<br>"+"Modalidades: "+((ins.modalidades || []).join(", ") || "-"); card.appendChild(detalhe);
+    const info = document.createElement("div"); info.style.marginTop = "4px"; info.style.fontSize = "0.78rem"; info.textContent = "Já indicado por "+bloqueios.length+" professor(es)."; card.appendChild(info);
+    const btn = document.createElement("button"); btn.className = "btn btn-primaria"; btn.style.marginTop = "4px"; btn.textContent = jaIndicou ? "Você já indicou este aluno" : "Indicar que NÃO pode participar"; btn.disabled = jaIndicou; btn.addEventListener("click", () => indicarAlunoNaoParticipa(ins.id));
+    card.appendChild(btn); listaDiv.appendChild(card);
+  });
+}
+
+function configurarSelectTurmaProfessor(){
+  const turnoSel = document.getElementById("profTurnoSelect");
+  const turmaSel = document.getElementById("profTurmaSelect");
+  if (!turnoSel || !turmaSel) return;
+  const turno = turnoSel.value;
+  turmaSel.innerHTML = "";
+  const optDefault = document.createElement("option");
+  if (!turno){ optDefault.value = ""; optDefault.textContent = "Selecione o turno primeiro..."; turmaSel.appendChild(optDefault); }
+  else { optDefault.value = ""; optDefault.textContent = "Selecione a turma..."; turmaSel.appendChild(optDefault); const turmasTurno = getTurmasPorTurno(turno); turmasTurno.forEach(t => { const opt = document.createElement("option"); opt.value = t; opt.textContent = t; turmaSel.appendChild(opt); }); }
+}
+
+async function indicarAlunoNaoParticipa(inscricaoId){
+  if (!currentProfessor){ alert("Faça login como professor/coordenador/gestor para indicar alunos."); return; }
+  if (!confirm("Confirmar indicação de que este aluno NÃO pode participar?")){ return; }
+  const ref = db.collection("inscricoes").doc(inscricaoId);
+  try{
+    await db.runTransaction(function(tx){
+      return tx.get(ref).then(doc => {
+        if (!doc.exists) return;
+        const data = doc.data();
+        let lista = Array.isArray(data.naoAutorizadoPor) ? data.naoAutorizadoPor.slice() : [];
+        if (!lista.includes(currentProfessor.id)) lista.push(currentProfessor.id);
+        if (lista.length >= 2){ tx.delete(ref); } else { tx.update(ref, { naoAutorizadoPor: lista }); }
+      });
+    });
+    alert("Indicação registrada. Se mais um professor indicar este aluno, a inscrição será cancelada automaticamente.");
+  }catch(e){ console.error(e); alert("Erro ao registrar indicação."); }
+}
+
+/* ========== TROCA DE TELAS & ABRIR ADMIN ========== */
 
 function mostrarSecao(sec){
   document.getElementById("secInscricao").style.display = (sec==="inscricao"?"block":"none");
@@ -1030,28 +1724,9 @@ function mostrarSecao(sec){
   document.getElementById("secPlacarAoVivo").style.display = (sec==="placar"?"block":"none");
   document.getElementById("adminSection").style.display = (sec==="admin"?"block":"none");
   document.getElementById("professoresSection").style.display = (sec==="professores"?"block":"none");
-  // sempre esconder welcome quando for admin/professores
-  if (sec === "admin" || sec === "professores") document.getElementById("secWelcome").style.display = "none";
+  // welcome is controlled by atualizarStatusInscricoes
 }
 
-/* mostra apenas a seção pública apropriada (inscricao ou welcome) */
-function mostrarSecaoPublica(sec){
-  if (sec === "welcome"){
-    document.getElementById("secWelcome").style.display = "block";
-    document.getElementById("secInscricao").style.display = "none";
-    // ocultar outras seções públicas, caso queira manter só welcome, mantenho apenas inscricao/welcome
-    document.getElementById("secInscritos").style.display = "none";
-    document.getElementById("secJogos").style.display = "none";
-    document.getElementById("secClassificados").style.display = "none";
-    document.getElementById("secPlacarAoVivo").style.display = "none";
-  } else {
-    document.getElementById("secWelcome").style.display = "none";
-    document.getElementById("secInscricao").style.display = "block";
-    // mantém outras seções com estado anterior (mas por padrão ficam escondidas)
-  }
-}
-
-/* abrir admin (mantém lógica anterior) */
 function abrirAdmin(){
   const opcao = prompt(
     "Selecione o tipo de acesso:\n" +
@@ -1067,31 +1742,20 @@ function abrirAdmin(){
   else if (opcao === "3") role = "Coordenador";
   else if (opcao === "4") role = "Gestor";
   else { alert("Opção inválida."); return; }
-
   const senha = prompt("Digite a senha:");
   if (senha === null || senha === "") return;
-
   if (role === "ADMIN"){
     if (senha !== ADMIN_PASSWORD){ alert("Senha incorreta."); return; }
-    isAdmin = true; currentRole = "ADMIN"; currentProfessor = null;
-    mostrarSecao("admin");
-    renderAdmin();
-    renderAdminJogos && renderAdminJogos();
-    // atualizar contagem total visível apenas no admin
-    document.getElementById("adminTotalInscritos").textContent = "Inscritos: " + (todasInscricoes.length || 0);
-    return;
+    isAdmin = true; currentRole = "ADMIN"; currentProfessor = null; mostrarSecao("admin"); renderAdmin(); renderAdminJogos(); return;
   }
-
   const prof = todosProfessores.find(p => p.senha === senha && p.tipo === role);
   if (!prof){ alert("Senha incorreta ou acesso não encontrado para este tipo."); return; }
-
-  isAdmin = false; currentRole = role; currentProfessor = prof;
-  mostrarSecao("professores");
-  renderPainelProfessores && renderPainelProfessores();
+  isAdmin = false; currentRole = role; currentProfessor = prof; mostrarSecao("professores"); renderPainelProfessores();
 }
 
 function fecharAdmin(){ mostrarSecao("inscricao"); currentRole = null; isAdmin = false; }
 function fecharProfessores(){ mostrarSecao("inscricao"); currentRole = null; currentProfessor = null; }
+
 function configurarAbasAdmin(){
   const botoes = document.querySelectorAll(".admin-tab-btn");
   botoes.forEach(btn => {
@@ -1105,16 +1769,13 @@ function configurarAbasAdmin(){
   });
 }
 
-/* ========== LISTENERS FIRESTORE (ouvinte em tempo real) ========== */
+/* ========== FIRESTORE LISTENERS ========== */
 
 function iniciarListeners(){
   db.collection("professoresAcesso").onSnapshot(snap => {
     todosProfessores = [];
-    snap.forEach(doc => {
-      const d = doc.data();
-      todosProfessores.push({ id: doc.id, nome: d.nome || "", tipo: d.tipo || "Professor", senha: d.senha || "" });
-    });
-    renderProfessoresAdmin && renderProfessoresAdmin();
+    snap.forEach(doc => { const d = doc.data(); todosProfessores.push({ id: doc.id, nome: d.nome || "", tipo: d.tipo || "Professor", senha: d.senha || "" }); });
+    renderProfessoresAdmin();
   });
 
   db.collection("inscricoes").orderBy("timestamp","asc").onSnapshot(snap => {
@@ -1143,7 +1804,7 @@ function iniciarListeners(){
         if (!countsPorTurmaModalidade[ins.turma][m]) countsPorTurmaModalidade[ins.turma][m] = 0;
         countsPorTurmaModalidade[ins.turma][m]++;
         if (m === "QUEIMADA MISTA"){
-          if (!countsQueimadaGenero[ins.turma]) countsQueimadaGenero[ins.turma] = {Masculino:0,Feminino:0};
+          if (!countsQueimadaGenero[ins.turma]) countsQueimadaGenero[ins.turma] = {Masculino:0, Feminino:0};
           if (ins.sexo === "Masculino") countsQueimadaGenero[ins.turma].Masculino++;
           if (ins.sexo === "Feminino") countsQueimadaGenero[ins.turma].Feminino++;
         }
@@ -1153,10 +1814,8 @@ function iniciarListeners(){
     atualizarSelectsAdminPublico();
     renderPublico();
     renderAdmin();
-    renderRelatorio && renderRelatorio();
-    // atualizar contagem exibida no admin (se estiver aberto)
-    document.getElementById("adminTotalInscritos").textContent = "Inscritos: " + (todasInscricoes.length || 0);
-    if (currentRole && currentRole !== "ADMIN") renderPainelProfessores && renderPainelProfessores();
+    renderRelatorio();
+    if (currentRole && currentRole !== "ADMIN"){ renderPainelProfessores(); }
   });
 
   db.collection("jogos").orderBy("dataJogo","asc").onSnapshot(snap => {
@@ -1181,32 +1840,101 @@ function iniciarListeners(){
         placar2: Number.isFinite(p2) ? p2 : 0
       });
     });
-    atualizarSelectExcluirJogo && atualizarSelectExcluirJogo();
-    renderJogosAluno && renderJogosAluno();
-    renderPlacarAoVivo && renderPlacarAoVivo();
-    renderClassificacao && renderClassificacao();
-    renderAdminJogos && renderAdminJogos();
+    atualizarSelectExcluirJogo();
+    renderJogosAluno();
+    renderPlacarAoVivo();
+    renderClassificacao();
+    renderAdminJogos();
   });
 }
 
-/* ========== INIT ========== */
+/* ========== WELCOME PAGE: RENDER PÚBLICO + SALVAR/UPLOAD (ADMIN) ========== */
+
+function renderWelcomePublic(){
+  const wp = configEvento.welcomePage || {};
+  const title = wp.title || "Bem-vindo";
+  const subtitle = wp.subtitle || "";
+  const html = wp.html || "";
+  const logoUrl = wp.logoUrl || "";
+  document.getElementById("welcomeTitle").textContent = title;
+  document.getElementById("welcomeSubtitle").textContent = subtitle;
+  document.getElementById("welcomeContent").innerHTML = sanitizeHtml(html);
+  const img = document.getElementById("welcomeLogo");
+  if (logoUrl){ img.src = logoUrl; img.style.display = "block"; } else { img.style.display = "none"; }
+}
+
+/* upload logo para storage e retorna URL pública */
+async function uploadWelcomeLogo(file){
+  if (!file) return null;
+  const path = 'welcome_logos/' + Date.now() + '_' + (file.name || 'logo');
+  const ref = storage.ref().child(path);
+  const snap = await ref.put(file);
+  const url = await snap.ref.getDownloadURL();
+  return url;
+}
+
+/* salvar welcomePage a partir do editor admin */
+async function salvarWelcomePage(){
+  if (!isAdmin){ alert("Apenas administrador pode salvar a página inicial."); return; }
+  const title = (document.getElementById("welcomeTitleInput").value || "").trim();
+  const subtitle = (document.getElementById("welcomeSubtitleInput").value || "").trim();
+  const html = (document.getElementById("welcomeHtmlInput").value || "").trim();
+  const fileInput = document.getElementById("welcomeLogoFile");
+  let logoUrl = (configEvento.welcomePage && configEvento.welcomePage.logoUrl) || null;
+
+  try{
+    if (fileInput && fileInput.files && fileInput.files[0]){
+      const url = await uploadWelcomeLogo(fileInput.files[0]);
+      if (url) logoUrl = url;
+    }
+
+    const welcomeObj = {
+      title: title,
+      subtitle: subtitle,
+      html: html,
+      logoUrl: logoUrl || null,
+      lastEditedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      lastEditedBy: (currentRole === "ADMIN" ? "ADMIN" : (currentProfessor ? currentProfessor.id : null))
+    };
+
+    // atualiza local e no banco (merge)
+    configEvento.welcomePage = welcomeObj;
+    await db.collection("config").doc("geral").set({ welcomePage: welcomeObj }, { merge: true });
+
+    // atualizar preview e público
+    document.getElementById("welcomePreviewTitle").textContent = title;
+    document.getElementById("welcomePreviewSubtitle").textContent = subtitle;
+    document.getElementById("welcomePreviewHtml").innerHTML = sanitizeHtml(html);
+    if (logoUrl){ document.getElementById("welcomePreviewLogo").src = logoUrl; document.getElementById("welcomePreviewLogo").style.display = "block"; }
+    alert("Página inicial salva com sucesso.");
+    // se inscrições estão encerradas, atualiza página pública também
+    if (inscricoesEncerradas) renderWelcomePublic();
+  }catch(e){ console.error(e); alert("Erro ao salvar página inicial."); }
+}
+
+/* botão preview */
+function previewWelcomeLocal(){
+  const title = (document.getElementById("welcomeTitleInput").value || "").trim();
+  const subtitle = (document.getElementById("welcomeSubtitleInput").value || "").trim();
+  const html = (document.getElementById("welcomeHtmlInput").value || "").trim();
+  document.getElementById("welcomePreviewTitle").textContent = title;
+  document.getElementById("welcomePreviewSubtitle").textContent = subtitle;
+  document.getElementById("welcomePreviewHtml").innerHTML = sanitizeHtml(html);
+  document.getElementById("welcomePreviewLogo").style.display = "none";
+}
+
+/* ========== INICIALIZAÇÃO UI e EVENTOS ========== */
 
 function init(){
-  try {
-    const saved = localStorage.getItem('insc_email');
-    if (saved && saved.includes('@')){ emailAtual = saved; const ov = document.getElementById('emailOverlay'); if (ov) ov.style.display = 'none'; }
-  } catch(e){}
-
+  try { const saved = localStorage.getItem('insc_email'); if (saved && saved.includes('@')){ emailAtual = saved; const ov = document.getElementById('emailOverlay'); if (ov) ov.style.display = 'none'; } } catch(e){}
   const overlay = document.getElementById("emailOverlay");
   const emailInput = document.getElementById("emailAluno");
   const msgEmail = document.getElementById("msgEmailOverlay");
-  function liberarEmail(){ const val = (emailInput.value || '').trim(); if (!validarEmail(val)){ msgEmail.textContent = "Digite um e-mail válido."; return; } emailAtual = val; try { localStorage.setItem('insc_email', val); }catch(e){} try { window._inscricao_email_fallback = val; }catch(e){} if (overlay) overlay.style.display = "none"; }
-
+  function liberarEmail(){ const val = (emailInput.value || '').trim(); if (!validarEmail(val)){ msgEmail.textContent = "Digite um e-mail válido."; return; } emailAtual = val; try { localStorage.setItem('insc_email', val); }catch(e){} try { window._inscricao_email_fallback = val; } catch(e){} if (overlay) overlay.style.display = "none"; }
   const btnEntrar = document.getElementById("btnEntrarEmail");
   if (btnEntrar) btnEntrar.addEventListener("click", liberarEmail);
-  if (emailInput){ emailInput.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); liberarEmail(); } }); }
+  if (emailInput) emailInput.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); liberarEmail(); } });
 
-  // montar lista de modalidades (UI)
   const contMods = document.getElementById("modalidadesContainer");
   MODALIDADES.forEach(m => {
     const item = document.createElement("div"); item.className = "modalidade-item";
@@ -1215,16 +1943,13 @@ function init(){
     const lbl = document.createElement("span"); lbl.className = "modalidade-label"; lbl.textContent = m;
     const vagas = document.createElement("span"); vagas.className = "modalidade-vagas"; vagas.dataset.mod = m; vagas.textContent = "Selecione turno e turma para ver vagas.";
     info.appendChild(lbl); info.appendChild(vagas);
-    item.appendChild(chk); item.appendChild(info);
-    contMods.appendChild(item);
+    item.appendChild(chk); item.appendChild(info); contMods.appendChild(item);
   });
 
   contMods.addEventListener("change", e => {
     if (e.target.classList.contains("chkModalidade")){
       const marcados = contMods.querySelectorAll(".chkModalidade:checked");
-      if (marcados.length > LIMITE_MODALIDADES_POR_ALUNO){
-        e.target.checked = false; alert("Máximo de "+LIMITE_MODALIDADES_POR_ALUNO+" modalidades por aluno.");
-      }
+      if (marcados.length > LIMITE_MODALIDADES_POR_ALUNO){ e.target.checked = false; alert("Máximo de "+LIMITE_MODALIDADES_POR_ALUNO+" modalidades por aluno."); }
     }
   });
 
@@ -1251,21 +1976,21 @@ function init(){
   const filtroModalidade = document.getElementById("filtroModalidade");
   filtroTurma.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
   filtroModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
-
   filtroTurno.addEventListener("change", () => {
-    const turno = filtroTurno.value; filtroTurma.innerHTML = ""; const optDefault = document.createElement("option");
+    const turno = filtroTurno.value;
+    filtroTurma.innerHTML = "";
+    const optDefault = document.createElement("option");
     if (!turno){ optDefault.value = ""; optDefault.textContent = "Selecione o turno primeiro..."; filtroTurma.appendChild(optDefault); }
     else {
       optDefault.value = ""; optDefault.textContent = "Selecione a turma..."; filtroTurma.appendChild(optDefault);
-      const turmasTurno = getTurmasPorTurno(turno); turmasTurno.forEach(t => { const opt = document.createElement("option"); opt.value = t; opt.textContent = t; filtroTurma.appendChild(opt); });
+      const turmasTurno = getTurmasPorTurno(turno);
+      turmasTurno.forEach(t => { const opt = document.createElement("option"); opt.value = t; opt.textContent = t; filtroTurma.appendChild(opt); });
     }
     renderPublico();
   });
-
   filtroTurma.addEventListener("change", renderPublico);
   filtroModalidade.addEventListener("change", renderPublico);
 
-  // jogoTurmas
   const jogoTurma1 = document.getElementById("jogoTurma1");
   const jogoTurma2 = document.getElementById("jogoTurma2");
   if (jogoTurma1 && jogoTurma2){
@@ -1276,32 +2001,31 @@ function init(){
       const o2 = document.createElement("option"); o2.value = t; o2.textContent = t; jogoTurma2.appendChild(o2);
     });
   }
-
   const jogoModalidade = document.getElementById("jogoModalidade");
   MODALIDADES.forEach(m => { const opt = document.createElement("option"); opt.value = m; opt.textContent = m; jogoModalidade.appendChild(opt); });
 
   const relatorioTurno = document.getElementById("relatorioTurno");
   const relatorioTurma = document.getElementById("relatorioTurma");
   const relatorioModalidade = document.getElementById("relatorioModalidade");
-  if (relatorioModalidade){ relatorioModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>'; MODALIDADES.forEach(m => { const opt = document.createElement("option"); opt.value = m; opt.textContent = m; relatorioModalidade.appendChild(opt); }); }
-
+  if (relatorioModalidade){
+    relatorioModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
+    MODALIDADES.forEach(m => { const opt = document.createElement("option"); opt.value = m; opt.textContent = m; relatorioModalidade.appendChild(opt); });
+  }
   if (relatorioTurno && relatorioTurma){
     relatorioTurno.addEventListener("change", () => {
       const turno = relatorioTurno.value; relatorioTurma.innerHTML = ""; const optDefault = document.createElement("option");
       if (!turno){ optDefault.value = ""; optDefault.textContent = "Selecione o turno primeiro..."; relatorioTurma.appendChild(optDefault); }
       else { optDefault.value = ""; optDefault.textContent = "Selecione a turma..."; relatorioTurma.appendChild(optDefault); const turmasTurno = getTurmasPorTurno(turno); turmasTurno.forEach(t => { const opt = document.createElement("option"); opt.value = t; opt.textContent = t; relatorioTurma.appendChild(opt); }); }
-      renderRelatorio && renderRelatorio();
+      renderRelatorio();
     });
-
     relatorioTurma.addEventListener("change", renderRelatorio);
   }
-
-  if (relatorioModalidade){ relatorioModalidade.addEventListener("change", renderRelatorio); }
+  if (relatorioModalidade) relatorioModalidade.addEventListener("change", renderRelatorio);
 
   const btnImprimirRelatorio = document.getElementById("btnImprimirRelatorio");
-  if (btnImprimirRelatorio){ btnImprimirRelatorio.addEventListener("click", () => { renderRelatorio && renderRelatorio(); window.print(); }); }
+  if (btnImprimirRelatorio) btnImprimirRelatorio.addEventListener("click", () => { renderRelatorio(); window.print(); });
   const btnImprimirTodaTurma = document.getElementById("btnImprimirTodaTurma");
-  if (btnImprimirTodaTurma){ btnImprimirTodaTurma.addEventListener("click", () => { renderRelatorioTodaTurma && renderRelatorioTodaTurma(); window.print(); }); }
+  if (btnImprimirTodaTurma) btnImprimirTodaTurma.addEventListener("click", () => { renderRelatorioTodaTurma(); window.print(); });
 
   document.getElementById("btnToggleInscritos").addEventListener("click", () => {
     const sec = document.getElementById("secInscritos").style.display === "block";
@@ -1310,70 +2034,76 @@ function init(){
   });
 
   document.getElementById("btnVerJogos").addEventListener("click", () => {
-    const sec = document.getElementById("secJogos").style.display === "block";
-    const btn = document.getElementById("btnVerJogos");
+    const sec = document.getElementById("secJogos").style.display === "block"; const btn = document.getElementById("btnVerJogos");
     if (sec){ mostrarSecao("inscricao"); btn.textContent = "🏆 Ver jogos"; } else { mostrarSecao("jogos"); btn.textContent = "⬅ Voltar para inscrição"; }
   });
 
   document.getElementById("btnClassificados").addEventListener("click", () => {
-    const sec = document.getElementById("secClassificados").style.display === "block";
-    const btn = document.getElementById("btnClassificados");
+    const sec = document.getElementById("secClassificados").style.display === "block"; const btn = document.getElementById("btnClassificados");
     if (sec){ mostrarSecao("inscricao"); btn.textContent = "✅ Classificados"; } else { mostrarSecao("classificados"); btn.textContent = "⬅ Voltar para inscrição"; }
   });
 
   document.getElementById("btnPlacarAoVivo").addEventListener("click", () => {
-    const sec = document.getElementById("secPlacarAoVivo").style.display === "block";
-    const btn = document.getElementById("btnPlacarAoVivo");
+    const sec = document.getElementById("secPlacarAoVivo").style.display === "block"; const btn = document.getElementById("btnPlacarAoVivo");
     if (sec){ mostrarSecao("inscricao"); btn.textContent = "⚡ Placar ao vivo"; } else { mostrarSecao("placar"); btn.textContent = "⬅ Voltar para inscrição"; }
   });
 
   document.getElementById("btnAdminArea").addEventListener("click", abrirAdmin);
   document.getElementById("btnFecharAdmin").addEventListener("click", fecharAdmin);
   document.getElementById("btnFecharProfessores").addEventListener("click", fecharProfessores);
-
   document.getElementById("formInscricao").addEventListener("submit", handleSubmitInscricao);
-
   document.getElementById("adminFiltroNome").addEventListener("input", () => { renderAdmin(); atualizarSelectsAdminPublico(); });
   document.getElementById("adminFiltroTurma").addEventListener("change", () => { renderAdmin(); atualizarSelectsAdminPublico(); });
   document.getElementById("adminFiltroModalidade").addEventListener("change", renderAdmin);
   document.getElementById("btnCancelarInscricao").addEventListener("click", cancelarInscricao);
-
   const filtroModalidadeJogo = document.getElementById("filtroModalidadeJogo");
   if (filtroModalidadeJogo){ filtroModalidadeJogo.innerHTML = '<option value="">Selecione...</option>'; MODALIDADES.forEach(m => { const opt = document.createElement("option"); opt.value = m; opt.textContent = m; filtroModalidadeJogo.appendChild(opt); }); filtroModalidadeJogo.addEventListener("change", renderJogosAluno); }
-
   document.getElementById("filtroSerieJogo").addEventListener("change", renderJogosAluno);
   document.getElementById("filtroDataJogo").addEventListener("change", renderJogosAluno);
-
-  const filtroExcluirJogo = document.getElementById("filtroExcluirJogo");
-  if (filtroExcluirJogo){ filtroExcluirJogo.addEventListener("input", atualizarSelectExcluirJogo); }
-
+  const filtroExcluirJogo = document.getElementById("filtroExcluirJogo"); if (filtroExcluirJogo) filtroExcluirJogo.addEventListener("input", atualizarSelectExcluirJogo);
   document.getElementById("btnCadastrarJogo").addEventListener("click", cadastrarJogo);
   document.getElementById("btnExcluirJogo").addEventListener("click", excluirJogo);
-
   document.getElementById("btnSalvarConfig").addEventListener("click", e => { e.preventDefault(); salvarConfiguracoes(); });
 
   document.getElementById("btnAdicionarProfessor").addEventListener("click", e => { e.preventDefault(); adicionarProfessorAcesso(); });
-
   const btnGerarSenha = document.getElementById("btnGerarSenhaProfessor");
-  if (btnGerarSenha){ btnGerarSenha.addEventListener("click", e => { e.preventDefault(); let senha = ""; for (let i = 0; i < 5; i++) senha += Math.floor(Math.random()*10); document.getElementById("profSenhaCadastro").value = senha; }); }
+  if (btnGerarSenha) btnGerarSenha.addEventListener("click", e => { e.preventDefault(); let senha = ""; for (let i = 0; i < 5; i++) senha += Math.floor(Math.random() * 10); document.getElementById("profSenhaCadastro").value = senha; });
 
   const profTurnoSelect = document.getElementById("profTurnoSelect");
   const profTurmaSelect = document.getElementById("profTurmaSelect");
   if (profTurnoSelect && profTurmaSelect){
-    profTurnoSelect.addEventListener("change", () => { configurarSelectTurmaProfessor(); renderPainelProfessores && renderPainelProfessores(); });
+    profTurnoSelect.addEventListener("change", () => { configurarSelectTurmaProfessor(); renderPainelProfessores(); });
     profTurmaSelect.addEventListener("change", renderPainelProfessores);
   }
 
   configurarAbasAdmin();
   iniciarListeners();
+
+  // welcome editor buttons
+  document.getElementById("btnSalvarWelcome").addEventListener("click", e => { e.preventDefault(); salvarWelcomePage(); });
+  document.getElementById("btnPreviewWelcome").addEventListener("click", e => { e.preventDefault(); previewWelcomeLocal(); });
+
+  // preencher selects iniciais
+  configurarSelectsIniciais();
+
   carregarConfiguracoes();
 
-  // escolher exibição inicial
-  mostrarSecaoPublica(inscricoesEncerradas ? "welcome" : "inscricao");
+  mostrarSecao("inscricao");
+}
+
+/* helpers para preencher selects iniciais */
+function configurarSelectsIniciais(){
+  // preencher filtros de turno->turma e adminFiltroTurma
+  const adminTurma = document.getElementById("adminFiltroTurma");
+  adminTurma.innerHTML = '<option value="">Todas</option>';
+  TODAS_TURMAS.forEach(t => { const opt = document.createElement("option"); opt.value = t; opt.textContent = t; adminTurma.appendChild(opt); });
+
+  // relatorioTurno options já preenchidos no init
 }
 
 /* DOM ready */
 if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", init); } else { init(); }
+
 </script>
 
 </body>
