@@ -8,7 +8,6 @@
   <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
   <style>
     :root {
@@ -21,59 +20,93 @@
       --texto: #222;
     }
     * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    body { margin:0; background:#f0f4fb; color:var(--texto); }
-    header { background: linear-gradient(90deg, var(--azul), #007bff); color:#fff; padding:14px 18px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; }
-    header h1{ margin:0; font-size:1.1rem; } header small{ display:block; font-size:0.8rem; opacity:.9; }
-    .header-right{ display:flex; gap:8px; flex-wrap:wrap; }
-    .btn{ border:none; border-radius:999px; padding:7px 14px; cursor:pointer; font-size:0.9rem; display:inline-flex; align-items:center; gap:6px;}
-    .btn-primaria{ background:#fff; color:var(--azul); box-shadow:0 2px 6px rgba(0,0,0,0.15); }
-    .btn-admin{ background:transparent; border:1px solid rgba(255,255,255,0.6); color:#fff; }
-    main{ max-width:1100px; margin:18px auto 30px; padding:0 10px; }
-    .card{ background:#fff; border-radius:12px; border:1px solid var(--borda); padding:15px; margin-bottom:14px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
-    .card h2{ margin:0 0 8px; font-size:1.05rem; color:var(--azul); }
-    .grid-2{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-    @media (max-width:768px){ .grid-2{ grid-template-columns:1fr; } }
-    label{ display:block; font-size:0.85rem; margin-bottom:3px; font-weight:500; }
+    body { margin: 0; background: #f0f4fb; color: var(--texto); }
+
+    header { background: linear-gradient(90deg, var(--azul), #007bff); color: #fff; padding: 14px 18px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
+    header h1 { margin: 0; font-size: 1.1rem; }
+    header small { display: block; font-size: 0.8rem; opacity: .9; }
+    .header-right { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { border: none; border-radius: 999px; padding: 7px 14px; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primaria { background: #fff; color: var(--azul); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+    .btn-admin { background: transparent; border: 1px solid rgba(255,255,255,0.6); color: #fff; }
+
+    main { max-width: 1100px; margin: 18px auto 30px; padding: 0 10px; }
+    .card { background: #fff; border-radius: 12px; border: 1px solid var(--borda); padding: 15px; margin-bottom: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .card h2 { margin: 0 0 8px; font-size: 1.05rem; color: var(--azul); }
+    .card small { font-size: 0.8rem; color: #555; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    @media (max-width: 768px){ .grid-2{ grid-template-columns:1fr; } }
+    label { display:block; font-size:0.85rem; margin-bottom:3px; font-weight:500; }
     input[type="text"], input[type="date"], input[type="time"], input[type="number"], select, textarea { width:100%; padding:7px 8px; border-radius:8px; border:1px solid var(--borda); background:#fafbff; font-size:0.9rem; }
-    textarea{ resize:vertical; min-height:60px; }
-    .modalidades-lista{ margin-top:6px; display:grid; grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap:6px; }
-    .modalidade-item{ display:flex; gap:6px; padding:6px 8px; border-radius:8px; border:1px solid var(--borda); background:var(--azul-claro); font-size:0.8rem; }
-    .modalidade-item input{ margin-top:3px; }
-    .modalidade-label{ font-weight:600; font-size:0.85rem; }
-    .modalidade-vagas{ display:block; font-size:0.75rem; color:#333; }
-    .modalidade-lotado{ color:var(--vermelho); font-weight:600; }
-    .alerta{ margin-top:4px; font-size:0.8rem; color:#555; }
-    .msg-erro{ background:#ffe5e5; color:#b30000; padding:6px 8px; border-radius:8px; font-size:0.8rem; margin-bottom:6px; }
-    .msg-sucesso{ background:#e5ffe9; color:#0c7a2a; padding:6px 8px; border-radius:8px; font-size:0.8rem; margin-bottom:6px; }
-    table{ width:100%; border-collapse:collapse; margin-top:6px; font-size:0.8rem; }
-    th,td{ padding:5px 6px; border-bottom:1px solid #e1e4eb; text-align:left; }
-    th{ background:#f2f5ff; font-weight:600; }
-    tr:hover td{ background:#f9fbff; }
-    .filtros{ margin-top:6px; display:flex; flex-wrap:wrap; gap:8px; }
-    .filtros > div{ min-width:150px; }
+    textarea { resize:vertical; min-height:60px; }
+
+    .modalidades-lista { margin-top:6px; display:grid; grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap:6px; }
+    .modalidade-item { display:flex; gap:6px; padding:6px 8px; border-radius:8px; border:1px solid var(--borda); background:var(--azul-claro); font-size:0.8rem; }
+    .modalidade-item input { margin-top:3px; }
+    .modalidade-label { font-weight:600; font-size:0.85rem; }
+    .modalidade-vagas { display:block; font-size:0.75rem; color:#333; }
+    .modalidade-lotado { color:var(--vermelho); font-weight:600; }
+
+    .alerta { margin-top:4px; font-size:0.8rem; color:#555; }
+    .msg-erro { background:#ffe5e5; color:#b30000; padding:6px 8px; border-radius:8px; font-size:0.8rem; margin-bottom:6px; }
+    .msg-sucesso { background:#e5ffe9; color:#0c7a2a; padding:6px 8px; border-radius:8px; font-size:0.8rem; margin-bottom:6px; }
+
+    table { width:100%; border-collapse:collapse; margin-top:6px; font-size:0.8rem; }
+    th,td { padding:5px 6px; border-bottom:1px solid #e1e4eb; text-align:left; }
+    th { background:#f2f5ff; font-weight:600; }
+    tr:hover td { background:#f9fbff; }
+
+    .filtros { margin-top:6px; display:flex; flex-wrap:wrap; gap:8px; }
+    .filtros > div { min-width:150px; }
+
+    /* Responsividade tabela inscrições (admin) */
+    #tab-inscricoes { overflow-x: auto; }
+    #tab-inscricoes table { min-width: 700px; }
+
+    /* admin */
     #adminSection { display:none; }
-    .admin-header{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
-    .admin-status{ font-size:0.75rem; padding:3px 8px; border-radius:999px; background:#e5ffe9; color:#0c7a2a; }
-    .admin-status.fechado{ background:#ffe5e5; color:#b30000; }
-    .admin-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; border-bottom:1px solid #e1e4eb; padding-bottom:4px; }
-    .admin-tab-btn{ border:none; border-radius:999px; padding:5px 10px; font-size:0.8rem; background:#f1f3fb; cursor:pointer; }
-    .admin-tab-btn.ativo{ background:var(--azul); color:#fff; }
-    .admin-tab-content{ display:none; }
-    .admin-tab-content.ativo{ display:block; }
-    .admin-bloco{ background:#f9fbff; border-radius:10px; border:1px dashed #c5cde0; padding:8px; margin-bottom:8px; font-size:0.82rem; }
-    /* welcome section */
-    #secWelcome { display:none; }
-    #welcomeLogo { max-width:160px; display:block; margin-bottom:12px; }
-    #welcomeContent { font-size:0.95rem; color:#333; margin-top:6px; }
-    .preview-box { border:1px dashed #c5cde0; padding:8px; border-radius:8px; background:#fff; }
-    .small-note { font-size:0.85rem; color:#555; margin-top:6px; }
+    .admin-header { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
+    .admin-header h2 { margin:0; font-size:1rem; color:var(--azul); }
+    .admin-sub { font-size:0.8rem; color:#555; }
+    .admin-status { font-size:0.75rem; padding:3px 8px; border-radius:999px; background:#e5ffe9; color:#0c7a2a; }
+    .admin-status.fechado { background:#ffe5e5; color:#b30000; }
+    .admin-tabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; border-bottom:1px solid #e1e4eb; padding-bottom:4px; }
+    .admin-tab-btn { border:none; border-radius:999px; padding:5px 10px; font-size:0.8rem; background:#f1f3fb; cursor:pointer; }
+    .admin-tab-btn.ativo { background:var(--azul); color:#fff; }
+    .admin-tab-content { display:none; }
+    .admin-tab-content.ativo { display:block; }
+    .admin-bloco { background:#f9fbff; border-radius:10px; border:1px dashed #c5cde0; padding:8px; margin-bottom:8px; font-size:0.82rem; }
+
+    /* jogos / placar / classificação */
+    #secInscritos, #secJogos, #secPlacarAoVivo, #secClassificados { display:none; }
+
+    /* overlay e-mail */
+    #emailOverlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; }
+    #emailOverlayCard { background:#fff; border-radius:10px; padding:15px; max-width:360px; width:90%; box-shadow:0 8px 20px rgba(0,0,0,0.3); }
+    #emailOverlayCard h2 { margin:0 0 6px; font-size:1rem; color:var(--azul); }
+    #emailOverlayCard p { margin:0 0 8px; font-size:0.85rem; }
+    #msgEmailOverlay { font-size:0.78rem; color:var(--vermelho); min-height:14px; margin-bottom:4px; }
+
+    /* ESTILO DE IMPRESSÃO – mostrar SOMENTE a tabela do relatório */
+    @media print {
+      body { background:#fff; margin:0; padding:0; }
+      header, #secInscricao, #secInscritos, #secJogos, #secPlacarAoVivo, #secClassificados, #emailOverlay, .admin-header, .admin-tabs, #tab-inscricoes, #tab-jogos, #tab-config, #btnFecharAdmin, #tab-relatorio .admin-bloco, #btnImprimirRelatorio, #btnImprimirTodaTurma { display: none !important; }
+      main { margin: 0; padding: 0; }
+      #adminSection { display:block !important; margin:0; padding:0; border:none; box-shadow:none; background:#fff; }
+      .card { border:none; box-shadow:none; margin:0; padding:0; background:#fff; }
+      #tab-relatorio { display:block !important; margin:0; padding:0; }
+      #tabelaRelatorio { display: table !important; width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 0; }
+      #tabelaRelatorio thead { display: table-header-group; }
+      #tabelaRelatorio tbody { display: table-row-group; }
+      #tabelaRelatorio th, #tabelaRelatorio td { border: 1px solid #000; padding: 4px 6px; }
+    }
   </style>
 </head>
 <body>
 
 <!-- OVERLAY E-MAIL -->
 <div id="emailOverlay">
-  <div id="emailOverlayCard" class="card" style="max-width:360px; margin:18px auto;">
+  <div id="emailOverlayCard">
     <h2>Antes de continuar...</h2>
     <p>Informe seu <strong>e-mail</strong> para registrar sua inscrição.</p>
     <div id="msgEmailOverlay"></div>
@@ -98,19 +131,22 @@
 
 <main>
 
-  <!-- WELCOME (publico quando inscrições encerradas) -->
-  <section class="card" id="secWelcome">
-    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-      <img id="welcomeLogo" src="" alt="Logo" style="display:none;">
-      <div>
-        <h2 id="welcomeTitle">Bem-vindo</h2>
-        <small id="welcomeSubtitle">Obrigado pelo interesse — confira novidades em breve.</small>
+  <!-- NOVA: PÁGINA INICIAL (quando inscrições ENCERRADAS) -->
+  <section class="card" id="secHome" style="display:none;">
+    <!-- Este bloco é totalmente editável via admin (salvo em config.geral.homepage) -->
+    <div id="homeContent">
+      <div style="display:flex; gap:12px; align-items:center; margin-bottom:8px;">
+        <img id="homeLogo" src="" alt="logo" style="height:64px; width:auto; display:none; border-radius:8px; background:#fff; padding:6px; border:1px solid var(--borda);" />
+        <div>
+          <h2 id="homeTitle">Movimenta Odisseia</h2>
+          <small id="homeSubtitle">Inscrições encerradas — obrigado pelo interesse!</small>
+        </div>
+      </div>
+      <div id="homeHeroHtml" style="margin-top:10px; font-size:0.95rem; color:#333;">
+        <!-- conteúdo HTML livre (seguro: salvo pelo admin) -->
+        <p>As inscrições foram encerradas. Em breve publicaremos os jogos e classificados. Fique atento às próximas comunicações da escola.</p>
       </div>
     </div>
-    <div id="welcomeContent" class="preview-box">
-      <!-- conteudo html da pagina inicial -->
-    </div>
-    <div class="small-note">Se você é administrador, use a aba <strong>Configurações → Texto do evento / Página inicial</strong> para editar esta página.</div>
   </section>
 
   <!-- INSCRIÇÃO -->
@@ -221,6 +257,8 @@
     </table>
   </section>
 
+  <!-- (o restante do documento - jogos, classificados, placar, admin etc. permanece inalterado em layout) -->
+
   <!-- JOGOS (ALUNO) -->
   <section class="card" id="secJogos">
     <h2>Jogos</h2>
@@ -326,6 +364,12 @@
         </div>
       </div>
 
+      <div class="admin-bloco">
+        <strong>Contagem geral (apenas admins)</strong>
+        <small style="display:block;margin-top:2px;">Aqui aparecem os números de inscritos por turma/modalidade.</small>
+        <div id="adminContagens" style="margin-top:6px; font-size:0.9rem;"></div>
+      </div>
+
       <table id="tabelaAdmin">
         <thead>
           <tr>
@@ -342,9 +386,6 @@
         </thead>
         <tbody></tbody>
       </table>
-      <div style="margin-top:8px;">
-        <strong>Total de inscritos:</strong> <span id="totalInscritosAdmin">0</span>
-      </div>
     </div>
 
     <!-- TAB JOGOS -->
@@ -584,46 +625,35 @@
         </div>
       </div>
 
-      <!-- NOVO: EDITOR DA PÁGINA INICIAL (WELCOME) -->
-      <div class="admin-bloco">
-        <strong>Editar Página Inicial (Boas-vindas)</strong>
-        <small style="display:block; margin-top:4px;">Se as inscrições estiverem encerradas, o conteúdo abaixo será exibido na página pública.</small>
+      <button class="btn btn-primaria" id="btnSalvarConfig">💾 Salvar configurações</button>
+
+      <!-- EDITOR DA PÁGINA INICIAL (ADMIN) -->
+      <div class="admin-bloco" style="margin-top:12px;">
+        <strong>Editor da página inicial (quando inscrições estiverem encerradas)</strong>
+        <small style="display:block;margin-top:2px;">Edite o conteúdo que será mostrado ao público quando as inscrições estiverem fechadas.</small>
 
         <div style="margin-top:8px;">
-          <label for="welcomeTitleInput">Título</label>
-          <input type="text" id="welcomeTitleInput" placeholder="Ex: Bem-vindos ao Movimenta Odisseia">
+          <label for="homepageTitle">Título (h2)</label>
+          <input type="text" id="homepageTitle" placeholder="Ex: Movimenta Odisseia 2025">
         </div>
         <div style="margin-top:8px;">
-          <label for="welcomeSubtitleInput">Subtítulo</label>
-          <input type="text" id="welcomeSubtitleInput" placeholder="Ex: Obrigado pelo interesse">
+          <label for="homepageSubtitle">Subtítulo</label>
+          <input type="text" id="homepageSubtitle" placeholder="Ex: Obrigado pelo interesse — inscrições encerradas.">
         </div>
         <div style="margin-top:8px;">
-          <label for="welcomeHtmlInput">Conteúdo (HTML permitido, scripts serão removidos)</label>
-          <textarea id="welcomeHtmlInput" placeholder="<p>Coloque aqui o texto da página inicial...</p>" style="min-height:120px;"></textarea>
+          <label for="homepageLogoUrl">URL do logo (opcional)</label>
+          <input type="text" id="homepageLogoUrl" placeholder="https://...">
         </div>
         <div style="margin-top:8px;">
-          <label for="welcomeLogoFile">Logo da escola (opcional)</label>
-          <input type="file" id="welcomeLogoFile" accept="image/*" />
-          <div class="small-note">Ao enviar, a imagem será armazenada no Firebase Storage e o link será salvo nas configs.</div>
+          <label for="homepageHeroHtml">HTML do bloco principal (pode conter <code>&lt;p&gt;</code>, <code>&lt;ul&gt;</code> etc.)</label>
+          <textarea id="homepageHeroHtml" placeholder="<p>Mensagem...</p>"></textarea>
         </div>
-
-        <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
-          <button class="btn btn-primaria" id="btnSalvarWelcome">💾 Salvar página inicial</button>
-          <button class="btn" id="btnPreviewWelcome" style="background:#fff;">👁️ Visualizar</button>
-        </div>
-
-        <div style="margin-top:8px;">
-          <strong>Preview atual</strong>
-          <div class="preview-box" id="welcomePreviewBox" style="margin-top:6px;">
-            <img id="welcomePreviewLogo" src="" alt="logo" style="max-width:120px; display:none; margin-bottom:8px;">
-            <h3 id="welcomePreviewTitle"></h3>
-            <small id="welcomePreviewSubtitle"></small>
-            <div id="welcomePreviewHtml" style="margin-top:8px;"></div>
-          </div>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button class="btn btn-primaria" id="btnSalvarHomepage">💾 Salvar página inicial</button>
+          <button class="btn btn-primaria" id="btnPreviewHomepage">👁️ Visualizar (local)</button>
         </div>
       </div>
 
-      <button class="btn btn-primaria" id="btnSalvarConfig">💾 Salvar configurações</button>
     </div>
   </section>
 
@@ -688,9 +718,8 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const storage = firebase.storage();
 
-/* ========== CONSTANTES e ESTADO ========== */
+/* ========== CONSTANTES ========== */
 
 const MODALIDADES = [
   "FUTSAL",
@@ -719,16 +748,23 @@ const TURMAS_NOTURNO = [
   "3ºA","3ºB","3ºC"
 ];
 
-const TODAS_TURMAS = [...TURMAS_MATUTINO, ...TURMAS_VESPERTINO, ...TURMAS_NOTURNO];
+const TODAS_TURMAS = [
+  ...TURMAS_MATUTINO,
+  ...TURMAS_VESPERTINO,
+  ...TURMAS_NOTURNO
+];
 
-function getTurmasPorTurno(turno){
+function getTurmasPorTurno(turno) {
   if (turno === "Matutino") return TURMAS_MATUTINO;
   if (turno === "Vespertino") return TURMAS_VESPERTINO;
   if (turno === "Noturno") return TURMAS_NOTURNO;
   return [];
 }
 
-function getSerieFromTurma(t){ if (!t) return ""; return t.charAt(0); }
+function getSerieFromTurma(t){
+  if (!t) return "";
+  return t.charAt(0);
+}
 
 /* limites padrão (podem ser alterados nas configs) */
 let LIMITE_MODALIDADES_POR_ALUNO = 2;
@@ -743,7 +779,7 @@ let LIMITE_MODALIDADE_TURMA = {
 let LIMITE_QUEIMADA_TOTAL = 10;
 let LIMITE_QUEIMADA_POR_SEXO = 5;
 
-/* controle de inscrições por turma/mod e queimada */
+/* controle de inscrições por turma/mod queimada */
 let countsPorTurmaModalidade = {};
 let countsQueimadaGenero = {};
 let todasInscricoes = [];
@@ -763,7 +799,7 @@ let configEvento = {
   anoEvento: "",
   textoInicial: "",
   autorizacoes: {},
-  welcomePage: {} // { title, subtitle, html, logoUrl, lastEditedAt, lastEditedBy }
+  homepage: { title: "", subtitle: "", logoUrl: "", heroHtml: "" }
 };
 
 let inscricoesEncerradas = false;
@@ -771,30 +807,38 @@ let emailAtual = null;
 let isAdmin = false;
 const ADMIN_PASSWORD = "52090949";
 
-/* ========== AUX ========== */
+/* ========== FUNÇÕES AUXILIARES ========== */
 
 function normalizarNome(str){
-  return (str || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ");
-}
-function validarEmail(email){ return email && email.includes("@") && email.includes("."); }
-function msgForm(texto, ok){ const box = document.getElementById("msgForm"); box.innerHTML = ""; const div = document.createElement("div"); div.className = ok ? "msg-sucesso" : "msg-erro"; div.textContent = texto; box.appendChild(div); }
-function formatarDataBR(yyyyMMdd){ if (!yyyyMMdd) return "-"; const p = yyyyMMdd.split("-"); if (p.length !== 3) return yyyyMMdd; return p[2] + "/" + p[1] + "/" + p[0]; }
-
-/* sanitize HTML: remove <script> e atributos on* */
-function sanitizeHtml(html){
-  if (!html) return "";
-  // remove <script>...</script>
-  html = html.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
-  // remove on* attributes (onclick, onerror, etc)
-  html = html.replace(/\son\w+="[^"]*"/gi, "");
-  html = html.replace(/\son\w+='[^']*'/gi, "");
-  // remove javascript: in href/src
-  html = html.replace(/(href|src)\s*=\s*"(javascript:[^"]*)"/gi, '$1="#"');
-  html = html.replace(/(href|src)\s*=\s*'(javascript:[^']*)'/gi, "$1='#'");
-  return html;
+  return (str || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/\s+/g," ");
 }
 
-/* ========== STATUS INSCRIÇÕES E TROCA DE TELAS ========== */
+function validarEmail(email){
+  return email && email.includes("@") && email.includes(".");
+}
+
+function msgForm(texto, ok){
+  const box = document.getElementById("msgForm");
+  box.innerHTML = "";
+  const div = document.createElement("div");
+  div.className = ok ? "msg-sucesso" : "msg-erro";
+  div.textContent = texto;
+  box.appendChild(div);
+}
+
+function formatarDataBR(yyyyMMdd){
+  if (!yyyyMMdd) return "-";
+  const p = yyyyMMdd.split("-");
+  if (p.length !== 3) return yyyyMMdd;
+  return p[2] + "/" + p[1] + "/" + p[0];
+}
+
+/* ========== CONTROLE DE FECHAMENTO E TROCA PÁGINA INICIAL ========== */
 
 function atualizarStatusInscricoes(){
   const hoje = new Date();
@@ -815,37 +859,42 @@ function atualizarStatusInscricoes(){
 
   inscricoesEncerradas = fechado;
 
+  // habilita/desabilita campos do formulário (se aberto apenas)
   const form = document.getElementById("formInscricao");
+  const adminStatus = document.getElementById("adminStatus");
   if (form){
     const campos = form.querySelectorAll("input,select,textarea,button[type='submit']");
     campos.forEach(el => { el.disabled = fechado; });
   }
-
-  const adminStatus = document.getElementById("adminStatus");
   if (fechado){
     msgForm(configEvento.msgEncerradas || "As inscrições foram encerradas.", false);
     if (adminStatus){
       adminStatus.textContent = "Inscrições ENCERRADAS";
       adminStatus.classList.add("fechado");
     }
-    // mostrar página de boas-vindas pública e ocultar formulário
-    document.getElementById("secInscricao").style.display = "none";
-    document.getElementById("secWelcome").style.display = "block";
-    // popular preview com conteúdo salvo
-    renderWelcomePublic();
   } else {
     document.getElementById("msgForm").innerHTML = "";
     if (adminStatus){
       adminStatus.textContent = "Inscrições ABERTAS";
       adminStatus.classList.remove("fechado");
     }
-    // mostrar formulário e ocultar welcome público
-    document.getElementById("secInscricao").style.display = "block";
-    document.getElementById("secWelcome").style.display = "none";
+  }
+
+  // Mostrar página inicial de boas-vindas se encerrado, caso contrário o formulário
+  if (inscricoesEncerradas){
+    mostrarSecao("home");
+  } else {
+    // se admin estiver logado, não forçamos voltar ao formulário (admin vê admin)
+    if (!isAdmin && currentRole === null){
+      mostrarSecao("inscricao");
+    } else if (!isAdmin && currentRole !== null && currentRole !== "ADMIN"){
+      // deixa a tela de professores se o usuário for professor
+      mostrarSecao("professores");
+    }
   }
 }
 
-/* ========== CARREGAR / SALVAR CONFIGS (inclui welcomePage) ========== */
+/* ========== CARREGAR / SALVAR CONFIGS (inclui homepage) ========== */
 
 async function carregarConfiguracoes(){
   try{
@@ -862,20 +911,22 @@ async function carregarConfiguracoes(){
       if (d.limitesModalidadeTurma){
         Object.keys(d.limitesModalidadeTurma).forEach(m => {
           const val = d.limitesModalidadeTurma[m];
-          if (typeof val === "number"){ LIMITE_MODALIDADE_TURMA[m] = val; }
+          if (typeof val === "number"){
+            LIMITE_MODALIDADE_TURMA[m] = val;
+          }
         });
       }
       if (d.nomeEvento) configEvento.nomeEvento = d.nomeEvento;
       if (d.anoEdicao) configEvento.anoEvento = d.anoEdicao;
       if (d.textoInicial) configEvento.textoInicial = d.textoInicial;
       if (d.autorizacoes) configEvento.autorizacoes = d.autorizacoes || {};
-      if (d.welcomePage) configEvento.welcomePage = d.welcomePage || {};
+      if (d.homepage) configEvento.homepage = Object.assign(configEvento.homepage || {}, d.homepage);
     }
   }catch(e){
-    console.error("Erro ao carregar configurações:", e);
+    console.error("Erro ao carregar configurações:",e);
   }
 
-  // Atualiza UI com config carregada
+  // Atualiza campos da UI com config carregada
   document.getElementById("cfgDataLimite").value = configEvento.dataLimite || "";
   document.getElementById("cfgMsgEncerradas").value = configEvento.msgEncerradas || "";
   document.getElementById("cfgBloquearAgora").checked = !!configEvento.bloquearAgora;
@@ -892,6 +943,13 @@ async function carregarConfiguracoes(){
   document.getElementById("cfgAnoEvento").value = configEvento.anoEvento || "";
   document.getElementById("cfgTextoInicial").value = configEvento.textoInicial || "";
 
+  // homepage editor fields (admin)
+  document.getElementById("homepageTitle").value = configEvento.homepage.title || "";
+  document.getElementById("homepageSubtitle").value = configEvento.homepage.subtitle || "";
+  document.getElementById("homepageLogoUrl").value = configEvento.homepage.logoUrl || "";
+  document.getElementById("homepageHeroHtml").value = configEvento.homepage.heroHtml || "";
+
+  // Atualiza cabeçalho público com nome do evento/texto inicial
   document.getElementById("tituloEvento").textContent = "Inscrições " + (configEvento.nomeEvento || "Movimenta Odisseia");
   if (configEvento.textoInicial){
     document.getElementById("subEvento").textContent = configEvento.textoInicial;
@@ -899,28 +957,15 @@ async function carregarConfiguracoes(){
     document.getElementById("subEvento").textContent = "Inscrições para o " + configEvento.nomeEvento + " " + configEvento.anoEvento;
   }
 
-  // carregar welcomePage na UI (editor)
-  const wp = configEvento.welcomePage || {};
-  document.getElementById("welcomeTitleInput").value = wp.title || "";
-  document.getElementById("welcomeSubtitleInput").value = wp.subtitle || "";
-  document.getElementById("welcomeHtmlInput").value = wp.html || "";
-  // preview box
-  document.getElementById("welcomePreviewTitle").textContent = wp.title || "";
-  document.getElementById("welcomePreviewSubtitle").textContent = wp.subtitle || "";
-  document.getElementById("welcomePreviewHtml").innerHTML = wp.html ? sanitizeHtml(wp.html) : "";
-  if (wp.logoUrl){
-    document.getElementById("welcomePreviewLogo").src = wp.logoUrl;
-    document.getElementById("welcomePreviewLogo").style.display = "block";
-  } else {
-    document.getElementById("welcomePreviewLogo").style.display = "none";
-  }
+  // Carregar homepage no DOM (público)
+  renderHomepage();
 
-  atualizarAutorizacoesUI();
+  // atualizar status de encerramento e disponibilidade
   atualizarStatusInscricoes();
   atualizarDisponibilidadeModalidades();
 }
 
-/* salvar configs (mantém welcomePage salvo em config) */
+/* SALVAR CONFIG */
 async function salvarConfiguracoes(){
   if (!isAdmin){
     alert("Apenas o administrador pode salvar as configurações.");
@@ -967,10 +1012,9 @@ async function salvarConfiguracoes(){
       anoEdicao: anoEvento,
       textoInicial: textoInicial,
       autorizacoes: configEvento.autorizacoes || {},
-      welcomePage: configEvento.welcomePage || {}
+      // mantenha homepage intacta ao salvar configs (merge)
     }, { merge:true });
 
-    // atualizar local
     configEvento.dataLimite = dataLimite || null;
     configEvento.msgEncerradas = msgEnc;
     configEvento.bloquearAgora = bloquearAgora;
@@ -983,7 +1027,9 @@ async function salvarConfiguracoes(){
     configEvento.textoInicial = textoInicial;
 
     document.getElementById("tituloEvento").textContent = "Inscrições " + (configEvento.nomeEvento || "Movimenta Odisseia");
-    if (configEvento.textoInicial){ document.getElementById("subEvento").textContent = configEvento.textoInicial; }
+    if (configEvento.textoInicial){
+      document.getElementById("subEvento").textContent = configEvento.textoInicial;
+    }
 
     atualizarStatusInscricoes();
     atualizarDisponibilidadeModalidades();
@@ -994,7 +1040,63 @@ async function salvarConfiguracoes(){
   }
 }
 
-/* ========== AUTORIZAÇÕES UI ========== */
+/* SALVAR HOMEPAGE (ADMIN) */
+async function salvarHomepage(){
+  if (!isAdmin){
+    alert("Apenas o administrador pode salvar a página inicial.");
+    return;
+  }
+  const title = (document.getElementById("homepageTitle").value || "").trim();
+  const subtitle = (document.getElementById("homepageSubtitle").value || "").trim();
+  const logoUrl = (document.getElementById("homepageLogoUrl").value || "").trim();
+  const heroHtml = (document.getElementById("homepageHeroHtml").value || "").trim();
+
+  try{
+    await db.collection("config").doc("geral").set({
+      homepage: {
+        title: title,
+        subtitle: subtitle,
+        logoUrl: logoUrl || null,
+        heroHtml: heroHtml || null
+      }
+    }, { merge:true });
+
+    configEvento.homepage.title = title;
+    configEvento.homepage.subtitle = subtitle;
+    configEvento.homepage.logoUrl = logoUrl;
+    configEvento.homepage.heroHtml = heroHtml;
+
+    renderHomepage();
+    alert("Página inicial salva com sucesso.");
+  }catch(e){
+    console.error(e);
+    alert("Erro ao salvar a página inicial.");
+  }
+}
+
+/* Renderiza homepage no bloco público */
+function renderHomepage(){
+  const logo = document.getElementById("homeLogo");
+  const title = document.getElementById("homeTitle");
+  const subtitle = document.getElementById("homeSubtitle");
+  const hero = document.getElementById("homeHeroHtml");
+
+  if (!configEvento.homepage) return;
+
+  title.textContent = configEvento.homepage.title || configEvento.nomeEvento || "Movimenta Odisseia";
+  subtitle.textContent = configEvento.homepage.subtitle || configEvento.textoInicial || "";
+
+  if (configEvento.homepage.logoUrl){
+    logo.src = configEvento.homepage.logoUrl;
+    logo.style.display = "block";
+  } else {
+    logo.style.display = "none";
+  }
+
+  hero.innerHTML = configEvento.homepage.heroHtml || "<p>As inscrições foram encerradas. Em breve divulgaremos as próximas etapas.</p>";
+}
+
+/* ========== AUTORIZAÇÕES UI (mesma lógica) ========== */
 
 function atualizarAutorizacoesUI(){
   const sel = document.getElementById("cfgAutTurma");
@@ -1002,17 +1104,29 @@ function atualizarAutorizacoesUI(){
   if (!sel || !cont) return;
   sel.innerHTML = '<option value="">Selecione a turma...</option>';
   TODAS_TURMAS.forEach(t => {
-    const o = document.createElement("option"); o.value = t; o.textContent = t; sel.appendChild(o);
+    const o = document.createElement("option");
+    o.value = t; o.textContent = t;
+    sel.appendChild(o);
   });
 
   cont.innerHTML = "";
   MODALIDADES.forEach(m => {
     const id = "cfgAutChk_" + m.replace(/\s+/g,"_");
     const wrapper = document.createElement("label");
-    wrapper.style.marginRight = "10px"; wrapper.style.fontSize = "0.9rem"; wrapper.style.display = "inline-flex"; wrapper.style.alignItems = "center"; wrapper.style.gap = "6px";
-    const chk = document.createElement("input"); chk.type = "checkbox"; chk.id = id; chk.dataset.mod = m; chk.className = "cfgAutChk";
+    wrapper.style.marginRight = "10px";
+    wrapper.style.fontSize = "0.9rem";
+    wrapper.style.display = "inline-flex";
+    wrapper.style.alignItems = "center";
+    wrapper.style.gap = "6px";
+    const chk = document.createElement("input");
+    chk.type = "checkbox";
+    chk.id = id;
+    chk.dataset.mod = m;
+    chk.className = "cfgAutChk";
     wrapper.appendChild(chk);
-    const span = document.createElement("span"); span.textContent = "Permitir " + m; wrapper.appendChild(span);
+    const span = document.createElement("span");
+    span.textContent = "Permitir " + m;
+    wrapper.appendChild(span);
     cont.appendChild(wrapper);
   });
 
@@ -1032,7 +1146,7 @@ function atualizarAutorizacoesUI(){
   });
 }
 
-/* ========== DISPONIBILIDADE MODALIDADES ========== */
+/* ========== DISPONIBILIDADE MODALIDADES (AJUSTADO: sem números para público) ========== */
 
 function atualizarDisponibilidadeModalidades(){
   const turma = document.getElementById("turma").value;
@@ -1040,42 +1154,81 @@ function atualizarDisponibilidadeModalidades(){
   const spans = document.querySelectorAll(".modalidade-vagas");
   const chks = document.querySelectorAll(".chkModalidade");
 
+  const publicoNaoVerNumeros = !isAdmin; // se não for admin, não mostramos números
+
   spans.forEach(span => {
     const mod = span.dataset.mod;
     if (!turma){
-      span.textContent = mod + " (selecione turno e turma)";
+      span.textContent = mod + (publicoNaoVerNumeros ? " (selecione turno e turma)" : " (selecione turno e turma)");
       span.classList.remove("modalidade-lotado");
       return;
     }
+
     const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
+
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
       const gen = countsQueimadaGenero[turma] || {Masculino:0, Feminino:0};
-      span.textContent = mod + " ("+tot+"/"+LIMITE_QUEIMADA_TOTAL+" / Meninos: "+gen.Masculino+"/"+LIMITE_QUEIMADA_POR_SEXO+" / Meninas: "+gen.Feminino+"/"+LIMITE_QUEIMADA_POR_SEXO+")" + (autorizada ? " — AUTORIZADO" : "");
-      if (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada) span.classList.add("modalidade-lotado"); else span.classList.remove("modalidade-lotado");
+      if (publicoNaoVerNumeros){
+        // público: sem números, exibe apenas estado (Disponível / Lotado)
+        if ((tot >= LIMITE_QUEIMADA_TOTAL) && !autorizada) {
+          span.textContent = mod + " — Lotado";
+          span.classList.add("modalidade-lotado");
+        } else {
+          span.textContent = mod + (autorizada ? " — AUTORIZADO" : " — Vagas disponíveis");
+          span.classList.remove("modalidade-lotado");
+        }
+      } else {
+        // admin: mostra números
+        span.textContent = mod + " ("+tot+"/"+LIMITE_QUEIMADA_TOTAL+" / Meninos: "+gen.Masculino+"/"+LIMITE_QUEIMADA_POR_SEXO+" / Meninas: "+gen.Feminino+"/"+LIMITE_QUEIMADA_POR_SEXO+")" + (autorizada ? " — AUTORIZADO" : "");
+        if (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada) span.classList.add("modalidade-lotado");
+        else span.classList.remove("modalidade-lotado");
+      }
     } else {
       const lim = LIMITE_MODALIDADE_TURMA[mod] || 0;
       const qtd = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      span.textContent = mod + " ("+qtd+"/"+lim+" vagas)" + (autorizada ? " — AUTORIZADO" : "");
-      if (qtd >= lim && !autorizada) span.classList.add("modalidade-lotado"); else span.classList.remove("modalidade-lotado");
+      if (publicoNaoVerNumeros){
+        if (qtd >= lim && !autorizada) span.textContent = mod + " — Lotado";
+        else span.textContent = mod + (autorizada ? " — AUTORIZADO" : " — Vagas disponíveis");
+      } else {
+        span.textContent = mod + " ("+qtd+"/"+lim+" vagas)" + (autorizada ? " — AUTORIZADO" : "");
+        if (qtd >= lim && !autorizada) span.classList.add("modalidade-lotado");
+        else span.classList.remove("modalidade-lotado");
+      }
     }
   });
 
   chks.forEach(chk => {
     const mod = chk.value;
-    if (!turma){ chk.disabled = true; chk.checked = false; return; }
+    if (!turma){
+      chk.disabled = true;
+      chk.checked = false;
+      return;
+    }
+
     const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
+
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      const gen = countsQueimadaGenero[turma] || {Masculino:0,Feminino:0};
-      if (!sexo || (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada)){ chk.disabled = true; chk.checked = false; return; }
-      if (sexo === "Masculino" && gen.Masculino >= LIMITE_QUEIMADA_POR_SEXO && !autorizada){ chk.disabled = true; chk.checked = false; return; }
-      if (sexo === "Feminino" && gen.Feminino >= LIMITE_QUEIMADA_POR_SEXO && !autorizada){ chk.disabled = true; chk.checked = false; return; }
+      const gen = countsQueimadaGenero[turma] || {Masculino:0, Feminino:0};
+      if (!sexo || (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada)){
+        chk.disabled = true; chk.checked = false; return;
+      }
+      if (sexo === "Masculino" && gen.Masculino >= LIMITE_QUEIMADA_POR_SEXO && !autorizada){
+        chk.disabled = true; chk.checked = false; return;
+      }
+      if (sexo === "Feminino" && gen.Feminino >= LIMITE_QUEIMADA_POR_SEXO && !autorizada){
+        chk.disabled = true; chk.checked = false; return;
+      }
       chk.disabled = false;
     } else {
       const lim = LIMITE_MODALIDADE_TURMA[mod] || 0;
       const qtd = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      if (qtd >= lim && !autorizada){ chk.disabled = true; chk.checked = false; } else { chk.disabled = false; }
+      if (qtd >= lim && !autorizada){
+        chk.disabled = true; chk.checked = false;
+      } else {
+        chk.disabled = false;
+      }
     }
   });
 }
@@ -1089,9 +1242,15 @@ async function handleSubmitInscricao(e){
     return;
   }
   if (!emailAtual){
-    try{ const fromStorage = localStorage.getItem('insc_email'); if (validarEmail(fromStorage)) emailAtual = fromStorage; }catch(e){}
+    try{
+      const fromStorage = localStorage.getItem('insc_email');
+      if (validarEmail(fromStorage)) emailAtual = fromStorage;
+    }catch(e){}
   }
-  if (!emailAtual || !validarEmail(emailAtual)){ alert("Informe um e-mail válido antes de se inscrever."); return; }
+  if (!emailAtual || !validarEmail(emailAtual)){
+    alert("Informe um e-mail válido antes de se inscrever.");
+    return;
+  }
 
   const nome = document.getElementById("nome").value.trim();
   const sexo = document.getElementById("sexo").value;
@@ -1101,31 +1260,52 @@ async function handleSubmitInscricao(e){
   const observacoes = document.getElementById("observacoes").value.trim();
 
   const nomeNorm = normalizarNome(nome);
-  if (!nome || !sexo || !turno || !turma){ msgForm("Preencha nome, sexo, turno e turma.", false); return; }
+  if (!nome || !sexo || !turno || !turma){
+    msgForm("Preencha nome, sexo, turno e turma.", false);
+    return;
+  }
 
   const chks = document.querySelectorAll(".chkModalidade:checked");
   const mods = [];
   chks.forEach(chk => mods.push(chk.value));
-  if (!mods.length){ msgForm("Escolha pelo menos 1 modalidade.", false); return; }
-  if (mods.length > LIMITE_MODALIDADES_POR_ALUNO){ msgForm("Você só pode escolher até "+LIMITE_MODALIDADES_POR_ALUNO+" modalidades.", false); return; }
+  if (!mods.length){
+    msgForm("Escolha pelo menos 1 modalidade.", false);
+    return;
+  }
+  if (mods.length > LIMITE_MODALIDADES_POR_ALUNO){
+    msgForm("Você só pode escolher até "+LIMITE_MODALIDADES_POR_ALUNO+" modalidades.", false);
+    return;
+  }
 
   for (const ins of todasInscricoes){
-    if (ins.nomeNormalizado === nomeNorm && ins.turma === turma){ msgForm("Já existe inscrição para este nome nesta turma.", false); return; }
+    if (ins.nomeNormalizado === nomeNorm && ins.turma === turma){
+      msgForm("Já existe inscrição para este nome nesta turma.", false);
+      return;
+    }
   }
 
   for (const mod of mods){
     const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
     if (autorizada) continue;
+
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
       const gen = countsQueimadaGenero[turma] || {Masculino:0,Feminino:0};
-      if (tot >= LIMITE_QUEIMADA_TOTAL){ msgForm("QUEIMADA MISTA está lotada para a turma "+turma+".", false); return; }
-      if (sexo === "Masculino" && gen.Masculino >= LIMITE_QUEIMADA_POR_SEXO){ msgForm("Limite de meninos na QUEIMADA MISTA da turma "+turma+" já foi atingido.", false); return; }
-      if (sexo === "Feminino" && gen.Feminino >= LIMITE_QUEIMADA_POR_SEXO){ msgForm("Limite de meninas na QUEIMADA MISTA da turma "+turma+" já foi atingido.", false); return; }
+      if (tot >= LIMITE_QUEIMADA_TOTAL){
+        msgForm("QUEIMADA MISTA está lotada para a turma "+turma+".", false); return;
+      }
+      if (sexo === "Masculino" && gen.Masculino >= LIMITE_QUEIMADA_POR_SEXO){
+        msgForm("Limite de meninos na QUEIMADA MISTA da turma "+turma+" já foi atingido.", false); return;
+      }
+      if (sexo === "Feminino" && gen.Feminino >= LIMITE_QUEIMADA_POR_SEXO){
+        msgForm("Limite de meninas na QUEIMADA MISTA da turma "+turma+" já foi atingido.", false); return;
+      }
     } else {
       const lim = LIMITE_MODALIDADE_TURMA[mod] || 0;
       const qtd = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      if (qtd >= lim){ msgForm('A modalidade "'+mod+'" está lotada para a turma '+turma+".", false); return; }
+      if (qtd >= lim){
+        msgForm('A modalidade "'+mod+'" está lotada para a turma '+turma+".", false); return;
+      }
     }
   }
 
@@ -1156,26 +1336,42 @@ async function handleSubmitInscricao(e){
 
 /* CANCELAR INSCRIÇÃO (ADMIN) */
 async function cancelarInscricao(){
-  if (!isAdmin){ alert("Apenas o administrador pode cancelar inscrições."); return; }
+  if (!isAdmin){
+    alert("Apenas o administrador pode cancelar inscrições.");
+    return;
+  }
   const sel = document.getElementById("selectCancelar");
   const raw = sel.value;
-  if (!raw){ alert("Selecione uma inscrição."); return; }
+  if (!raw){
+    alert("Selecione uma inscrição."); return;
+  }
   const partes = raw.split("|||");
   const id = partes[0];
   const modalidadeSelecionada = partes[1] || null;
+
   const ins = todasInscricoes.find(i => i.id === id);
-  if (!ins){ alert("Inscrição não encontrada."); return; }
-  if (!modalidadeSelecionada){ alert("Modalidade inválida."); return; }
+  if (!ins){
+    alert("Inscrição não encontrada."); return;
+  }
+
+  if (!modalidadeSelecionada){
+    alert("Modalidade inválida."); return;
+  }
+
   const mensagemConfirm = 'Cancelar a modalidade "'+modalidadeSelecionada+'" do aluno "'+ins.nome+'" da turma '+ins.turma+'?\n\nSe esta for a única modalidade, a inscrição inteira será removida.';
   if (!confirm(mensagemConfirm)) return;
+
   try{
     const modalidadesAtuais = Array.isArray(ins.modalidades) ? ins.modalidades.slice() : [];
     const filtradas = modalidadesAtuais.filter(m => m !== modalidadeSelecionada);
+
     if (filtradas.length === 0){
       await db.collection("inscricoes").doc(id).delete();
       alert("Inscrição completa cancelada.");
     } else {
-      await db.collection("inscricoes").doc(id).update({ modalidades: filtradas });
+      await db.collection("inscricoes").doc(id).update({
+        modalidades: filtradas
+      });
       alert("Modalidade cancelada com sucesso.");
     }
   }catch(e){
@@ -1184,13 +1380,14 @@ async function cancelarInscricao(){
   }
 }
 
-/* ========== TABELAS & RENDER ========== */
+/* ========== TABELAS ========== */
 
 function renderPublico(){
   const corpo = document.querySelector("#tabelaPublica tbody");
   const filtroTurnoEl = document.getElementById("filtroTurno");
   const filtroTurmaEl = document.getElementById("filtroTurma");
   const filtroModEl = document.getElementById("filtroModalidade");
+
   if (!corpo || !filtroTurnoEl || !filtroTurmaEl || !filtroModEl) return;
 
   const turno = filtroTurnoEl.value;
@@ -1260,7 +1457,6 @@ function renderAdmin(){
     td.textContent = "Nenhuma inscrição com esses filtros.";
     tr.appendChild(td);
     corpo.appendChild(tr);
-    document.getElementById("totalInscritosAdmin").textContent = todasInscricoes.length;
     return;
   }
 
@@ -1302,24 +1498,49 @@ function renderAdmin(){
     corpo.appendChild(tr);
   });
 
-  document.getElementById("totalInscritosAdmin").textContent = todasInscricoes.length;
+  // Render contagens administrativas (apenas admins veem)
+  const adminCont = document.getElementById("adminContagens");
+  adminCont.innerHTML = "";
+  const turmas = Object.keys(countsPorTurmaModalidade).sort();
+  if (!turmas.length){
+    adminCont.textContent = "Nenhuma inscrição ainda.";
+  } else {
+    turmas.forEach(t => {
+      const div = document.createElement("div");
+      div.style.marginBottom = "6px";
+      const linhas = [];
+      Object.keys(countsPorTurmaModalidade[t] || {}).forEach(mod => {
+        const qtd = countsPorTurmaModalidade[t][mod] || 0;
+        linhas.push(mod + ": " + qtd);
+      });
+      const queimada = countsQueimadaGenero[t] || {Masculino:0,Feminino:0};
+      const qLine = "QUEIMADA MISTA — total: " + ((countsPorTurmaModalidade[t] && countsPorTurmaModalidade[t]["QUEIMADA MISTA"]) || 0) + " (M: "+queimada.Masculino+", F: "+queimada.Feminino+")";
+      div.innerHTML = "<strong>"+t+"</strong><br>" + (linhas.join(" — ") + " — " + qLine);
+      adminCont.appendChild(div);
+    });
+  }
 }
 
-/* RELATÓRIO e RELATÓRIO TODA TURMA (mesma lógica do seu original) */
-function renderRelatorio(){ /* ... copiar/usar sua implementação já existente ... */ 
-  // por brevidade aqui chamamos a versão completa já implementada abaixo
+/* RELATÓRIO IMPRESSO (mesmas funções) */
+
+function renderRelatorio(){
   const tbody = document.querySelector("#tabelaRelatorio tbody");
   const turnoEl = document.getElementById("relatorioTurno");
   const turmaEl = document.getElementById("relatorioTurma");
   const modEl = document.getElementById("relatorioModalidade");
   const tituloLinha1 = document.getElementById("relatorioTituloLinha1");
   const tituloLinha2 = document.getElementById("relatorioTituloLinha2");
+
   if (!tbody || !turnoEl || !turmaEl || !modEl) return;
+
   const turno = turnoEl.value;
   const turma = turmaEl.value;
   const modalidade = modEl.value;
+
   tbody.innerHTML = "";
+
   tituloLinha1.textContent = "Relatório de inscritos – " + (configEvento.nomeEvento || "Movimenta Odisseia");
+
   if (!turno || !turma || !modalidade){
     tituloLinha2.textContent = "Selecione turno, turma e modalidade para gerar o relatório.";
     const tr = document.createElement("tr");
@@ -1330,8 +1551,16 @@ function renderRelatorio(){ /* ... copiar/usar sua implementação já existente
     tbody.appendChild(tr);
     return;
   }
-  let lista = todasInscricoes.filter(ins => ins.turno === turno && ins.turma === turma && ins.modalidades && ins.modalidades.includes(modalidade));
+
+  let lista = todasInscricoes.filter(ins => {
+    if (ins.turno !== turno) return false;
+    if (ins.turma !== turma) return false;
+    if (!ins.modalidades || !ins.modalidades.includes(modalidade)) return false;
+    return true;
+  });
+
   lista = lista.slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
+
   if (!lista.length){
     tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – 0 inscritos.`;
     const tr = document.createElement("tr");
@@ -1342,9 +1571,12 @@ function renderRelatorio(){ /* ... copiar/usar sua implementação já existente
     tbody.appendChild(tr);
     return;
   }
+
   tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – Total: ${lista.length} inscrito(s).`;
+
   lista.forEach(ins => {
     const tr = document.createElement("tr");
+
     const tdNome = document.createElement("td");
     const tdSexo = document.createElement("td");
     const tdTurma = document.createElement("td");
@@ -1353,6 +1585,7 @@ function renderRelatorio(){ /* ... copiar/usar sua implementação já existente
     const tdEmail = document.createElement("td");
     const tdCamisa = document.createElement("td");
     const tdObs = document.createElement("td");
+
     tdNome.textContent = ins.nome || "";
     tdSexo.textContent = ins.sexo || "";
     tdTurma.textContent = ins.turma || "";
@@ -1361,8 +1594,16 @@ function renderRelatorio(){ /* ... copiar/usar sua implementação já existente
     tdEmail.textContent = ins.email || "";
     tdCamisa.textContent = ins.camisaNumero || "";
     tdObs.textContent = ins.observacoes || "";
-    tr.appendChild(tdNome); tr.appendChild(tdSexo); tr.appendChild(tdTurma); tr.appendChild(tdTurno);
-    tr.appendChild(tdModalidades); tr.appendChild(tdEmail); tr.appendChild(tdCamisa); tr.appendChild(tdObs);
+
+    tr.appendChild(tdNome);
+    tr.appendChild(tdSexo);
+    tr.appendChild(tdTurma);
+    tr.appendChild(tdTurno);
+    tr.appendChild(tdModalidades);
+    tr.appendChild(tdEmail);
+    tr.appendChild(tdCamisa);
+    tr.appendChild(tdObs);
+
     tbody.appendChild(tr);
   });
 }
@@ -1373,32 +1614,50 @@ function renderRelatorioTodaTurma(){
   const turmaEl = document.getElementById("relatorioTurma");
   const tituloLinha1 = document.getElementById("relatorioTituloLinha1");
   const tituloLinha2 = document.getElementById("relatorioTituloLinha2");
+
   if (!tbody || !turnoEl || !turmaEl) return;
+
   const turno = turnoEl.value;
   const turma = turmaEl.value;
+
   tbody.innerHTML = "";
   tituloLinha1.textContent = "Relatório completo da turma – " + (configEvento.nomeEvento || "Movimenta Odisseia");
+
   if (!turno || !turma){
     tituloLinha2.textContent = "Selecione turno e turma para gerar o relatório da turma inteira.";
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 8;
     td.textContent = "Selecione turno e turma para gerar o relatório da turma inteira.";
-    tr.appendChild(td); tbody.appendChild(tr); return;
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
   }
-  let lista = todasInscricoes.filter(ins => ins.turno === turno && ins.turma === turma);
+
+  let lista = todasInscricoes.filter(ins => {
+    if (ins.turno !== turno) return false;
+    if (ins.turma !== turma) return false;
+    return true;
+  });
+
   lista = lista.slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
+
   if (!lista.length){
     tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} – Total: 0 inscritos.`;
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 8;
     td.textContent = "Nenhuma inscrição nesta turma.";
-    tr.appendChild(td); tbody.appendChild(tr); return;
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
   }
+
   tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} – Total: ${lista.length} inscrito(s).`;
+
   lista.forEach(ins => {
     const tr = document.createElement("tr");
+
     const tdNome = document.createElement("td");
     const tdSexo = document.createElement("td");
     const tdTurma = document.createElement("td");
@@ -1407,6 +1666,7 @@ function renderRelatorioTodaTurma(){
     const tdEmail = document.createElement("td");
     const tdCamisa = document.createElement("td");
     const tdObs = document.createElement("td");
+
     tdNome.textContent = ins.nome || "";
     tdSexo.textContent = ins.sexo || "";
     tdTurma.textContent = ins.turma || "";
@@ -1415,8 +1675,16 @@ function renderRelatorioTodaTurma(){
     tdEmail.textContent = ins.email || "";
     tdCamisa.textContent = ins.camisaNumero || "";
     tdObs.textContent = ins.observacoes || "";
-    tr.appendChild(tdNome); tr.appendChild(tdSexo); tr.appendChild(tdTurma); tr.appendChild(tdTurno);
-    tr.appendChild(tdModalidades); tr.appendChild(tdEmail); tr.appendChild(tdCamisa); tr.appendChild(tdObs);
+
+    tr.appendChild(tdNome);
+    tr.appendChild(tdSexo);
+    tr.appendChild(tdTurma);
+    tr.appendChild(tdTurno);
+    tr.appendChild(tdModalidades);
+    tr.appendChild(tdEmail);
+    tr.appendChild(tdCamisa);
+    tr.appendChild(tdObs);
+
     tbody.appendChild(tr);
   });
 }
@@ -1435,14 +1703,20 @@ function atualizarSelectsAdminPublico(){
 
   adminTurma.innerHTML = '<option value="">Todas</option>';
   turmasOrd.forEach(t => {
-    const opt = document.createElement("option"); opt.value = t; opt.textContent = t; adminTurma.appendChild(opt);
+    const opt = document.createElement("option");
+    opt.value = t; opt.textContent = t;
+    adminTurma.appendChild(opt);
   });
 
   filtroMod.innerHTML = '<option value="">Selecione a modalidade...</option>';
   adminMod.innerHTML = '<option value="">Todas</option>';
   MODALIDADES.forEach(m => {
-    const o1 = document.createElement("option"); o1.value = m; o1.textContent = m; filtroMod.appendChild(o1);
-    const o2 = document.createElement("option"); o2.value = m; o2.textContent = m; adminMod.appendChild(o2);
+    const o1 = document.createElement("option");
+    o1.value = m; o1.textContent = m;
+    filtroMod.appendChild(o1);
+    const o2 = document.createElement("option");
+    o2.value = m; o2.textContent = m;
+    adminMod.appendChild(o2);
   });
 
   const nomeFiltro = (document.getElementById("adminFiltroNome").value || "").toLowerCase();
@@ -1452,6 +1726,7 @@ function atualizarSelectsAdminPublico(){
   todasInscricoes.forEach(ins => {
     if (nomeFiltro && !(ins.nome || "").toLowerCase().includes(nomeFiltro)) return;
     if (turmaFiltro && ins.turma !== turmaFiltro) return;
+
     (ins.modalidades || []).forEach(mod => {
       const opt = document.createElement("option");
       opt.value = ins.id + "|||" + mod;
@@ -1461,19 +1736,27 @@ function atualizarSelectsAdminPublico(){
   });
 }
 
-/* ========== JOGOS / PLACAR / CLASSIFICAÇÃO (mantive suas implementações) ========== */
+/* ========== JOGOS (ALUNO) ========== */
 
-function renderJogosAluno(){ /* implementação similar já existente (usada acima) */
+function renderJogosAluno(){
   const serieEl = document.getElementById("filtroSerieJogo");
   const modalidadeEl = document.getElementById("filtroModalidadeJogo");
   const dataEl = document.getElementById("filtroDataJogo");
   const container = document.getElementById("listaJogosContainer");
+
   if (!serieEl || !modalidadeEl || !dataEl || !container) return;
+
   const serie = serieEl.value;
   const modalidade = modalidadeEl.value;
   const dataFiltro = dataEl.value;
+
   container.innerHTML = "";
-  if (!serie || !modalidade){ container.textContent = "Selecione a série e a modalidade para ver os jogos."; return; }
+
+  if (!serie || !modalidade){
+    container.textContent = "Selecione a série e a modalidade para ver os jogos.";
+    return;
+  }
+
   let lista = todosJogos.filter(j => {
     const s1 = getSerieFromTurma(j.turma1);
     const s2 = getSerieFromTurma(j.turma2);
@@ -1482,12 +1765,18 @@ function renderJogosAluno(){ /* implementação similar já existente (usada aci
     if (dataFiltro && j.dataJogo !== dataFiltro) return false;
     return true;
   });
-  if (!lista.length){ container.textContent = "Nenhum jogo para esses filtros."; return; }
+
+  if (!lista.length){
+    container.textContent = "Nenhum jogo para esses filtros.";
+    return;
+  }
+
   lista = lista.slice().sort((a,b) => {
     const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
     const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
     return da.localeCompare(db);
   });
+
   lista.forEach(j => {
     const div = document.createElement("div");
     div.className = "jogo-bloco";
@@ -1500,72 +1789,196 @@ function renderJogosAluno(){ /* implementação similar já existente (usada aci
   });
 }
 
+/* ========== PLACAR AO VIVO (ALUNO) ========== */
+
 function renderPlacarAoVivo(){
   const container = document.getElementById("placarAoVivoContainer");
   if (!container) return;
   container.innerHTML = "";
-  const statusLabel = { "AGENDADO": "Agendado", "PRESTES": "Prestes a começar", "EM_ANDAMENTO": "Em andamento", "FINALIZADO": "Finalizado" };
+
+  const statusLabel = {
+    "AGENDADO": "Agendado",
+    "PRESTES": "Prestes a começar",
+    "EM_ANDAMENTO": "Em andamento",
+    "FINALIZADO": "Finalizado"
+  };
+
   const jogosAoVivo = todosJogos.filter(j => j.status === "EM_ANDAMENTO" || j.status === "PRESTES");
+
   if (!jogosAoVivo.length){
-    const p = document.createElement("p"); p.textContent = "Nenhum jogo em andamento ou prestes a começar neste momento."; container.appendChild(p); return;
+    const p = document.createElement("p");
+    p.textContent = "Nenhum jogo em andamento ou prestes a começar neste momento.";
+    container.appendChild(p);
+    return;
   }
-  jogosAoVivo.sort((a,b) => ((a.dataJogo||"") + (a.horarioJogo||"")).localeCompare((b.dataJogo||"") + (b.horarioJogo||"")));
+
+  jogosAoVivo.sort((a,b) => {
+    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
+    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
+    return da.localeCompare(db);
+  });
+
   jogosAoVivo.forEach(j => {
-    const card = document.createElement("div"); card.className = "placar-card";
-    const topo = document.createElement("div"); topo.className = "placar-linha-principal"; topo.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-"); card.appendChild(topo);
-    const info = document.createElement("div"); info.innerHTML = "Local: "+(j.localJogo || "-")+"<br>"+(j.turma1||"")+" <strong>"+(j.placar1 ?? 0)+"</strong> x <strong>"+(j.placar2 ?? 0)+"</strong> "+(j.turma2 || ""); card.appendChild(info);
-    const statusSpan = document.createElement("span"); statusSpan.className = "placar-status"; if (j.status==="EM_ANDAMENTO") statusSpan.classList.add("andamento"); if (j.status==="PRESTES") statusSpan.classList.add("prestes"); statusSpan.textContent = statusLabel[j.status] || j.status || "–"; card.appendChild(statusSpan);
+    const card = document.createElement("div");
+    card.className = "placar-card";
+
+    const topo = document.createElement("div");
+    topo.className = "placar-linha-principal";
+    topo.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-");
+    card.appendChild(topo);
+
+    const info = document.createElement("div");
+    info.innerHTML =
+      "Local: "+(j.localJogo || "-")+"<br>"+
+      (j.turma1 || "")+" <strong>"+(j.placar1 ?? 0)+"</strong> x <strong>"+(j.placar2 ?? 0)+"</strong> "+(j.turma2 || "");
+    card.appendChild(info);
+
+    const statusSpan = document.createElement("span");
+    statusSpan.className = "placar-status";
+    if (j.status === "EM_ANDAMENTO") statusSpan.classList.add("andamento");
+    if (j.status === "PRESTES") statusSpan.classList.add("prestes");
+    statusSpan.textContent = statusLabel[j.status] || j.status || "–";
+    card.appendChild(statusSpan);
+
     container.appendChild(card);
   });
 }
+
+/* ========== CLASSIFICAÇÃO / CLASSIFICADOS (ALUNO) ========== */
 
 function renderClassificacao(){
   const container = document.getElementById("classificacaoContainer");
   if (!container) return;
   container.innerHTML = "";
-  if (!todosJogos.length){ container.textContent = "Nenhum jogo registrado ainda."; return; }
+
+  if (!todosJogos.length){
+    container.textContent = "Nenhum jogo registrado ainda.";
+    return;
+  }
+
   const finalizados = todosJogos.filter(j => j.status === "FINALIZADO");
-  if (!finalizados.length){ container.textContent = "Nenhum jogo finalizado ainda para mostrar classificados."; return; }
-  finalizados.sort((a,b) => ((a.dataJogo||"") + (a.horarioJogo||"")).localeCompare((b.dataJogo||"") + (b.horarioJogo||"")));
+
+  if (!finalizados.length){
+    container.textContent = "Nenhum jogo finalizado ainda para mostrar classificados.";
+    return;
+  }
+
+  finalizados.sort((a,b) => {
+    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
+    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
+    return da.localeCompare(db);
+  });
+
   finalizados.forEach(j => {
-    const card = document.createElement("div"); card.className = "jogo-bloco";
-    const header = document.createElement("div"); header.style.fontWeight = "600"; header.style.marginBottom = "4px"; header.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-"); card.appendChild(header);
-    const p1 = j.placar1 ?? 0; const p2 = j.placar2 ?? 0;
-    let vencedor = null; if (p1 > p2) vencedor = "t1"; else if (p2 > p1) vencedor = "t2";
+    const card = document.createElement("div");
+    card.className = "jogo-bloco";
+
+    const header = document.createElement("div");
+    header.style.fontWeight = "600";
+    header.style.marginBottom = "4px";
+    header.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-");
+    card.appendChild(header);
+
+    const p1 = j.placar1 ?? 0;
+    const p2 = j.placar2 ?? 0;
+
+    let vencedor = null;
+    if (p1 > p2) vencedor = "t1";
+    else if (p2 > p1) vencedor = "t2";
+
     function montarLinha(turma, placar, pos){
-      const linha = document.createElement("div"); linha.className = "linha-classificado";
-      const bol = document.createElement("span"); bol.className = "bolinha-resultado";
-      if (!vencedor) bol.classList.add("bolinha-neutra"); else if ((vencedor==="t1"&&pos===1)||(vencedor==="t2"&&pos===2)) bol.classList.add("bolinha-verde"); else bol.classList.add("bolinha-vermelha");
-      const nomeSpan = document.createElement("span"); nomeSpan.textContent = turma || "-"; nomeSpan.style.marginRight = "6px";
-      const placarSpan = document.createElement("strong"); placarSpan.textContent = placar;
-      linha.appendChild(bol); linha.appendChild(nomeSpan); linha.appendChild(document.createTextNode(" — ")); linha.appendChild(placarSpan);
+      const linha = document.createElement("div");
+      linha.className = "linha-classificado";
+      const bol = document.createElement("span");
+      bol.className = "bolinha-resultado";
+
+      if (!vencedor){
+        bol.classList.add("bolinha-neutra");
+      } else if ((vencedor === "t1" && pos === 1) || (vencedor === "t2" && pos === 2)){
+        bol.classList.add("bolinha-verde");
+      } else {
+        bol.classList.add("bolinha-vermelha");
+      }
+
+      const nomeSpan = document.createElement("span");
+      nomeSpan.textContent = turma || "-";
+      nomeSpan.style.marginRight = "6px";
+
+      const placarSpan = document.createElement("strong");
+      placarSpan.textContent = placar;
+
+      linha.appendChild(bol);
+      linha.appendChild(nomeSpan);
+      linha.appendChild(document.createTextNode(" — "));
+      linha.appendChild(placarSpan);
       return linha;
     }
-    card.appendChild(montarLinha(j.turma1, p1, 1)); card.appendChild(montarLinha(j.turma2, p2, 2));
-    const info = document.createElement("div"); info.style.marginTop = "4px";
-    if (vencedor === "t1") info.textContent = "Classificado: " + (j.turma1 || "-"); else if (vencedor === "t2") info.textContent = "Classificado: " + (j.turma2 || "-"); else info.textContent = "Empate – sem classificado definido.";
+
+    card.appendChild(montarLinha(j.turma1, p1, 1));
+    card.appendChild(montarLinha(j.turma2, p2, 2));
+
+    const info = document.createElement("div");
+    info.style.marginTop = "4px";
+    if (vencedor === "t1"){
+      info.textContent = "Classificado: " + (j.turma1 || "-");
+    } else if (vencedor === "t2"){
+      info.textContent = "Classificado: " + (j.turma2 || "-");
+    } else {
+      info.textContent = "Empate – sem classificado definido.";
+    }
     card.appendChild(info);
+
     container.appendChild(card);
   });
 }
 
-/* ========== JOGOS ADMIN (CADASTRAR/EXCLUIR/ATUALIZAR) ========== */
+/* ========== JOGOS ADMIN: CADASTRAR / EXCLUIR / EDITAR PLACAR ========== */
 
 async function cadastrarJogo(){
-  if (!isAdmin){ alert("Apenas o administrador pode cadastrar jogos."); return; }
+  if (!isAdmin){
+    alert("Apenas o administrador pode cadastrar jogos.");
+    return;
+  }
   const dataJogo = document.getElementById("jogoData").value;
   const turma1 = document.getElementById("jogoTurma1").value;
   const turma2 = document.getElementById("jogoTurma2").value;
   const modalidade = document.getElementById("jogoModalidade").value;
   const horario = document.getElementById("jogoHorario").value;
   const local = (document.getElementById("jogoLocal").value || "").trim();
-  if (!dataJogo || !turma1 || !turma2 || !modalidade || !horario || !local){ alert("Preencha todos os campos do jogo."); return; }
-  if (turma1 === turma2){ alert("Turma 1 e Turma 2 devem ser diferentes."); return; }
+
+  if (!dataJogo || !turma1 || !turma2 || !modalidade || !horario || !local){
+    alert("Preencha todos os campos do jogo.");
+    return;
+  }
+  if (turma1 === turma2){
+    alert("Turma 1 e Turma 2 devem ser diferentes.");
+    return;
+  }
+
   try{
-    await db.collection("jogos").add({ dataJogo, turma1, turma2, modalidade, horarioJogo: horario, localJogo: local, status: "AGENDADO", placar1: 0, placar2: 0, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection("jogos").add({
+      dataJogo: dataJogo,
+      turma1: turma1,
+      turma2: turma2,
+      modalidade: modalidade,
+      horarioJogo: horario,
+      localJogo: local,
+      status: "AGENDADO",
+      placar1: 0,
+      placar2: 0,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
     alert("Jogo cadastrado com sucesso.");
-    document.getElementById("jogoData").value = ""; document.getElementById("jogoTurma1").value = ""; document.getElementById("jogoTurma2").value = ""; document.getElementById("jogoModalidade").value = ""; document.getElementById("jogoHorario").value = ""; document.getElementById("jogoLocal").value = "";
-  }catch(e){ console.error(e); alert("Erro ao cadastrar jogo."); }
+    document.getElementById("jogoData").value = "";
+    document.getElementById("jogoTurma1").value = "";
+    document.getElementById("jogoTurma2").value = "";
+    document.getElementById("jogoModalidade").value = "";
+    document.getElementById("jogoHorario").value = "";
+    document.getElementById("jogoLocal").value = "";
+  }catch(e){
+    console.error(e);
+    alert("Erro ao cadastrar jogo.");
+  }
 }
 
 function atualizarSelectExcluirJogo(){
@@ -1573,115 +1986,305 @@ function atualizarSelectExcluirJogo(){
   if (!sel) return;
   const filtroInput = document.getElementById("filtroExcluirJogo");
   const termo = filtroInput ? (filtroInput.value || "").toLowerCase() : "";
+
   sel.innerHTML = '<option value="">Selecione um jogo...</option>';
   todosJogos.forEach(j => {
     const label = (j.modalidade || "")+" — "+formatarDataBR(j.dataJogo)+" "+(j.horarioJogo || "")+" — "+(j.turma1 || "")+" x "+(j.turma2 || "");
     if (termo && !label.toLowerCase().includes(termo)) return;
-    const opt = document.createElement("option"); opt.value = j.id; opt.textContent = label; sel.appendChild(opt);
+    const opt = document.createElement("option");
+    opt.value = j.id;
+    opt.textContent = label;
+    sel.appendChild(opt);
   });
 }
 
 async function excluirJogo(){
-  if (!isAdmin){ alert("Apenas o administrador pode excluir jogos."); return; }
-  const sel = document.getElementById("selectExcluirJogo"); const id = sel.value;
-  if (!id){ alert("Selecione um jogo."); return; }
+  if (!isAdmin){
+    alert("Apenas o administrador pode excluir jogos.");
+    return;
+  }
+  const sel = document.getElementById("selectExcluirJogo");
+  const id = sel.value;
+  if (!id){
+    alert("Selecione um jogo."); return;
+  }
   const jogo = todosJogos.find(j => j.id === id);
   const desc = jogo ? ((jogo.modalidade || "")+" — "+formatarDataBR(jogo.dataJogo)+" "+(jogo.horarioJogo || "")+" — "+(jogo.turma1 || "")+" x "+(jogo.turma2 || "")) : "";
   if (!confirm("Excluir o jogo: "+desc+" ?")) return;
-  try{ await db.collection("jogos").doc(id).delete(); alert("Jogo excluído."); }catch(e){ console.error(e); alert("Erro ao excluir jogo."); }
+  try{
+    await db.collection("jogos").doc(id).delete();
+    alert("Jogo excluído.");
+  }catch(e){
+    console.error(e);
+    alert("Erro ao excluir jogo.");
+  }
 }
+
+/* Painel de placar ao vivo / status (admin) */
 
 function renderAdminJogos(){
   const container = document.getElementById("listaAdminJogos");
   if (!container) return;
   container.innerHTML = "";
-  if (!todosJogos.length){ container.textContent = "Nenhum jogo cadastrado."; return; }
+
+  if (!todosJogos.length){
+    container.textContent = "Nenhum jogo cadastrado.";
+    return;
+  }
+
   const statusOptions = ["AGENDADO","PRESTES","EM_ANDAMENTO","FINALIZADO"];
+
   todosJogos.forEach(j => {
-    const bloco = document.createElement("div"); bloco.className = "jogo-bloco";
-    const linha1 = document.createElement("div"); linha1.innerHTML = "<strong>"+(j.modalidade || "-")+"</strong> — "+formatarDataBR(j.dataJogo)+" às "+(j.horarioJogo || "-"); bloco.appendChild(linha1);
-    const linha2 = document.createElement("div"); linha2.textContent = "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+" — Local: "+(j.localJogo || "-"); bloco.appendChild(linha2);
-    const controles = document.createElement("div"); controles.style.marginTop = "4px"; controles.style.display = "flex"; controles.style.flexWrap = "wrap"; controles.style.gap = "6px"; controles.style.alignItems = "center";
-    const selStatus = document.createElement("select"); selStatus.dataset.id = j.id; statusOptions.forEach(st => { const opt = document.createElement("option"); opt.value = st; opt.textContent = st; if (j.status === st) opt.selected = true; selStatus.appendChild(opt); });
-    const inpP1 = document.createElement("input"); inpP1.type = "number"; inpP1.min = "0"; inpP1.value = (j.placar1 ?? 0); inpP1.style.width = "60px"; inpP1.dataset.id = j.id; inpP1.dataset.tipo = "p1";
-    const inpP2 = document.createElement("input"); inpP2.type = "number"; inpP2.min = "0"; inpP2.value = (j.placar2 ?? 0); inpP2.style.width = "60px"; inpP2.dataset.id = j.id; inpP2.dataset.tipo = "p2";
-    const labelP1 = document.createElement("span"); labelP1.textContent = (j.turma1 || "T1")+":";
-    const labelP2 = document.createElement("span"); labelP2.textContent = (j.turma2 || "T2")+":";
-    const btnSalvar = document.createElement("button"); btnSalvar.className = "btn btn-primaria btnSalvarJogo"; btnSalvar.textContent = "Salvar"; btnSalvar.dataset.id = j.id;
-    controles.appendChild(document.createTextNode("Status:")); controles.appendChild(selStatus); controles.appendChild(labelP1); controles.appendChild(inpP1); controles.appendChild(labelP2); controles.appendChild(inpP2); controles.appendChild(btnSalvar);
-    bloco.appendChild(controles); container.appendChild(bloco);
+    const bloco = document.createElement("div");
+    bloco.className = "jogo-bloco";
+
+    const linha1 = document.createElement("div");
+    linha1.innerHTML = "<strong>"+(j.modalidade || "-")+"</strong> — "+formatarDataBR(j.dataJogo)+" às "+(j.horarioJogo || "-");
+    bloco.appendChild(linha1);
+
+    const linha2 = document.createElement("div");
+    linha2.textContent = "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+" — Local: "+(j.localJogo || "-");
+    bloco.appendChild(linha2);
+
+    const controles = document.createElement("div");
+    controles.style.marginTop = "4px";
+    controles.style.display = "flex";
+    controles.style.flexWrap = "wrap";
+    controles.style.gap = "6px";
+    controles.style.alignItems = "center";
+
+    const selStatus = document.createElement("select");
+    selStatus.dataset.id = j.id;
+    statusOptions.forEach(st => {
+      const opt = document.createElement("option");
+      opt.value = st;
+      opt.textContent = st;
+      if (j.status === st) opt.selected = true;
+      selStatus.appendChild(opt);
+    });
+
+    const inpP1 = document.createElement("input");
+    inpP1.type = "number";
+    inpP1.min = "0";
+    inpP1.value = (j.placar1 ?? 0);
+    inpP1.style.width = "60px";
+    inpP1.dataset.id = j.id;
+    inpP1.dataset.tipo = "p1";
+
+    const inpP2 = document.createElement("input");
+    inpP2.type = "number";
+    inpP2.min = "0";
+    inpP2.value = (j.placar2 ?? 0);
+    inpP2.style.width = "60px";
+    inpP2.dataset.id = j.id;
+    inpP2.dataset.tipo = "p2";
+
+    const labelP1 = document.createElement("span");
+    labelP1.textContent = (j.turma1 || "T1")+":";
+    const labelP2 = document.createElement("span");
+    labelP2.textContent = (j.turma2 || "T2")+":"; 
+
+    const btnSalvar = document.createElement("button");
+    btnSalvar.className = "btn btn-primaria btnSalvarJogo";
+    btnSalvar.textContent = "Salvar";
+    btnSalvar.dataset.id = j.id;
+
+    controles.appendChild(document.createTextNode("Status:"));
+    controles.appendChild(selStatus);
+    controles.appendChild(labelP1);
+    controles.appendChild(inpP1);
+    controles.appendChild(labelP2);
+    controles.appendChild(inpP2);
+    controles.appendChild(btnSalvar);
+
+    bloco.appendChild(controles);
+    container.appendChild(bloco);
   });
 
   container.querySelectorAll(".btnSalvarJogo").forEach(btn => {
     btn.addEventListener("click", async () => {
-      if (!isAdmin){ alert("Apenas o administrador pode atualizar jogos."); return; }
+      if (!isAdmin){
+        alert("Apenas o administrador pode atualizar jogos.");
+        return;
+      }
       const id = btn.dataset.id;
       const bloco = btn.closest(".jogo-bloco");
-      const selStatus = bloco.querySelector("select"); const inpP1 = bloco.querySelector('input[data-tipo="p1"]'); const inpP2 = bloco.querySelector('input[data-tipo="p2"]');
-      const novoStatus = selStatus.value; const placar1 = parseInt(inpP1.value,10) || 0; const placar2 = parseInt(inpP2.value,10) || 0;
-      try{ await db.collection("jogos").doc(id).update({ status: novoStatus, placar1: placar1, placar2: placar2 }); alert("Jogo atualizado com sucesso."); }catch(e){ console.error(e); alert("Erro ao atualizar jogo."); }
+      const selStatus = bloco.querySelector("select");
+      const inpP1 = bloco.querySelector('input[data-tipo="p1"]');
+      const inpP2 = bloco.querySelector('input[data-tipo="p2"]');
+
+      const novoStatus = selStatus.value;
+      const placar1 = parseInt(inpP1.value,10) || 0;
+      const placar2 = parseInt(inpP2.value,10) || 0;
+
+      try{
+        await db.collection("jogos").doc(id).update({
+          status: novoStatus,
+          placar1: placar1,
+          placar2: placar2
+        });
+        alert("Jogo atualizado com sucesso.");
+      }catch(e){
+        console.error(e);
+        alert("Erro ao atualizar jogo.");
+      }
     });
   });
 }
 
-/* ========== PROFESSORES (ACESSOS) ========== */
+/* ========== PROFESSORES (ADMIN GERENCIA ACESSO) ========== */
 
 async function adicionarProfessorAcesso(){
-  if (!isAdmin){ alert("Apenas o administrador pode cadastrar acessos de professores."); return; }
+  if (!isAdmin){
+    alert("Apenas o administrador pode cadastrar acessos de professores.");
+    return;
+  }
   const nome = (document.getElementById("profNomeCadastro").value || "").trim();
   const tipo = document.getElementById("profTipoCadastro").value || "Professor";
   const senha = (document.getElementById("profSenhaCadastro").value || "").trim();
-  if (!nome || !senha){ alert("Preencha nome e senha."); return; }
-  try{ await db.collection("professoresAcesso").add({ nome: nome, tipo: tipo, senha: senha }); alert("Acesso cadastrado com sucesso."); document.getElementById("profNomeCadastro").value = ""; document.getElementById("profSenhaCadastro").value = ""; document.getElementById("profTipoCadastro").value = "Professor"; }catch(e){ console.error(e); alert("Erro ao cadastrar acesso."); }
+
+  if (!nome || !senha){
+    alert("Preencha nome e senha.");
+    return;
+  }
+
+  try{
+    await db.collection("professoresAcesso").add({
+      nome: nome,
+      tipo: tipo,
+      senha: senha
+    });
+    alert("Acesso cadastrado com sucesso.");
+    document.getElementById("profNomeCadastro").value = "";
+    document.getElementById("profSenhaCadastro").value = "";
+    document.getElementById("profTipoCadastro").value = "Professor";
+  }catch(e){
+    console.error(e);
+    alert("Erro ao cadastrar acesso.");
+  }
 }
 
 async function excluirProfessorAcesso(id){
-  if (!isAdmin){ alert("Apenas o administrador pode excluir acessos."); return; }
+  if (!isAdmin){
+    alert("Apenas o administrador pode excluir acessos.");
+    return;
+  }
   if (!confirm("Excluir este acesso de professor?")) return;
-  try{ await db.collection("professoresAcesso").doc(id).delete(); alert("Acesso excluído."); }catch(e){ console.error(e); alert("Erro ao excluir acesso."); }
+  try{
+    await db.collection("professoresAcesso").doc(id).delete();
+    alert("Acesso excluído.");
+  }catch(e){
+    console.error(e);
+    alert("Erro ao excluir acesso.");
+  }
 }
 
 function renderProfessoresAdmin(){
   const tbody = document.getElementById("tabelaProfessoresAdmin");
   if (!tbody) return;
   tbody.innerHTML = "";
+
   if (!todosProfessores.length){
-    const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan = 4; td.textContent = "Nenhum acesso cadastrado."; tr.appendChild(td); tbody.appendChild(tr); return;
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 4;
+    td.textContent = "Nenhum acesso cadastrado.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
   }
+
   todosProfessores.forEach(p => {
     const tr = document.createElement("tr");
-    const tdNome = document.createElement("td"); const tdTipo = document.createElement("td"); const tdSenha = document.createElement("td"); const tdAcoes = document.createElement("td");
-    tdNome.textContent = p.nome || ""; tdTipo.textContent = p.tipo || ""; tdSenha.textContent = p.senha || "";
-    const btn = document.createElement("button"); btn.className = "btn btn-primaria"; btn.style.padding = "3px 8px"; btn.textContent = "Excluir"; btn.addEventListener("click", () => excluirProfessorAcesso(p.id));
+    const tdNome = document.createElement("td");
+    const tdTipo = document.createElement("td");
+    const tdSenha = document.createElement("td");
+    const tdAcoes = document.createElement("td");
+
+    tdNome.textContent = p.nome || "";
+    tdTipo.textContent = p.tipo || "";
+    tdSenha.textContent = p.senha || "";
+
+    const btn = document.createElement("button");
+    btn.className = "btn btn-primaria";
+    btn.style.padding = "3px 8px";
+    btn.textContent = "Excluir";
+    btn.addEventListener("click", () => excluirProfessorAcesso(p.id));
+
     tdAcoes.appendChild(btn);
-    tr.appendChild(tdNome); tr.appendChild(tdTipo); tr.appendChild(tdSenha); tr.appendChild(tdAcoes);
+
+    tr.appendChild(tdNome);
+    tr.appendChild(tdTipo);
+    tr.appendChild(tdSenha);
+    tr.appendChild(tdAcoes);
     tbody.appendChild(tr);
   });
 }
 
-/* ========== PAINEL PROFESSORES (MARCAR) ========== */
+/* ========== PAINEL PROFESSORES (MARCAR ALUNO) ========== */
 
 function renderPainelProfessores(){
   const listaDiv = document.getElementById("profListaAlunos");
   const turnoSel = document.getElementById("profTurnoSelect");
   const turmaSel = document.getElementById("profTurmaSelect");
   const labelProf = document.getElementById("profUsuarioAtivo");
+
   if (!listaDiv || !turnoSel || !turmaSel) return;
-  if (currentProfessor && labelProf){ labelProf.textContent = currentProfessor.nome + " (" + currentProfessor.tipo + ")"; }
-  const turno = turnoSel.value; const turma = turmaSel.value;
+
+  if (currentProfessor && labelProf){
+    labelProf.textContent = currentProfessor.nome + " (" + currentProfessor.tipo + ")";
+  }
+
+  const turno = turnoSel.value;
+  const turma = turmaSel.value;
+
   listaDiv.innerHTML = "";
-  if (!turno || !turma){ listaDiv.textContent = "Selecione turno e turma para ver os alunos inscritos."; return; }
+
+  if (!turno || !turma){
+    listaDiv.textContent = "Selecione turno e turma para ver os alunos inscritos.";
+    return;
+  }
+
   const lista = todasInscricoes.filter(ins => ins.turno === turno && ins.turma === turma);
-  if (!lista.length){ listaDiv.textContent = "Nenhum inscrito nesta turma para estes filtros."; return; }
+
+  if (!lista.length){
+    listaDiv.textContent = "Nenhum inscrito nesta turma para estes filtros.";
+    return;
+  }
+
   lista.forEach(ins => {
     const bloqueios = Array.isArray(ins.naoAutorizadoPor) ? ins.naoAutorizadoPor : [];
     const jaIndicou = currentProfessor ? bloqueios.includes(currentProfessor.id) : false;
-    const card = document.createElement("div"); card.className = "jogo-bloco";
-    const nome = document.createElement("div"); nome.innerHTML = "<strong>"+(ins.nome || "")+"</strong>"; card.appendChild(nome);
-    const detalhe = document.createElement("div"); detalhe.style.fontSize = "0.8rem"; detalhe.innerHTML = "Turma: "+(ins.turma || "-")+" — Turno: "+(ins.turno || "-")+"<br>"+"Modalidades: "+((ins.modalidades || []).join(", ") || "-"); card.appendChild(detalhe);
-    const info = document.createElement("div"); info.style.marginTop = "4px"; info.style.fontSize = "0.78rem"; info.textContent = "Já indicado por "+bloqueios.length+" professor(es)."; card.appendChild(info);
-    const btn = document.createElement("button"); btn.className = "btn btn-primaria"; btn.style.marginTop = "4px"; btn.textContent = jaIndicou ? "Você já indicou este aluno" : "Indicar que NÃO pode participar"; btn.disabled = jaIndicou; btn.addEventListener("click", () => indicarAlunoNaoParticipa(ins.id));
-    card.appendChild(btn); listaDiv.appendChild(card);
+
+    const card = document.createElement("div");
+    card.className = "jogo-bloco";
+
+    const nome = document.createElement("div");
+    nome.innerHTML = "<strong>"+(ins.nome || "")+"</strong>";
+    card.appendChild(nome);
+
+    const detalhe = document.createElement("div");
+    detalhe.style.fontSize = "0.8rem";
+    detalhe.innerHTML =
+      "Turma: "+(ins.turma || "-")+" — Turno: "+(ins.turno || "-")+"<br>"+
+      "Modalidades: "+((ins.modalidades || []).join(", ") || "-");
+    card.appendChild(detalhe);
+
+    const info = document.createElement("div");
+    info.style.marginTop = "4px";
+    info.style.fontSize = "0.78rem";
+    info.textContent = "Já indicado por "+bloqueios.length+" professor(es).";
+    card.appendChild(info);
+
+    const btn = document.createElement("button");
+    btn.className = "btn btn-primaria";
+    btn.style.marginTop = "4px";
+    btn.textContent = jaIndicou ? "Você já indicou este aluno" : "Indicar que NÃO pode participar";
+    btn.disabled = jaIndicou;
+    btn.addEventListener("click", () => indicarAlunoNaoParticipa(ins.id));
+
+    card.appendChild(btn);
+    listaDiv.appendChild(card);
   });
 }
 
@@ -1689,16 +2292,37 @@ function configurarSelectTurmaProfessor(){
   const turnoSel = document.getElementById("profTurnoSelect");
   const turmaSel = document.getElementById("profTurmaSelect");
   if (!turnoSel || !turmaSel) return;
+
   const turno = turnoSel.value;
   turmaSel.innerHTML = "";
   const optDefault = document.createElement("option");
-  if (!turno){ optDefault.value = ""; optDefault.textContent = "Selecione o turno primeiro..."; turmaSel.appendChild(optDefault); }
-  else { optDefault.value = ""; optDefault.textContent = "Selecione a turma..."; turmaSel.appendChild(optDefault); const turmasTurno = getTurmasPorTurno(turno); turmasTurno.forEach(t => { const opt = document.createElement("option"); opt.value = t; opt.textContent = t; turmaSel.appendChild(opt); }); }
+  if (!turno){
+    optDefault.value = "";
+    optDefault.textContent = "Selecione o turno primeiro...";
+    turmaSel.appendChild(optDefault);
+  } else {
+    optDefault.value = "";
+    optDefault.textContent = "Selecione a turma...";
+    turmaSel.appendChild(optDefault);
+    const turmasTurno = getTurmasPorTurno(turno);
+    turmasTurno.forEach(t => {
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t;
+      turmaSel.appendChild(opt);
+    });
+  }
 }
 
 async function indicarAlunoNaoParticipa(inscricaoId){
-  if (!currentProfessor){ alert("Faça login como professor/coordenador/gestor para indicar alunos."); return; }
-  if (!confirm("Confirmar indicação de que este aluno NÃO pode participar?")){ return; }
+  if (!currentProfessor){
+    alert("Faça login como professor/coordenador/gestor para indicar alunos.");
+    return;
+  }
+  if (!confirm("Confirmar indicação de que este aluno NÃO pode participar?")){
+    return;
+  }
+
   const ref = db.collection("inscricoes").doc(inscricaoId);
   try{
     await db.runTransaction(function(tx){
@@ -1706,28 +2330,52 @@ async function indicarAlunoNaoParticipa(inscricaoId){
         if (!doc.exists) return;
         const data = doc.data();
         let lista = Array.isArray(data.naoAutorizadoPor) ? data.naoAutorizadoPor.slice() : [];
-        if (!lista.includes(currentProfessor.id)) lista.push(currentProfessor.id);
-        if (lista.length >= 2){ tx.delete(ref); } else { tx.update(ref, { naoAutorizadoPor: lista }); }
+        if (!lista.includes(currentProfessor.id)){
+          lista.push(currentProfessor.id);
+        }
+
+        if (lista.length >= 2){
+          // Dois ou mais professores indicaram -> remove a inscrição inteira
+          tx.delete(ref);
+        } else {
+          tx.update(ref, { naoAutorizadoPor: lista });
+        }
       });
     });
     alert("Indicação registrada. Se mais um professor indicar este aluno, a inscrição será cancelada automaticamente.");
-  }catch(e){ console.error(e); alert("Erro ao registrar indicação."); }
+  }catch(e){
+    console.error(e);
+    alert("Erro ao registrar indicação.");
+  }
 }
 
-/* ========== TROCA DE TELAS & ABRIR ADMIN ========== */
+/* ========== TROCA DE TELAS ========== */
 
 function mostrarSecao(sec){
-  document.getElementById("secInscricao").style.display = (sec==="inscricao"?"block":"none");
-  document.getElementById("secInscritos").style.display = (sec==="inscritos"?"block":"none");
-  document.getElementById("secJogos").style.display = (sec==="jogos"?"block":"none");
-  document.getElementById("secClassificados").style.display = (sec==="classificados"?"block":"none");
-  document.getElementById("secPlacarAoVivo").style.display = (sec==="placar"?"block":"none");
-  document.getElementById("adminSection").style.display = (sec==="admin"?"block":"none");
-  document.getElementById("professoresSection").style.display = (sec==="professores"?"block":"none");
-  // welcome is controlled by atualizarStatusInscricoes
+  // sec: 'inscricao','inscritos','jogos','classificados','placar','admin','professores','home'
+  const mapa = ["secInscricao","secInscritos","secJogos","secClassificados","secPlacarAoVivo","adminSection","professoresSection","secHome"];
+  // hide all
+  document.getElementById("secInscricao").style.display = "none";
+  document.getElementById("secInscritos").style.display = "none";
+  document.getElementById("secJogos").style.display = "none";
+  document.getElementById("secClassificados").style.display = "none";
+  document.getElementById("secPlacarAoVivo").style.display = "none";
+  document.getElementById("adminSection").style.display = "none";
+  document.getElementById("professoresSection").style.display = "none";
+  document.getElementById("secHome").style.display = "none";
+
+  if (sec === "inscricao") document.getElementById("secInscricao").style.display = "block";
+  if (sec === "inscritos") document.getElementById("secInscritos").style.display = "block";
+  if (sec === "jogos") document.getElementById("secJogos").style.display = "block";
+  if (sec === "classificados") document.getElementById("secClassificados").style.display = "block";
+  if (sec === "placar") document.getElementById("secPlacarAoVivo").style.display = "block";
+  if (sec === "admin") document.getElementById("adminSection").style.display = "block";
+  if (sec === "professores") document.getElementById("professoresSection").style.display = "block";
+  if (sec === "home") document.getElementById("secHome").style.display = "block";
 }
 
 function abrirAdmin(){
+  // Seleciona tipo de acesso primeiro
   const opcao = prompt(
     "Selecione o tipo de acesso:\n" +
     "1 - Administrador\n" +
@@ -1736,26 +2384,61 @@ function abrirAdmin(){
     "4 - Gestor"
   );
   if (opcao === null) return;
+
   let role = null;
   if (opcao === "1") role = "ADMIN";
   else if (opcao === "2") role = "Professor";
   else if (opcao === "3") role = "Coordenador";
   else if (opcao === "4") role = "Gestor";
-  else { alert("Opção inválida."); return; }
+  else {
+    alert("Opção inválida.");
+    return;
+  }
+
   const senha = prompt("Digite a senha:");
   if (senha === null || senha === "") return;
+
   if (role === "ADMIN"){
-    if (senha !== ADMIN_PASSWORD){ alert("Senha incorreta."); return; }
-    isAdmin = true; currentRole = "ADMIN"; currentProfessor = null; mostrarSecao("admin"); renderAdmin(); renderAdminJogos(); return;
+    if (senha !== ADMIN_PASSWORD){
+      alert("Senha incorreta.");
+      return;
+    }
+    isAdmin = true;
+    currentRole = "ADMIN";
+    currentProfessor = null;
+    mostrarSecao("admin");
+    renderAdmin();
+    renderAdminJogos();
+    return;
   }
+
+  // Professor / Coordenador / Gestor
   const prof = todosProfessores.find(p => p.senha === senha && p.tipo === role);
-  if (!prof){ alert("Senha incorreta ou acesso não encontrado para este tipo."); return; }
-  isAdmin = false; currentRole = role; currentProfessor = prof; mostrarSecao("professores"); renderPainelProfessores();
+  if (!prof){
+    alert("Senha incorreta ou acesso não encontrado para este tipo.");
+    return;
+  }
+
+  isAdmin = false;
+  currentRole = role;
+  currentProfessor = prof;
+  mostrarSecao("professores");
+  renderPainelProfessores();
 }
 
-function fecharAdmin(){ mostrarSecao("inscricao"); currentRole = null; isAdmin = false; }
-function fecharProfessores(){ mostrarSecao("inscricao"); currentRole = null; currentProfessor = null; }
+function fecharAdmin(){
+  mostrarSecao("inscricao");
+  currentRole = null;
+  isAdmin = false;
+}
 
+function fecharProfessores(){
+  mostrarSecao("inscricao");
+  currentRole = null;
+  currentProfessor = null;
+}
+
+/* abas admin */
 function configurarAbasAdmin(){
   const botoes = document.querySelectorAll(".admin-tab-btn");
   botoes.forEach(btn => {
@@ -1769,12 +2452,21 @@ function configurarAbasAdmin(){
   });
 }
 
-/* ========== FIRESTORE LISTENERS ========== */
+/* ========== LISTENERS FIRESTORE (realtime listeners) ========== */
 
 function iniciarListeners(){
+  // Professores (acesso)
   db.collection("professoresAcesso").onSnapshot(snap => {
     todosProfessores = [];
-    snap.forEach(doc => { const d = doc.data(); todosProfessores.push({ id: doc.id, nome: d.nome || "", tipo: d.tipo || "Professor", senha: d.senha || "" }); });
+    snap.forEach(doc => {
+      const d = doc.data();
+      todosProfessores.push({
+        id: doc.id,
+        nome: d.nome || "",
+        tipo: d.tipo || "Professor",
+        senha: d.senha || ""
+      });
+    });
     renderProfessoresAdmin();
   });
 
@@ -1799,6 +2491,7 @@ function iniciarListeners(){
         timestamp: d.timestamp
       };
       todasInscricoes.push(ins);
+
       if (!countsPorTurmaModalidade[ins.turma]) countsPorTurmaModalidade[ins.turma] = {};
       ins.modalidades.forEach(m => {
         if (!countsPorTurmaModalidade[ins.turma][m]) countsPorTurmaModalidade[ins.turma][m] = 0;
@@ -1815,14 +2508,17 @@ function iniciarListeners(){
     renderPublico();
     renderAdmin();
     renderRelatorio();
-    if (currentRole && currentRole !== "ADMIN"){ renderPainelProfessores(); }
+    if (currentRole && currentRole !== "ADMIN"){
+      renderPainelProfessores();
+    }
   });
 
   db.collection("jogos").orderBy("dataJogo","asc").onSnapshot(snap => {
     todosJogos = [];
     snap.forEach(doc => {
       const d = doc.data();
-      let p1 = d.placar1; let p2 = d.placar2;
+      let p1 = d.placar1;
+      let p2 = d.placar2;
       if (typeof p1 === "string") p1 = parseInt(p1,10);
       if (typeof p2 === "string") p2 = parseInt(p2,10);
       todosJogos.push({
@@ -1848,108 +2544,75 @@ function iniciarListeners(){
   });
 }
 
-/* ========== WELCOME PAGE: RENDER PÚBLICO + SALVAR/UPLOAD (ADMIN) ========== */
-
-function renderWelcomePublic(){
-  const wp = configEvento.welcomePage || {};
-  const title = wp.title || "Bem-vindo";
-  const subtitle = wp.subtitle || "";
-  const html = wp.html || "";
-  const logoUrl = wp.logoUrl || "";
-  document.getElementById("welcomeTitle").textContent = title;
-  document.getElementById("welcomeSubtitle").textContent = subtitle;
-  document.getElementById("welcomeContent").innerHTML = sanitizeHtml(html);
-  const img = document.getElementById("welcomeLogo");
-  if (logoUrl){ img.src = logoUrl; img.style.display = "block"; } else { img.style.display = "none"; }
-}
-
-/* upload logo para storage e retorna URL pública */
-async function uploadWelcomeLogo(file){
-  if (!file) return null;
-  const path = 'welcome_logos/' + Date.now() + '_' + (file.name || 'logo');
-  const ref = storage.ref().child(path);
-  const snap = await ref.put(file);
-  const url = await snap.ref.getDownloadURL();
-  return url;
-}
-
-/* salvar welcomePage a partir do editor admin */
-async function salvarWelcomePage(){
-  if (!isAdmin){ alert("Apenas administrador pode salvar a página inicial."); return; }
-  const title = (document.getElementById("welcomeTitleInput").value || "").trim();
-  const subtitle = (document.getElementById("welcomeSubtitleInput").value || "").trim();
-  const html = (document.getElementById("welcomeHtmlInput").value || "").trim();
-  const fileInput = document.getElementById("welcomeLogoFile");
-  let logoUrl = (configEvento.welcomePage && configEvento.welcomePage.logoUrl) || null;
-
-  try{
-    if (fileInput && fileInput.files && fileInput.files[0]){
-      const url = await uploadWelcomeLogo(fileInput.files[0]);
-      if (url) logoUrl = url;
-    }
-
-    const welcomeObj = {
-      title: title,
-      subtitle: subtitle,
-      html: html,
-      logoUrl: logoUrl || null,
-      lastEditedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      lastEditedBy: (currentRole === "ADMIN" ? "ADMIN" : (currentProfessor ? currentProfessor.id : null))
-    };
-
-    // atualiza local e no banco (merge)
-    configEvento.welcomePage = welcomeObj;
-    await db.collection("config").doc("geral").set({ welcomePage: welcomeObj }, { merge: true });
-
-    // atualizar preview e público
-    document.getElementById("welcomePreviewTitle").textContent = title;
-    document.getElementById("welcomePreviewSubtitle").textContent = subtitle;
-    document.getElementById("welcomePreviewHtml").innerHTML = sanitizeHtml(html);
-    if (logoUrl){ document.getElementById("welcomePreviewLogo").src = logoUrl; document.getElementById("welcomePreviewLogo").style.display = "block"; }
-    alert("Página inicial salva com sucesso.");
-    // se inscrições estão encerradas, atualiza página pública também
-    if (inscricoesEncerradas) renderWelcomePublic();
-  }catch(e){ console.error(e); alert("Erro ao salvar página inicial."); }
-}
-
-/* botão preview */
-function previewWelcomeLocal(){
-  const title = (document.getElementById("welcomeTitleInput").value || "").trim();
-  const subtitle = (document.getElementById("welcomeSubtitleInput").value || "").trim();
-  const html = (document.getElementById("welcomeHtmlInput").value || "").trim();
-  document.getElementById("welcomePreviewTitle").textContent = title;
-  document.getElementById("welcomePreviewSubtitle").textContent = subtitle;
-  document.getElementById("welcomePreviewHtml").innerHTML = sanitizeHtml(html);
-  document.getElementById("welcomePreviewLogo").style.display = "none";
-}
-
-/* ========== INICIALIZAÇÃO UI e EVENTOS ========== */
+/* ========== INIT ========== */
 
 function init(){
-  try { const saved = localStorage.getItem('insc_email'); if (saved && saved.includes('@')){ emailAtual = saved; const ov = document.getElementById('emailOverlay'); if (ov) ov.style.display = 'none'; } } catch(e){}
+  // Overlay fallback: se já houver e-mail em localStorage, fecha imediatamente
+  try {
+    const saved = localStorage.getItem('insc_email');
+    if (saved && saved.includes('@')){
+      emailAtual = saved;
+      const ov = document.getElementById('emailOverlay');
+      if (ov) ov.style.display = 'none';
+    }
+  } catch(e){ /* ignore */ }
+
   const overlay = document.getElementById("emailOverlay");
   const emailInput = document.getElementById("emailAluno");
   const msgEmail = document.getElementById("msgEmailOverlay");
-  function liberarEmail(){ const val = (emailInput.value || '').trim(); if (!validarEmail(val)){ msgEmail.textContent = "Digite um e-mail válido."; return; } emailAtual = val; try { localStorage.setItem('insc_email', val); }catch(e){} try { window._inscricao_email_fallback = val; } catch(e){} if (overlay) overlay.style.display = "none"; }
+
+  function liberarEmail(){
+    const val = (emailInput.value || '').trim();
+    if (!validarEmail(val)){
+      msgEmail.textContent = "Digite um e-mail válido.";
+      return;
+    }
+    emailAtual = val;
+    try { localStorage.setItem('insc_email', val); } catch(e){}
+    try { window._inscricao_email_fallback = val; } catch(e){}
+    if (overlay) overlay.style.display = "none";
+  }
   const btnEntrar = document.getElementById("btnEntrarEmail");
   if (btnEntrar) btnEntrar.addEventListener("click", liberarEmail);
-  if (emailInput) emailInput.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); liberarEmail(); } });
+  if (emailInput){
+    emailInput.addEventListener("keydown", e => {
+      if (e.key === "Enter"){
+        e.preventDefault();
+        liberarEmail();
+      }
+    });
+  }
 
   const contMods = document.getElementById("modalidadesContainer");
   MODALIDADES.forEach(m => {
-    const item = document.createElement("div"); item.className = "modalidade-item";
-    const chk = document.createElement("input"); chk.type = "checkbox"; chk.className = "chkModalidade"; chk.value = m;
+    const item = document.createElement("div");
+    item.className = "modalidade-item";
+    const chk = document.createElement("input");
+    chk.type = "checkbox";
+    chk.className = "chkModalidade";
+    chk.value = m;
     const info = document.createElement("div");
-    const lbl = document.createElement("span"); lbl.className = "modalidade-label"; lbl.textContent = m;
-    const vagas = document.createElement("span"); vagas.className = "modalidade-vagas"; vagas.dataset.mod = m; vagas.textContent = "Selecione turno e turma para ver vagas.";
-    info.appendChild(lbl); info.appendChild(vagas);
-    item.appendChild(chk); item.appendChild(info); contMods.appendChild(item);
+    const lbl = document.createElement("span");
+    lbl.className = "modalidade-label";
+    lbl.textContent = m;
+    const vagas = document.createElement("span");
+    vagas.className = "modalidade-vagas";
+    vagas.dataset.mod = m;
+    vagas.textContent = "Selecione turno e turma para ver vagas.";
+    info.appendChild(lbl);
+    info.appendChild(vagas);
+    item.appendChild(chk);
+    item.appendChild(info);
+    contMods.appendChild(item);
   });
 
   contMods.addEventListener("change", e => {
     if (e.target.classList.contains("chkModalidade")){
       const marcados = contMods.querySelectorAll(".chkModalidade:checked");
-      if (marcados.length > LIMITE_MODALIDADES_POR_ALUNO){ e.target.checked = false; alert("Máximo de "+LIMITE_MODALIDADES_POR_ALUNO+" modalidades por aluno."); }
+      if (marcados.length > LIMITE_MODALIDADES_POR_ALUNO){
+        e.target.checked = false;
+        alert("Máximo de "+LIMITE_MODALIDADES_POR_ALUNO+" modalidades por aluno.");
+      }
     }
   });
 
@@ -1959,12 +2622,21 @@ function init(){
   turnoSel.addEventListener("change", () => {
     const turno = turnoSel.value;
     turmaSel.innerHTML = "";
-    if (!turno){ turmaSel.disabled = true; turmaSel.innerHTML = '<option value="">Selecione o turno primeiro...</option>'; }
-    else {
+    if (!turno){
+      turmaSel.disabled = true;
+      turmaSel.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
+    } else {
       turmaSel.disabled = false;
       const turmasTurno = getTurmasPorTurno(turno);
-      const optDefault = document.createElement("option"); optDefault.value = ""; optDefault.textContent = "Selecione a turma..."; turmaSel.appendChild(optDefault);
-      turmasTurno.forEach(t => { const opt = document.createElement("option"); opt.value = t; opt.textContent = t; turmaSel.appendChild(opt); });
+      const optDefault = document.createElement("option");
+      optDefault.value = "";
+      optDefault.textContent = "Selecione a turma...";
+      turmaSel.appendChild(optDefault);
+      turmasTurno.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t; opt.textContent = t;
+        turmaSel.appendChild(opt);
+      });
     }
     atualizarDisponibilidadeModalidades();
   });
@@ -1974,136 +2646,278 @@ function init(){
   const filtroTurno = document.getElementById("filtroTurno");
   const filtroTurma = document.getElementById("filtroTurma");
   const filtroModalidade = document.getElementById("filtroModalidade");
+
   filtroTurma.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
   filtroModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
+
   filtroTurno.addEventListener("change", () => {
     const turno = filtroTurno.value;
     filtroTurma.innerHTML = "";
     const optDefault = document.createElement("option");
-    if (!turno){ optDefault.value = ""; optDefault.textContent = "Selecione o turno primeiro..."; filtroTurma.appendChild(optDefault); }
-    else {
-      optDefault.value = ""; optDefault.textContent = "Selecione a turma..."; filtroTurma.appendChild(optDefault);
+    if (!turno){
+      optDefault.value = "";
+      optDefault.textContent = "Selecione o turno primeiro...";
+      filtroTurma.appendChild(optDefault);
+    } else {
+      optDefault.value = "";
+      optDefault.textContent = "Selecione a turma...";
+      filtroTurma.appendChild(optDefault);
       const turmasTurno = getTurmasPorTurno(turno);
-      turmasTurno.forEach(t => { const opt = document.createElement("option"); opt.value = t; opt.textContent = t; filtroTurma.appendChild(opt); });
+      turmasTurno.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        filtroTurma.appendChild(opt);
+      });
     }
     renderPublico();
   });
+
   filtroTurma.addEventListener("change", renderPublico);
   filtroModalidade.addEventListener("change", renderPublico);
 
+  /* JOGOS ADMIN SEM SÉRIE – TURMAS LIVRES (QUALQUER TURNO) */
   const jogoTurma1 = document.getElementById("jogoTurma1");
   const jogoTurma2 = document.getElementById("jogoTurma2");
+
   if (jogoTurma1 && jogoTurma2){
     jogoTurma1.innerHTML = '<option value="">Selecione a turma 1...</option>';
     jogoTurma2.innerHTML = '<option value="">Selecione a turma 2...</option>';
+
     TODAS_TURMAS.forEach(t => {
-      const o1 = document.createElement("option"); o1.value = t; o1.textContent = t; jogoTurma1.appendChild(o1);
-      const o2 = document.createElement("option"); o2.value = t; o2.textContent = t; jogoTurma2.appendChild(o2);
+      const o1 = document.createElement("option");
+      o1.value = t;
+      o1.textContent = t;
+      jogoTurma1.appendChild(o1);
+
+      const o2 = document.createElement("option");
+      o2.value = t;
+      o2.textContent = t;
+      jogoTurma2.appendChild(o2);
     });
   }
+
   const jogoModalidade = document.getElementById("jogoModalidade");
-  MODALIDADES.forEach(m => { const opt = document.createElement("option"); opt.value = m; opt.textContent = m; jogoModalidade.appendChild(opt); });
+  MODALIDADES.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m; opt.textContent = m;
+    jogoModalidade.appendChild(opt);
+  });
 
   const relatorioTurno = document.getElementById("relatorioTurno");
   const relatorioTurma = document.getElementById("relatorioTurma");
   const relatorioModalidade = document.getElementById("relatorioModalidade");
+
   if (relatorioModalidade){
     relatorioModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
-    MODALIDADES.forEach(m => { const opt = document.createElement("option"); opt.value = m; opt.textContent = m; relatorioModalidade.appendChild(opt); });
+    MODALIDADES.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = m;
+      relatorioModalidade.appendChild(opt);
+    });
   }
+
   if (relatorioTurno && relatorioTurma){
     relatorioTurno.addEventListener("change", () => {
-      const turno = relatorioTurno.value; relatorioTurma.innerHTML = ""; const optDefault = document.createElement("option");
-      if (!turno){ optDefault.value = ""; optDefault.textContent = "Selecione o turno primeiro..."; relatorioTurma.appendChild(optDefault); }
-      else { optDefault.value = ""; optDefault.textContent = "Selecione a turma..."; relatorioTurma.appendChild(optDefault); const turmasTurno = getTurmasPorTurno(turno); turmasTurno.forEach(t => { const opt = document.createElement("option"); opt.value = t; opt.textContent = t; relatorioTurma.appendChild(opt); }); }
+      const turno = relatorioTurno.value;
+      relatorioTurma.innerHTML = "";
+      const optDefault = document.createElement("option");
+      if (!turno){
+        optDefault.value = "";
+        optDefault.textContent = "Selecione o turno primeiro...";
+        relatorioTurma.appendChild(optDefault);
+      } else {
+        optDefault.value = "";
+        optDefault.textContent = "Selecione a turma...";
+        relatorioTurma.appendChild(optDefault);
+        const turmasTurno = getTurmasPorTurno(turno);
+        turmasTurno.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t;
+          opt.textContent = t;
+          relatorioTurma.appendChild(opt);
+        });
+      }
       renderRelatorio();
     });
+
     relatorioTurma.addEventListener("change", renderRelatorio);
   }
-  if (relatorioModalidade) relatorioModalidade.addEventListener("change", renderRelatorio);
+
+  if (relatorioModalidade){
+    relatorioModalidade.addEventListener("change", renderRelatorio);
+  }
 
   const btnImprimirRelatorio = document.getElementById("btnImprimirRelatorio");
-  if (btnImprimirRelatorio) btnImprimirRelatorio.addEventListener("click", () => { renderRelatorio(); window.print(); });
+  if (btnImprimirRelatorio){
+    btnImprimirRelatorio.addEventListener("click", () => {
+      renderRelatorio();
+      window.print();
+    });
+  }
+
   const btnImprimirTodaTurma = document.getElementById("btnImprimirTodaTurma");
-  if (btnImprimirTodaTurma) btnImprimirTodaTurma.addEventListener("click", () => { renderRelatorioTodaTurma(); window.print(); });
+  if (btnImprimirTodaTurma){
+    btnImprimirTodaTurma.addEventListener("click", () => {
+      renderRelatorioTodaTurma();
+      window.print();
+    });
+  }
 
   document.getElementById("btnToggleInscritos").addEventListener("click", () => {
     const sec = document.getElementById("secInscritos").style.display === "block";
     const btn = document.getElementById("btnToggleInscritos");
-    if (sec){ mostrarSecao("inscricao"); btn.textContent = "👀 Ver inscritos"; } else { mostrarSecao("inscritos"); btn.textContent = "⬅ Voltar para inscrição"; }
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "👀 Ver inscritos";
+    } else {
+      mostrarSecao("inscritos");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
   });
 
   document.getElementById("btnVerJogos").addEventListener("click", () => {
-    const sec = document.getElementById("secJogos").style.display === "block"; const btn = document.getElementById("btnVerJogos");
-    if (sec){ mostrarSecao("inscricao"); btn.textContent = "🏆 Ver jogos"; } else { mostrarSecao("jogos"); btn.textContent = "⬅ Voltar para inscrição"; }
+    const sec = document.getElementById("secJogos").style.display === "block";
+    const btn = document.getElementById("btnVerJogos");
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "🏆 Ver jogos";
+    } else {
+      mostrarSecao("jogos");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
   });
 
   document.getElementById("btnClassificados").addEventListener("click", () => {
-    const sec = document.getElementById("secClassificados").style.display === "block"; const btn = document.getElementById("btnClassificados");
-    if (sec){ mostrarSecao("inscricao"); btn.textContent = "✅ Classificados"; } else { mostrarSecao("classificados"); btn.textContent = "⬅ Voltar para inscrição"; }
+    const sec = document.getElementById("secClassificados").style.display === "block";
+    const btn = document.getElementById("btnClassificados");
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "✅ Classificados";
+    } else {
+      mostrarSecao("classificados");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
   });
 
   document.getElementById("btnPlacarAoVivo").addEventListener("click", () => {
-    const sec = document.getElementById("secPlacarAoVivo").style.display === "block"; const btn = document.getElementById("btnPlacarAoVivo");
-    if (sec){ mostrarSecao("inscricao"); btn.textContent = "⚡ Placar ao vivo"; } else { mostrarSecao("placar"); btn.textContent = "⬅ Voltar para inscrição"; }
+    const sec = document.getElementById("secPlacarAoVivo").style.display === "block";
+    const btn = document.getElementById("btnPlacarAoVivo");
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "⚡ Placar ao vivo";
+    } else {
+      mostrarSecao("placar");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
   });
 
   document.getElementById("btnAdminArea").addEventListener("click", abrirAdmin);
   document.getElementById("btnFecharAdmin").addEventListener("click", fecharAdmin);
   document.getElementById("btnFecharProfessores").addEventListener("click", fecharProfessores);
+
   document.getElementById("formInscricao").addEventListener("submit", handleSubmitInscricao);
-  document.getElementById("adminFiltroNome").addEventListener("input", () => { renderAdmin(); atualizarSelectsAdminPublico(); });
-  document.getElementById("adminFiltroTurma").addEventListener("change", () => { renderAdmin(); atualizarSelectsAdminPublico(); });
+
+  document.getElementById("adminFiltroNome").addEventListener("input", () => {
+    renderAdmin();
+    atualizarSelectsAdminPublico();
+  });
+  document.getElementById("adminFiltroTurma").addEventListener("change", () => {
+    renderAdmin();
+    atualizarSelectsAdminPublico();
+  });
   document.getElementById("adminFiltroModalidade").addEventListener("change", renderAdmin);
   document.getElementById("btnCancelarInscricao").addEventListener("click", cancelarInscricao);
+
   const filtroModalidadeJogo = document.getElementById("filtroModalidadeJogo");
-  if (filtroModalidadeJogo){ filtroModalidadeJogo.innerHTML = '<option value="">Selecione...</option>'; MODALIDADES.forEach(m => { const opt = document.createElement("option"); opt.value = m; opt.textContent = m; filtroModalidadeJogo.appendChild(opt); }); filtroModalidadeJogo.addEventListener("change", renderJogosAluno); }
+  if (filtroModalidadeJogo){
+    filtroModalidadeJogo.innerHTML = '<option value="">Selecione...</option>';
+    MODALIDADES.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = m;
+      filtroModalidadeJogo.appendChild(opt);
+    });
+    filtroModalidadeJogo.addEventListener("change", renderJogosAluno);
+  }
+
   document.getElementById("filtroSerieJogo").addEventListener("change", renderJogosAluno);
   document.getElementById("filtroDataJogo").addEventListener("change", renderJogosAluno);
-  const filtroExcluirJogo = document.getElementById("filtroExcluirJogo"); if (filtroExcluirJogo) filtroExcluirJogo.addEventListener("input", atualizarSelectExcluirJogo);
+
+  const filtroExcluirJogo = document.getElementById("filtroExcluirJogo");
+  if (filtroExcluirJogo){
+    filtroExcluirJogo.addEventListener("input", atualizarSelectExcluirJogo);
+  }
+
   document.getElementById("btnCadastrarJogo").addEventListener("click", cadastrarJogo);
   document.getElementById("btnExcluirJogo").addEventListener("click", excluirJogo);
-  document.getElementById("btnSalvarConfig").addEventListener("click", e => { e.preventDefault(); salvarConfiguracoes(); });
 
-  document.getElementById("btnAdicionarProfessor").addEventListener("click", e => { e.preventDefault(); adicionarProfessorAcesso(); });
+  document.getElementById("btnSalvarConfig").addEventListener("click", e => {
+    e.preventDefault();
+    salvarConfiguracoes();
+  });
+
+  // SALVAR HOMEPAGE e visualizar localmente
+  document.getElementById("btnSalvarHomepage").addEventListener("click", e => {
+    e.preventDefault();
+    salvarHomepage();
+  });
+  document.getElementById("btnPreviewHomepage").addEventListener("click", () => {
+    // atualiza configEvento.homepage localmente e renderiza
+    configEvento.homepage.title = document.getElementById("homepageTitle").value || "";
+    configEvento.homepage.subtitle = document.getElementById("homepageSubtitle").value || "";
+    configEvento.homepage.logoUrl = document.getElementById("homepageLogoUrl").value || "";
+    configEvento.homepage.heroHtml = document.getElementById("homepageHeroHtml").value || "";
+    renderHomepage();
+    alert("Preview atualizado localmente. Salve para tornar público.");
+  });
+
+  // Botão de adicionar professor (admin)
+  document.getElementById("btnAdicionarProfessor").addEventListener("click", e => {
+    e.preventDefault();
+    adicionarProfessorAcesso();
+  });
+
+  // Botão Gerar Senha (professores)
   const btnGerarSenha = document.getElementById("btnGerarSenhaProfessor");
-  if (btnGerarSenha) btnGerarSenha.addEventListener("click", e => { e.preventDefault(); let senha = ""; for (let i = 0; i < 5; i++) senha += Math.floor(Math.random() * 10); document.getElementById("profSenhaCadastro").value = senha; });
+  if (btnGerarSenha){
+    btnGerarSenha.addEventListener("click", e => {
+      e.preventDefault();
+      let senha = "";
+      for (let i = 0; i < 5; i++) {
+        senha += Math.floor(Math.random() * 10);
+      }
+      document.getElementById("profSenhaCadastro").value = senha;
+    });
+  }
 
+  // selects do painel de professores
   const profTurnoSelect = document.getElementById("profTurnoSelect");
   const profTurmaSelect = document.getElementById("profTurmaSelect");
   if (profTurnoSelect && profTurmaSelect){
-    profTurnoSelect.addEventListener("change", () => { configurarSelectTurmaProfessor(); renderPainelProfessores(); });
+    profTurnoSelect.addEventListener("change", () => {
+      configurarSelectTurmaProfessor();
+      renderPainelProfessores();
+    });
     profTurmaSelect.addEventListener("change", renderPainelProfessores);
   }
 
   configurarAbasAdmin();
   iniciarListeners();
-
-  // welcome editor buttons
-  document.getElementById("btnSalvarWelcome").addEventListener("click", e => { e.preventDefault(); salvarWelcomePage(); });
-  document.getElementById("btnPreviewWelcome").addEventListener("click", e => { e.preventDefault(); previewWelcomeLocal(); });
-
-  // preencher selects iniciais
-  configurarSelectsIniciais();
-
   carregarConfiguracoes();
 
-  mostrarSecao("inscricao");
-}
-
-/* helpers para preencher selects iniciais */
-function configurarSelectsIniciais(){
-  // preencher filtros de turno->turma e adminFiltroTurma
-  const adminTurma = document.getElementById("adminFiltroTurma");
-  adminTurma.innerHTML = '<option value="">Todas</option>';
-  TODAS_TURMAS.forEach(t => { const opt = document.createElement("option"); opt.value = t; opt.textContent = t; adminTurma.appendChild(opt); });
-
-  // relatorioTurno options já preenchidos no init
+  // mostra home ou inscrição inicialmente dependendo do status
+  if (inscricoesEncerradas) mostrarSecao("home");
+  else mostrarSecao("inscricao");
 }
 
 /* DOM ready */
-if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", init); } else { init(); }
-
+if (document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
 </script>
 
 </body>
