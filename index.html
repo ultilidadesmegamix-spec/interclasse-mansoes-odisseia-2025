@@ -87,6 +87,17 @@
     #emailOverlayCard p { margin:0 0 8px; font-size:0.85rem; }
     #msgEmailOverlay { font-size:0.78rem; color:var(--vermelho); min-height:14px; margin-bottom:4px; }
 
+    /* HOMEPAGE (inicio do site) - visual mais atraente quando inscrições encerradas */
+    #secHome { display:none; padding:28px; background: linear-gradient(180deg,#ffffff 0%, #f4f7ff 100%); border-radius:12px; }
+    #homeContent { max-width:920px; margin:0 auto; text-align:center; }
+    #homeContent .home-top { display:flex; gap:12px; align-items:center; justify-content:center; margin-bottom:12px; }
+    #homeLogo { height:80px; width:auto; display:none; border-radius:8px; background:#fff; padding:8px; border:1px solid var(--borda); }
+    #homeTitle { margin:0; font-size:1.6rem; color:#09345a; }
+    #homeSubtitle { display:block; margin-top:6px; font-size:1rem; color:#33475b; }
+    #homeHeroHtml { margin-top:14px; font-size:1.02rem; color:#333; line-height:1.45; }
+    .home-actions { margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .home-actions .btn { padding:10px 16px; font-size:0.95rem; border-radius:10px; }
+
     /* ESTILO DE IMPRESSÃO – mostrar SOMENTE a tabela do relatório */
     @media print {
       body { background:#fff; margin:0; padding:0; }
@@ -135,16 +146,25 @@
   <section class="card" id="secHome" style="display:none;">
     <!-- Este bloco é totalmente editável via admin (salvo em config.geral.homepage) -->
     <div id="homeContent">
-      <div style="display:flex; gap:12px; align-items:center; margin-bottom:8px;">
-        <img id="homeLogo" src="" alt="logo" style="height:64px; width:auto; display:none; border-radius:8px; background:#fff; padding:6px; border:1px solid var(--borda);" />
+      <div class="home-top">
+        <img id="homeLogo" src="" alt="logo" />
         <div>
           <h2 id="homeTitle">Movimenta Odisseia</h2>
           <small id="homeSubtitle">Inscrições encerradas — obrigado pelo interesse!</small>
         </div>
       </div>
-      <div id="homeHeroHtml" style="margin-top:10px; font-size:0.95rem; color:#333;">
+
+      <div id="homeHeroHtml">
         <!-- conteúdo HTML livre (seguro: salvo pelo admin) -->
         <p>As inscrições foram encerradas. Em breve publicaremos os jogos e classificados. Fique atento às próximas comunicações da escola.</p>
+      </div>
+
+      <div class="home-actions">
+        <button class="btn btn-primaria" onclick="mostrarSecao('inscritos')">👀 Ver inscritos</button>
+        <button class="btn btn-primaria" onclick="mostrarSecao('jogos')">🏆 Ver jogos</button>
+        <button class="btn btn-primaria" onclick="mostrarSecao('classificados')">✅ Classificados</button>
+        <button class="btn btn-primaria" onclick="mostrarSecao('placar')">⚡ Placar ao vivo</button>
+        <button class="btn btn-admin" onclick="abrirAdmin()">🔐 Área administrativa</button>
       </div>
     </div>
   </section>
@@ -881,15 +901,21 @@ function atualizarStatusInscricoes(){
   }
 
   // Mostrar página inicial de boas-vindas se encerrado, caso contrário o formulário
+  const overlay = document.getElementById('emailOverlay');
   if (inscricoesEncerradas){
     mostrarSecao("home");
+    // esconder overlay quando encerrado (não precisa pedir e-mail se inscrições fechadas)
+    if (overlay) overlay.style.display = 'none';
   } else {
     // se admin estiver logado, não forçamos voltar ao formulário (admin vê admin)
     if (!isAdmin && currentRole === null){
       mostrarSecao("inscricao");
+      // mostrar overlay apenas se não houver email salvo
+      if (overlay) overlay.style.display = (emailAtual && validarEmail(emailAtual)) ? 'none' : 'flex';
     } else if (!isAdmin && currentRole !== null && currentRole !== "ADMIN"){
       // deixa a tela de professores se o usuário for professor
       mostrarSecao("professores");
+      if (overlay) overlay.style.display = (emailAtual && validarEmail(emailAtual)) ? 'none' : 'flex';
     }
   }
 }
@@ -1210,7 +1236,7 @@ function atualizarDisponibilidadeModalidades(){
 
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      const gen = countsQueimadaGenero[turma] || {Masculino:0, Feminino:0};
+      const gen = countsQueimadaGenero[turma] || {Masculino:0,Feminino:0};
       if (!sexo || (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada)){
         chk.disabled = true; chk.checked = false; return;
       }
@@ -2353,7 +2379,6 @@ async function indicarAlunoNaoParticipa(inscricaoId){
 
 function mostrarSecao(sec){
   // sec: 'inscricao','inscritos','jogos','classificados','placar','admin','professores','home'
-  const mapa = ["secInscricao","secInscritos","secJogos","secClassificados","secPlacarAoVivo","adminSection","professoresSection","secHome"];
   // hide all
   document.getElementById("secInscricao").style.display = "none";
   document.getElementById("secInscritos").style.display = "none";
