@@ -19,70 +19,520 @@
       --verde: #28a745;
       --texto: #222;
     }
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    body { margin:0; background:#f0f4fb; color:var(--texto); }
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      background: #f0f4fb;
+      color: var(--texto);
+    }
 
     header {
       background: linear-gradient(90deg, var(--azul), #007bff);
-      color:#fff;
-      padding:14px 18px;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
+      color: #fff;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
     }
-    header h1{ margin:0; font-size:1.1rem; }
-    header small{ display:block; font-size:0.8rem; opacity:.9; }
-    .header-right{ display:flex; gap:8px; flex-wrap:wrap; }
-    .btn{ border:none; border-radius:999px; padding:7px 14px; cursor:pointer; font-size:0.9rem; display:inline-flex; align-items:center; gap:6px; }
-    .btn-primaria{ background:#fff; color:var(--azul); box-shadow:0 2px 6px rgba(0,0,0,0.15); }
-    .btn-admin{ background:transparent; border:1px solid rgba(255,255,255,0.6); color:#fff; }
+    header h1 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    header small {
+      display: block;
+      font-size: 0.8rem;
+      opacity: .9;
+    }
+    .header-right {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primaria {
+      background: #fff;
+      color: var(--azul);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .btn-admin {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.6);
+      color: #fff;
+    }
 
-    main{ max-width:1100px; margin:18px auto 30px; padding:0 10px; }
-    .card{ background:#fff; border-radius:12px; border:1px solid var(--borda); padding:15px; margin-bottom:14px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
-    .card h2{ margin:0 0 8px; font-size:1.05rem; color:var(--azul); }
-    .card small{ font-size:0.8rem; color:#555; }
-    .grid-2{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-    @media (max-width:768px){ .grid-2{ grid-template-columns:1fr; } }
-    label{ display:block; font-size:0.85rem; margin-bottom:3px; font-weight:500; }
-    input[type="text"], input[type="date"], input[type="time"], input[type="number"], select, textarea{ width:100%; padding:7px 8px; border-radius:8px; border:1px solid var(--borda); background:#fafbff; font-size:0.9rem; }
-    textarea{ resize:vertical; min-height:60px; }
-    .modalidades-lista{ margin-top:6px; display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:6px; }
-    .modalidade-item{ display:flex; gap:6px; padding:6px 8px; border-radius:8px; border:1px solid var(--borda); background:var(--azul-claro); font-size:0.8rem; }
-    .modalidade-item input{ margin-top:3px; }
-    .modalidade-label{ font-weight:600; font-size:0.85rem; }
-    .modalidade-vagas{ display:block; font-size:0.75rem; color:#333; }
-    .modalidade-lotado{ color:var(--vermelho); font-weight:600; }
-    .alerta{ margin-top:4px; font-size:0.8rem; color:#555; }
-    .msg-erro{ background:#ffe5e5; color:#b30000; padding:6px 8px; border-radius:8px; font-size:0.8rem; margin-bottom:6px; }
-    .msg-sucesso{ background:#e5ffe9; color:#0c7a2a; padding:6px 8px; border-radius:8px; font-size:0.8rem; margin-bottom:6px; }
-    table{ width:100%; border-collapse:collapse; margin-top:6px; font-size:0.8rem; }
-    th,td{ padding:5px 6px; border-bottom:1px solid #e1e4eb; text-align:left; }
-    th{ background:#f2f5ff; font-weight:600; }
-    tr:hover td{ background:#f9fbff; }
-    .filtros{ margin-top:6px; display:flex; flex-wrap:wrap; gap:8px; }
+    main {
+      max-width: 1100px;
+      margin: 18px auto 30px;
+      padding: 0 10px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid var(--borda);
+      padding: 15px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      color: var(--azul);
+    }
+    .card small {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 10px;
+    }
+    @media (max-width: 768px){
+      .grid-2{ grid-template-columns:1fr; }
+    }
+    label {
+      display:block;
+      font-size:0.85rem;
+      margin-bottom:3px;
+      font-weight:500;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    input[type="number"],
+    select,
+    textarea {
+      width:100%;
+      padding:7px 8px;
+      border-radius:8px;
+      border:1px solid var(--borda);
+      background:#fafbff;
+      font-size:0.9rem;
+    }
+    textarea {
+      resize:vertical;
+      min-height:60px;
+    }
+    .modalidades-lista {
+      margin-top:6px;
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(170px,1fr));
+      gap:6px;
+    }
+    .modalidade-item {
+      display:flex;
+      gap:6px;
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid var(--borda);
+      background:var(--azul-claro);
+      font-size:0.8rem;
+    }
+    .modalidade-item input {
+      margin-top:3px;
+    }
+    .modalidade-label {
+      font-weight:600;
+      font-size:0.85rem;
+    }
+    .modalidade-vagas {
+      display:block;
+      font-size:0.75rem;
+      color:#333;
+    }
+    .modalidade-lotado {
+      color:var(--vermelho);
+      font-weight:600;
+    }
+    .alerta {
+      margin-top:4px;
+      font-size:0.8rem;
+      color:#555;
+    }
+    .msg-erro {
+      background:#ffe5e5;
+      color:#b30000;
+      padding:6px 8px;
+      border-radius:8px;
+      font-size:0.8rem;
+      margin-bottom:6px;
+    }
+    .msg-sucesso {
+      background:#e5ffe9;
+      color:#0c7a2a;
+      padding:6px 8px;
+      border-radius:8px;
+      font-size:0.8rem;
+      margin-bottom:6px;
+    }
+    table {
+      width:100%;
+      border-collapse:collapse;
+      margin-top:6px;
+      font-size:0.8rem;
+    }
+    th,td {
+      padding:5px 6px;
+      border-bottom:1px solid #e1e4eb;
+      text-align:left;
+    }
+    th {
+      background:#f2f5ff;
+      font-weight:600;
+    }
+    tr:hover td {
+      background:#f9fbff;
+    }
+    .filtros {
+      margin-top:6px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .filtros > div {
+      min-width:150px;
+    }
+
+    /* Responsividade tabela inscrições (admin) */
+    #tab-inscricoes {
+      overflow-x: auto;
+    }
+    #tab-inscricoes table {
+      min-width: 700px;
+    }
 
     /* admin */
-    #adminSection{ display:none; }
+    #adminSection { display:none; }
+    .admin-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .admin-header h2 {
+      margin:0;
+      font-size:1rem;
+      color:var(--azul);
+    }
+    .admin-sub {
+      font-size:0.8rem;
+      color:#555;
+    }
+    .admin-status {
+      font-size:0.75rem;
+      padding:3px 8px;
+      border-radius:999px;
+      background:#e5ffe9;
+      color:#0c7a2a;
+    }
+    .admin-status.fechado {
+      background:#ffe5e5;
+      color:#b30000;
+    }
+    .admin-tabs {
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-bottom:8px;
+      border-bottom:1px solid #e1e4eb;
+      padding-bottom:4px;
+    }
+    .admin-tab-btn {
+      border:none;
+      border-radius:999px;
+      padding:5px 10px;
+      font-size:0.8rem;
+      background:#f1f3fb;
+      cursor:pointer;
+    }
+    .admin-tab-btn.ativo {
+      background:var(--azul);
+      color:#fff;
+    }
+    .admin-tab-content { display:none; }
+    .admin-tab-content.ativo { display:block; }
+    .admin-bloco {
+      background:#f9fbff;
+      border-radius:10px;
+      border:1px dashed #c5cde0;
+      padding:8px;
+      margin-bottom:8px;
+      font-size:0.82rem;
+    }
+    /* jogos / placar / classificação */
+    #secInscritos, #secJogos, #secPlacarAoVivo, #secClassificados { display:none; }
+    .jogo-bloco {
+      border-radius:10px;
+      border:1px solid var(--borda);
+      padding:6px 8px;
+      margin-top:6px;
+      background:#f9fbff;
+    }
+    .placar-card {
+      border-radius:10px;
+      border:1px solid var(--borda);
+      padding:8px 10px;
+      margin-top:6px;
+      background:#f9fbff;
+      font-size:0.85rem;
+    }
+    .placar-linha-principal {
+      font-weight:600;
+      margin-bottom:4px;
+    }
+    .placar-status {
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:0.75rem;
+      margin-top:2px;
+    }
+    .placar-status.andamento {
+      background:#e5ffe9;
+      color:#0c7a2a;
+    }
+    .placar-status.prestes {
+      background:#fff4d6;
+      color:#8a6d3b;
+    }
 
-    /* placar ao vivo: vídeo + overlay */
-    .live-wrapper{ position:relative; border-radius:10px; overflow:hidden; border:1px solid var(--borda); background:#000; }
-    .live-overlay-placar{ position:absolute; inset:auto 0 0 0; background: linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.55)); color:#fff; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; gap:10px; z-index:3; }
-    .live-overlay-placar .equipes{ font-weight:700; font-size:1.05rem; }
-    .live-video-container{ width:100%; height:360px; background:#000; display:flex; align-items:center; justify-content:center; }
-    .live-video-container iframe, .live-video-container video{ width:100%; height:100%; border:0; }
+    /* NOVO: linha / bolinhas para CLASSIFICADOS */
+    .linha-classificado {
+      display:flex;
+      align-items:center;
+      gap:4px;
+      font-size:0.85rem;
+      margin-top:2px;
+    }
+    .bolinha-resultado {
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      display:inline-block;
+    }
+    .bolinha-verde {
+      background: var(--verde);
+    }
+    .bolinha-vermelha {
+      background: var(--vermelho);
+    }
+    .bolinha-neutra {
+      background:#ccc;
+    }
 
-    /* modal TOP10 */
-    .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index:9999; }
-    .modal-card{ background:#fff; border-radius:10px; padding:12px; width:90%; max-width:720px; box-shadow:0 12px 30px rgba(0,0,0,0.3); }
-    .modal-card h3{ margin:0 0 6px; color:var(--azul); }
-    .top10-list{ margin-top:8px; }
-    .top10-item{ display:flex; justify-content:space-between; gap:8px; padding:8px 6px; border-bottom:1px solid #eef3fb; }
+    /* overlay e-mail */
+    #emailOverlay {
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.5);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+    }
+    #emailOverlayCard {
+      background:#fff;
+      border-radius:10px;
+      padding:15px;
+      max-width:360px;
+      width:90%;
+      box-shadow:0 8px 20px rgba(0,0,0,0.3);
+    }
+    #emailOverlayCard h2 {
+      margin:0 0 6px;
+      font-size:1rem;
+      color:var(--azul);
+    }
+    #emailOverlayCard p {
+      margin:0 0 8px;
+      font-size:0.85rem;
+    }
+    #msgEmailOverlay {
+      font-size:0.78rem;
+      color:var(--vermelho);
+      min-height:14px;
+      margin-bottom:4px;
+    }
 
-    .btn-ghost{ background:transparent; border:1px solid #e6eefb; }
+    /* Cabeçalho do relatório (tela) */
+    #relatorioCabecalhoImpressao {
+      margin-top:4px;
+      margin-bottom:4px;
+    }
+    #relatorioCabecalhoImpressao h3 {
+      margin:0;
+      font-size:0.95rem;
+      color:var(--azul);
+    }
+    #relatorioCabecalhoImpressao small {
+      font-size:0.8rem;
+      color:#555;
+    }
 
-    @media print{ body{ background:#fff; margin:0; } header, #secInscricao, #secInscritos, #secJogos, #secPlacarAoVivo, #secClassificados, #emailOverlay, .admin-header, .admin-tabs, #tab-inscricoes, #tab-jogos, #tab-config, #btnFecharAdmin, #tab-relatorio .admin-bloco, #btnImprimirRelatorio, #btnImprimirTodaTurma{ display:none !important; } main{ margin:0; padding:0; } }
+    /* PAINEL PROFESSORES (apenas para quem loga como prof/coord/gestor) */
+    #professoresSection {
+      display:none;
+    }
+    #profListaAlunos .jogo-bloco {
+      margin-top:8px;
+    }
+
+    /* ESTILO DE IMPRESSÃO – mostrar SOMENTE a tabela do relatório */
+    @media print {
+      body {
+        background:#fff;
+        margin:0;
+        padding:0;
+      }
+
+      /* Esconde tudo que não for a tabela do relatório */
+      header,
+      #secInscricao,
+      #secInscritos,
+      #secJogos,
+      #secPlacarAoVivo,
+      #secClassificados,
+      #emailOverlay,
+      .admin-header,
+      .admin-tabs,
+      #tab-inscricoes,
+      #tab-jogos,
+      #tab-config,
+      #btnFecharAdmin,
+      #tab-relatorio .admin-bloco,
+      #btnImprimirRelatorio,
+      #btnImprimirTodaTurma {
+        display: none !important;
+      }
+
+      main {
+        margin: 0;
+        padding: 0;
+      }
+      #adminSection {
+        display:block !important;
+        margin:0;
+        padding:0;
+        border:none;
+        box-shadow:none;
+        background:#fff;
+      }
+      .card {
+        border:none;
+        box-shadow:none;
+        margin:0;
+        padding:0;
+        background:#fff;
+      }
+      #tab-relatorio {
+        display:block !important;
+        margin:0;
+        padding:0;
+      }
+
+      #tabelaRelatorio {
+        display: table !important;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+        margin: 0;
+      }
+      #tabelaRelatorio thead {
+        display: table-header-group;
+      }
+      #tabelaRelatorio tbody {
+        display: table-row-group;
+      }
+      #tabelaRelatorio th,
+      #tabelaRelatorio td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+      }
+    }
+
+    /* ===== ADIÇÕES DE ESTILO (TOP10 + AO VIVO VIDEO) ===== */
+    /* Modal TOP10 */
+    #top10Modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      background: rgba(0,0,0,0.6);
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    #top10Card {
+      background: #fff;
+      width: 92%;
+      max-width: 720px;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+    #top10Card h3 { margin:0 0 8px; color:var(--azul); }
+    #top10Table { width:100%; border-collapse: collapse; font-size:0.9rem; margin-top:6px; }
+    #top10Table th, #top10Table td { padding:6px; border-bottom:1px solid #e6e9f2; text-align:left; }
+
+    /* Ao vivo - video container */
+    .live-video-frame {
+      margin-top:8px;
+      background:#000;
+      border-radius:8px;
+      overflow:hidden;
+      position:relative;
+      padding-top: 56.25%; /* 16:9 */
+    }
+    .live-video-frame iframe, .live-video-frame video {
+      position:absolute;
+      top:0; left:0; width:100%; height:100%;
+    }
+    .overlay-placar {
+      position:absolute;
+      left:12px;
+      top:12px;
+      background: rgba(255,255,255,0.95);
+      padding:6px 10px;
+      border-radius:8px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      z-index: 5;
+      font-weight:600;
+      color: var(--azul);
+    }
+    .admin-cameras {
+      margin-top:8px;
+      border-top:1px dashed #dfe7f5;
+      padding-top:8px;
+    }
+    .camera-item {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-top:6px;
+    }
+    .camera-item input[type="text"]{ flex:1; }
+    .camera-actions { display:flex; gap:6px; }
+    .camera-active-badge {
+      background:#e5ffe9;
+      color:#0c7a2a;
+      padding:3px 8px;
+      border-radius:999px;
+      font-size:0.75rem;
+    }
   </style>
 </head>
 <body>
@@ -108,12 +558,14 @@
     <button class="btn btn-primaria" id="btnVerJogos">🏆 Ver jogos</button>
     <button class="btn btn-primaria" id="btnClassificados">✅ Classificados</button>
     <button class="btn btn-primaria" id="btnPlacarAoVivo">⚡ Placar ao vivo</button>
+    <!-- NOVO: Botão TOP 10 -->
     <button class="btn btn-primaria" id="btnTop10">🏅 TOP 10</button>
     <button class="btn btn-admin" id="btnAdminArea">🔐 Área administrativa</button>
   </div>
 </header>
 
 <main>
+
   <!-- INSCRIÇÃO -->
   <section class="card" id="secInscricao">
     <h2>Formulário de inscrição</h2>
@@ -255,6 +707,7 @@
 
     <div id="listaJogosContainer"></div>
   </section>
+
   <!-- CLASSIFICAÇÃO / CLASSIFICADOS (ALUNO) -->
   <section class="card" id="secClassificados">
     <h2>Classificados</h2>
@@ -265,7 +718,7 @@
   <!-- PLACAR AO VIVO (ALUNO) -->
   <section class="card" id="secPlacarAoVivo">
     <h2>Placar ao vivo</h2>
-    <small>Veja os jogos que estão em andamento ou prestes a começar. Se a transmissão estiver ativa para um jogo, você verá o vídeo abaixo do placar.</small>
+    <small>Veja os jogos que estão em andamento ou prestes a começar.</small>
 
     <div id="placarAoVivoContainer"></div>
   </section>
@@ -400,14 +853,13 @@
 
       <div class="admin-bloco" id="adminPainelJogos">
         <strong>Placar ao vivo / Status dos jogos</strong>
-        <small style="display:block;margin-top:2px;">Atualize o status, placar e controle transmissão (câmeras) do jogo. As mudanças aparecem em tempo real no site público.</small>
+        <small style="display:block;margin-top:2px;">Atualize o status e o placar. As mudanças aparecem em tempo real no site público.</small>
         <div id="listaAdminJogos" style="margin-top:6px;"></div>
       </div>
     </div>
 
-    <!-- RESTANTE DAS ABAS (RELATÓRIO / PROFESSORES / CONFIG) PRESERVADAS -->
+    <!-- TAB RELATÓRIO -->
     <div class="admin-tab-content" id="tab-relatorio">
-      <!-- conteúdo existente do relatório (mantido) -->
       <div class="admin-bloco">
         <strong>Filtros para relatório</strong>
         <div class="filtros" style="margin-top:4px;">
@@ -460,19 +912,195 @@
       </table>
     </div>
 
-    <!-- As outras abas (professores/config) seguem idênticas ao original. -->
+    <!-- TAB PROFESSORES (ADMIN GERENCIA SENHAS) -->
+    <div class="admin-tab-content" id="tab-professores">
+      <div class="admin-bloco">
+        <strong>Cadastrar acesso de professor / coordenador / gestor</strong>
+        <div class="grid-2" style="margin-top:4px;">
+          <div>
+            <label for="profNomeCadastro">Nome</label>
+            <input type="text" id="profNomeCadastro" placeholder="Ex: Jean">
+          </div>
+          <div>
+            <label for="profTipoCadastro">Tipo de acesso</label>
+            <select id="profTipoCadastro">
+              <option value="Professor">Professor</option>
+              <option value="Coordenador">Coordenador</option>
+              <option value="Gestor">Gestor</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:4px;">
+          <div>
+            <label for="profSenhaCadastro">Senha</label>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <input type="text" id="profSenhaCadastro" placeholder="Senha que ele vai usar" style="flex:1;">
+              <button type="button" class="btn btn-primaria" id="btnGerarSenhaProfessor">Gerar senha</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primaria" style="margin-top:6px;" id="btnAdicionarProfessor">➕ Adicionar acesso</button>
+      </div>
+
+      <div class="admin-bloco">
+        <strong>Acessos cadastrados</strong>
+        <small style="display:block;margin-top:2px;">Use para controlar quem pode entrar no painel de professores.</small>
+        <table style="margin-top:4px; width:100%; border-collapse:collapse; font-size:0.8rem;">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Tipo</th>
+              <th>Senha</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaProfessoresAdmin"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB CONFIG -->
+    <div class="admin-tab-content" id="tab-config">
+      <div class="admin-bloco">
+        <strong>Datas e bloqueio</strong>
+        <div class="grid-2" style="margin-top:4px;">
+          <div>
+            <label for="cfgDataLimite">Data de encerramento</label>
+            <input type="date" id="cfgDataLimite">
+          </div>
+          <div>
+            <label><input type="checkbox" id="cfgBloquearAgora"> Bloquear inscrições agora</label>
+          </div>
+        </div>
+        <div style="margin-top:4px;">
+          <label for="cfgMsgEncerradas">Mensagem quando estiver encerrado</label>
+          <textarea id="cfgMsgEncerradas" placeholder="Ex: As inscrições foram encerradas."></textarea>
+        </div>
+      </div>
+
+      <div class="admin-bloco">
+        <strong>Limites</strong>
+        <div class="grid-2" style="margin-top:4px;">
+          <div>
+            <label for="cfgLimitePorAluno">Máx. modalidades por aluno</label>
+            <input type="number" id="cfgLimitePorAluno" min="1">
+          </div>
+          <div>
+            <label for="cfgQueimadaTotal">Queimada total (por turma)</label>
+            <input type="number" id="cfgQueimadaTotal" min="1">
+          </div>
+          <div>
+            <label for="cfgQueimadaSexo">Queimada por sexo</label>
+            <input type="number" id="cfgQueimadaSexo" min="1">
+          </div>
+        </div>
+        <p style="margin:6px 0 4px; font-size:0.8rem;"><strong>Limite por modalidade / turma</strong></p>
+        <div class="grid-2">
+          <div><label for="cfgFutsal">FUTSAL</label><input type="number" id="cfgFutsal" min="1"></div>
+          <div><label for="cfgDomino">DOMINÓ</label><input type="number" id="cfgDomino" min="1"></div>
+          <div><label for="cfgFutmesa">FUTMESA</label><input type="number" id="cfgFutmesa" min="1"></div>
+          <div><label for="cfgTenis">TÊNIS DE MESA</label><input type="number" id="cfgTenis" min="1"></div>
+          <div><label for="cfgXadrez">XADREZ</label><input type="number" id="cfgXadrez" min="1"></div>
+          <div><label for="cfgVolei">VOLEI</label><input type="number" id="cfgVolei" min="1"></div>
+        </div>
+      </div>
+
+      <div class="admin-bloco">
+        <strong>Autorizações (ignorar limites por turma)</strong>
+        <small style="display:block;margin-top:2px;">Selecione a turma e marque as modalidades que devem ser autorizadas — quando marcada, a modalidade será aceita mesmo que os limites estejam preenchidos (aplica-se à QUEIMADA também).</small>
+        <div style="display:flex; gap:8px; align-items:center; margin-top:6px; flex-wrap:wrap;">
+          <select id="cfgAutTurma" style="min-width:220px;">
+            <option value="">Selecione a turma...</option>
+          </select>
+          <div id="cfgAutModalidadesContainer" style="flex:1;"></div>
+        </div>
+      </div>
+
+      <div class="admin-bloco">
+        <strong>Texto do evento</strong>
+        <div class="grid-2" style="margin-top:4px;">
+          <div>
+            <label for="cfgNomeEvento">Nome do evento</label>
+            <input type="text" id="cfgNomeEvento" placeholder="Movimenta Odisseia">
+          </div>
+          <div>
+            <label for="cfgAnoEvento">Ano</label>
+            <input type="text" id="cfgAnoEvento" placeholder="2025">
+          </div>
+        </div>
+        <div style="margin-top:4px;">
+          <label for="cfgTextoInicial">Texto abaixo do título</label>
+          <textarea id="cfgTextoInicial"></textarea>
+        </div>
+      </div>
+
+      <button class="btn btn-primaria" id="btnSalvarConfig">💾 Salvar configurações</button>
+    </div>
+  </section>
+
+  <!-- PAINEL PARA PROFESSORES / COORDENADORES / GESTORES -->
+  <section class="card" id="professoresSection">
+    <div class="admin-header">
+      <div>
+        <h2>Painel de professores</h2>
+        <div class="admin-sub">
+          Selecione turno e turma para indicar alunos que <strong>não podem participar</strong>.
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
+        <span style="font-size:0.8rem;" id="profUsuarioAtivo">Professor logado</span>
+        <button class="btn btn-primaria" id="btnFecharProfessores">⬅ Voltar</button>
+      </div>
+    </div>
+
+    <div class="admin-bloco">
+      <strong>Filtrar turma</strong>
+      <div class="filtros" style="margin-top:4px;">
+        <div>
+          <label for="profTurnoSelect">Turno</label>
+          <select id="profTurnoSelect">
+            <option value="">Selecione...</option>
+            <option value="Matutino">Matutino</option>
+            <option value="Vespertino">Vespertino</option>
+            <option value="Noturno">Noturno</option>
+          </select>
+        </div>
+        <div>
+          <label for="profTurmaSelect">Turma</label>
+          <select id="profTurmaSelect">
+            <option value="">Selecione o turno primeiro...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-bloco">
+      <strong>Alunos inscritos na turma</strong>
+      <small style="display:block;margin-top:2px;">
+        Clique para indicar que o aluno <strong>não deve participar</strong>. Quando dois professores diferentes indicarem o mesmo aluno, a inscrição será cancelada automaticamente.
+      </small>
+      <div id="profListaAlunos" style="margin-top:6px;"></div>
+    </div>
   </section>
 
 </main>
 
-<!-- MODAL TOP10 -->
-<div id="top10Modal" style="display:none;" class="modal-backdrop">
-  <div class="modal-card">
+<!-- NOVO: MODAL TOP 10 -->
+<div id="top10Modal">
+  <div id="top10Card">
     <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-      <h3>TOP 10 — Turmas com mais pontos (jogos finalizados)</h3>
-      <button id="btnCloseTop10" class="btn btn-ghost">Fechar</button>
+      <h3>TOP 10 — Turmas com mais pontuações</h3>
+      <div>
+        <button class="btn btn-admin" id="btnFecharTop10">Fechar</button>
+      </div>
     </div>
-    <div id="top10Content" class="top10-list"></div>
+    <p style="margin:6px 0 8px; font-size:0.9rem; color:#555;">Lista atualizada automaticamente quando jogos são finalizados. Critério: soma dos gols/pontos marcados em todos os jogos (desempate por número de vitórias).</p>
+    <table id="top10Table">
+      <thead>
+        <tr><th>#</th><th>Turma</th><th>Pontos (gols marcados)</th><th>Vitórias</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 </div>
 
@@ -491,123 +1119,1011 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* ========== CONSTANTES e VARIÁVEIS (mantidas) ========== */
-const MODALIDADES = ["FUTSAL","QUEIMADA MISTA","DOMINÓ","FUTMESA","TÊNIS DE MESA","XADREZ","VOLEI"];
-const TURMAS_MATUTINO = ["7ºA","7ºB","7ºC","7ºD","7ºE","7ºF","8ºF","9ºA","9ºB","9ºC","9ºD","9ºE"];
-const TURMAS_VESPERTINO = ["6ºA","6ºB","6ºC","6ºD","6ºE","6ºF","6ºG","8ºA","8ºB","8ºC","8ºD","8ºE"];
-const TURMAS_NOTURNO = ["1ºA","1ºB","1ºC","1ºD","1ºE","1ºF","2ºA","2ºB","2ºC","3ºA","3ºB","3ºC"];
-const TODAS_TURMAS = [...TURMAS_MATUTINO,...TURMAS_VESPERTINO,...TURMAS_NOTURNO];
-function getTurmasPorTurno(turno){ if(turno==='Matutino') return TURMAS_MATUTINO; if(turno==='Vespertino') return TURMAS_VESPERTINO; if(turno==='Noturno') return TURMAS_NOTURNO; return []; }
-function getSerieFromTurma(t){ if(!t) return ''; return t.charAt(0); }
+/* ========== CONSTANTES ========== */
 
+const MODALIDADES = [
+  "FUTSAL",
+  "QUEIMADA MISTA",
+  "DOMINÓ",
+  "FUTMESA",
+  "TÊNIS DE MESA",
+  "XADREZ",
+  "VOLEI"
+];
+
+const TURMAS_MATUTINO = [
+  "7ºA","7ºB","7ºC","7ºD","7ºE","7ºF",
+  "8ºF",
+  "9ºA","9ºB","9ºC","9ºD","9ºE"
+];
+
+const TURMAS_VESPERTINO = [
+  "6ºA","6ºB","6ºC","6ºD","6ºE","6ºF","6ºG",
+  "8ºA","8ºB","8ºC","8ºD","8ºE"
+];
+
+const TURMAS_NOTURNO = [
+  "1ºA","1ºB","1ºC","1ºD","1ºE","1ºF",
+  "2ºA","2ºB","2ºC",
+  "3ºA","3ºB","3ºC"
+];
+
+/* TODAS AS TURMAS (para cadastro de jogos sem depender de turno/série) */
+const TODAS_TURMAS = [
+  ...TURMAS_MATUTINO,
+  ...TURMAS_VESPERTINO,
+  ...TURMAS_NOTURNO
+];
+
+function getTurmasPorTurno(turno) {
+  if (turno === "Matutino") return TURMAS_MATUTINO;
+  if (turno === "Vespertino") return TURMAS_VESPERTINO;
+  if (turno === "Noturno") return TURMAS_NOTURNO;
+  return [];
+}
+
+function getSerieFromTurma(t){
+  if (!t) return "";
+  return t.charAt(0);
+}
+
+/* limites padrão (podem ser alterados nas configs) */
 let LIMITE_MODALIDADES_POR_ALUNO = 2;
-let LIMITE_MODALIDADE_TURMA = {"FUTSAL":8,"DOMINÓ":2,"FUTMESA":2,"TÊNIS DE MESA":2,"XADREZ":2,"VOLEI":6};
+let LIMITE_MODALIDADE_TURMA = {
+  "FUTSAL": 8,
+  "DOMINÓ": 2,
+  "FUTMESA": 2,
+  "TÊNIS DE MESA": 2,
+  "XADREZ": 2,
+  "VOLEI": 6
+};
 let LIMITE_QUEIMADA_TOTAL = 10;
 let LIMITE_QUEIMADA_POR_SEXO = 5;
 
+/* controle de inscrições por turma/mod e queimada */
 let countsPorTurmaModalidade = {};
 let countsQueimadaGenero = {};
 let todasInscricoes = [];
 let todosJogos = [];
 
-let todosProfessores = [];
-let currentRole = null;
-let currentProfessor = null;
+/* NOVO: professores e papéis */
+let todosProfessores = []; // {id, nome, tipo, senha}
+let currentRole = null;    // "ADMIN", "Professor", "Coordenador", "Gestor"
+let currentProfessor = null; // objeto do professor logado
 
-let configEvento = { dataLimite:null, msgEncerradas:'', bloquearAgora:false, nomeEvento:'Movimenta Odisseia', anoEvento:'', textoInicial:'', autorizacoes:{} };
+/* config evento */
+let configEvento = {
+  dataLimite: null,           // yyyy-mm-dd
+  msgEncerradas: "",
+  bloquearAgora: false,
+  nomeEvento: "Movimenta Odisseia",
+  anoEvento: "",
+  textoInicial: "",
+  autorizacoes: {} // estrutura: { turma: { "FUTSAL": true, "QUEIMADA MISTA": true, ... } }
+};
+
 let inscricoesEncerradas = false;
 let emailAtual = null;
 let isAdmin = false;
 const ADMIN_PASSWORD = "52090949";
 
-/* ========== FUNÇÕES AUXILIARES (mantidas do original) ========== */
+/* ===== NOVO: Streams / Câmeras por jogo (armazenamento em Firestore 'streams' collection) ===== */
+let streamsData = {}; // estrutura local: { jogoId: { cameras: [{name, url}], active: index } }
+
+/* ========== FUNÇÕES AUXILIARES ========== */
 
 function normalizarNome(str){
-  return (str || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ");
+  return (str || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/\s+/g," ");
 }
-function validarEmail(email){ return email && email.includes("@") && email.includes("."); }
-function msgForm(texto, ok){ const box=document.getElementById("msgForm"); box.innerHTML=""; const div=document.createElement("div"); div.className = ok ? "msg-sucesso" : "msg-erro"; div.textContent = texto; box.appendChild(div); }
-function formatarDataBR(yyyyMMdd){ if(!yyyyMMdd) return "-"; const p=yyyyMMdd.split("-"); if(p.length!==3) return yyyyMMdd; return p[2] + "/" + p[1] + "/" + p[0]; }
 
-/* ========== ATUALIZAÇÃO: TOP10 / TRANSMISSÃO FUNCTIONS ========== */
+function validarEmail(email){
+  return email && email.includes("@") && email.includes(".");
+}
 
-function calcularPontuacaoPorTurma(){
-  const mapa = {};
-  todosJogos.filter(j => j.status === 'FINALIZADO').forEach(j => {
-    const t1 = j.turma1 || '—';
-    const t2 = j.turma2 || '—';
-    mapa[t1] = (mapa[t1]||0) + (Number.isFinite(j.placar1)? j.placar1 : 0);
-    mapa[t2] = (mapa[t2]||0) + (Number.isFinite(j.placar2)? j.placar2 : 0);
+function msgForm(texto, ok){
+  const box = document.getElementById("msgForm");
+  box.innerHTML = "";
+  const div = document.createElement("div");
+  div.className = ok ? "msg-sucesso" : "msg-erro";
+  div.textContent = texto;
+  box.appendChild(div);
+}
+
+function formatarDataBR(yyyyMMdd){
+  if (!yyyyMMdd) return "-";
+  const p = yyyyMMdd.split("-");
+  if (p.length !== 3) return yyyyMMdd;
+  return p[2] + "/" + p[1] + "/" + p[0];
+}
+
+/* ========== CONTROLE DE FECHAMENTO ========== */
+
+function atualizarStatusInscricoes(){
+  const hoje = new Date();
+  const hojeDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+  let fechado = false;
+
+  if (configEvento.bloquearAgora){
+    fechado = true;
+  } else if (configEvento.dataLimite){
+    const p = configEvento.dataLimite.split("-");
+    if (p.length === 3){
+      const limiteDia = new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+      if (hojeDia.getTime() >= limiteDia.getTime()){
+        fechado = true;
+      }
+    }
+  }
+
+  inscricoesEncerradas = fechado;
+
+  const form = document.getElementById("formInscricao");
+  const adminStatus = document.getElementById("adminStatus");
+  if (form){
+    const campos = form.querySelectorAll("input,select,textarea,button[type='submit']");
+    campos.forEach(el => { el.disabled = fechado; });
+  }
+  if (fechado){
+    msgForm(configEvento.msgEncerradas || "As inscrições foram encerradas.", false);
+    if (adminStatus){
+      adminStatus.textContent = "Inscrições ENCERRADAS";
+      adminStatus.classList.add("fechado");
+    }
+  } else {
+    document.getElementById("msgForm").innerHTML = "";
+    if (adminStatus){
+      adminStatus.textContent = "Inscrições ABERTAS";
+      adminStatus.classList.remove("fechado");
+    }
+  }
+}
+
+/* ========== CONFIG FIRESTORE ========== */
+
+async function carregarConfiguracoes(){
+  try{
+    const docSnap = await db.collection("config").doc("geral").get();
+    if (docSnap.exists){
+      const d = docSnap.data();
+      if (d.dataLimiteInscricao) configEvento.dataLimite = d.dataLimiteInscricao;
+      if (typeof d.bloquearInscricoesAgora === "boolean") configEvento.bloquearAgora = d.bloquearInscricoesAgora;
+      if (d.mensagemEncerradas) configEvento.msgEncerradas = d.mensagemEncerradas;
+
+      if (typeof d.limiteModalidadesPorAluno === "number") LIMITE_MODALIDADES_POR_ALUNO = d.limiteModalidadesPorAluno;
+      if (typeof d.limiteQueimadaTotal === "number") LIMITE_QUEIMADA_TOTAL = d.limiteQueimadaTotal;
+      if (typeof d.limiteQueimadaPorSexo === "number") LIMITE_QUEIMADA_POR_SEXO = d.limiteQueimadaPorSexo;
+      if (d.limitesModalidadeTurma){
+        Object.keys(d.limitesModalidadeTurma).forEach(m => {
+          const val = d.limitesModalidadeTurma[m];
+          if (typeof val === "number"){
+            LIMITE_MODALIDADE_TURMA[m] = val;
+          }
+        });
+      }
+      if (d.nomeEvento) configEvento.nomeEvento = d.nomeEvento;
+      if (d.anoEdicao) configEvento.anoEvento = d.anoEdicao;
+      if (d.textoInicial) configEvento.textoInicial = d.textoInicial;
+      if (d.autorizacoes) configEvento.autorizacoes = d.autorizacoes || {};
+    }
+  }catch(e){
+    console.error("Erro ao carregar configurações:",e);
+  }
+
+  // Atualiza campos da UI com config carregada
+  document.getElementById("cfgDataLimite").value = configEvento.dataLimite || "";
+  document.getElementById("cfgMsgEncerradas").value = configEvento.msgEncerradas || "";
+  document.getElementById("cfgBloquearAgora").checked = !!configEvento.bloquearAgora;
+  document.getElementById("cfgLimitePorAluno").value = LIMITE_MODALIDADES_POR_ALUNO;
+  document.getElementById("cfgQueimadaTotal").value = LIMITE_QUEIMADA_TOTAL;
+  document.getElementById("cfgQueimadaSexo").value = LIMITE_QUEIMADA_POR_SEXO;
+  document.getElementById("cfgFutsal").value = LIMITE_MODALIDADE_TURMA["FUTSAL"];
+  document.getElementById("cfgDomino").value = LIMITE_MODALIDADE_TURMA["DOMINÓ"];
+  document.getElementById("cfgFutmesa").value = LIMITE_MODALIDADE_TURMA["FUTMESA"];
+  document.getElementById("cfgTenis").value = LIMITE_MODALIDADE_TURMA["TÊNIS DE MESA"];
+  document.getElementById("cfgXadrez").value = LIMITE_MODALIDADE_TURMA["XADREZ"];
+  document.getElementById("cfgVolei").value = LIMITE_MODALIDADE_TURMA["VOLEI"];
+  document.getElementById("cfgNomeEvento").value = configEvento.nomeEvento || "";
+  document.getElementById("cfgAnoEvento").value = configEvento.anoEvento || "";
+  document.getElementById("cfgTextoInicial").value = configEvento.textoInicial || "";
+
+  document.getElementById("tituloEvento").textContent = "Inscrições " + (configEvento.nomeEvento || "Movimenta Odisseia");
+  if (configEvento.textoInicial){
+    document.getElementById("subEvento").textContent = configEvento.textoInicial;
+  } else if (configEvento.nomeEvento && configEvento.anoEvento){
+    document.getElementById("subEvento").textContent = "Inscrições para o " + configEvento.nomeEvento + " " + configEvento.anoEvento;
+  }
+
+  // carregar autorizações na UI (se houver)
+  atualizarAutorizacoesUI();
+
+  atualizarStatusInscricoes();
+  atualizarDisponibilidadeModalidades();
+}
+
+/* SALVAR CONFIG */
+
+async function salvarConfiguracoes(){
+  if (!isAdmin){
+    alert("Apenas o administrador pode salvar as configurações.");
+    return;
+  }
+  const dataLimite = (document.getElementById("cfgDataLimite").value || "").trim();
+  const msgEnc = (document.getElementById("cfgMsgEncerradas").value || "").trim();
+  const bloquearAgora = document.getElementById("cfgBloquearAgora").checked;
+
+  const limAluno = parseInt(document.getElementById("cfgLimitePorAluno").value,10) || LIMITE_MODALIDADES_POR_ALUNO;
+  const limQueimadaTot = parseInt(document.getElementById("cfgQueimadaTotal").value,10) || LIMITE_QUEIMADA_TOTAL;
+  const limQueimadaSex = parseInt(document.getElementById("cfgQueimadaSexo").value,10) || LIMITE_QUEIMADA_POR_SEXO;
+
+  const limFutsal = parseInt(document.getElementById("cfgFutsal").value,10) || LIMITE_MODALIDADE_TURMA["FUTSAL"];
+  const limDomino = parseInt(document.getElementById("cfgDomino").value,10) || LIMITE_MODALIDADE_TURMA["DOMINÓ"];
+  const limFutmesa = parseInt(document.getElementById("cfgFutmesa").value,10) || LIMITE_MODALIDADE_TURMA["FUTMESA"];
+  const limTenis = parseInt(document.getElementById("cfgTenis").value,10) || LIMITE_MODALIDADE_TURMA["TÊNIS DE MESA"];
+  const limXadrez = parseInt(document.getElementById("cfgXadrez").value,10) || LIMITE_MODALIDADE_TURMA["XADREZ"];
+  const limVolei = parseInt(document.getElementById("cfgVolei").value,10) || LIMITE_MODALIDADE_TURMA["VOLEI"];
+
+  const nomeEvento = (document.getElementById("cfgNomeEvento").value || "").trim();
+  const anoEvento = (document.getElementById("cfgAnoEvento").value || "").trim();
+  const textoInicial = (document.getElementById("cfgTextoInicial").value || "").trim();
+
+  const limitesModalidadeTurma = {
+    "FUTSAL": limFutsal,
+    "DOMINÓ": limDomino,
+    "FUTMESA": limFutmesa,
+    "TÊNIS DE MESA": limTenis,
+    "XADREZ": limXadrez,
+    "VOLEI": limVolei
+  };
+
+  // coletar autorizações (estado atual da UI)
+  const autorizacoes = {};
+  const selTurmaAut = document.getElementById("cfgAutTurma");
+  if (selTurmaAut){
+    // vamos usar configEvento.autorizacoes já mantida no código
+    // antes de salvar, atualizamos configEvento.autorizacoes a partir da UI geral
+    // para simplicidade, usamos configEvento.autorizacoes atual (a UI já sincroniza ao selecionar turma)
+  }
+  try{
+    await db.collection("config").doc("geral").set({
+      dataLimiteInscricao: dataLimite || null,
+      mensagemEncerradas: msgEnc,
+      bloquearInscricoesAgora: bloquearAgora,
+      limiteModalidadesPorAluno: limAluno,
+      limiteQueimadaTotal: limQueimadaTot,
+      limiteQueimadaPorSexo: limQueimadaSex,
+      limitesModalidadeTurma: limitesModalidadeTurma,
+      nomeEvento: nomeEvento,
+      anoEdicao: anoEvento,
+      textoInicial: textoInicial,
+      autorizacoes: configEvento.autorizacoes || {}
+    }, { merge:true });
+
+    configEvento.dataLimite = dataLimite || null;
+    configEvento.msgEncerradas = msgEnc;
+    configEvento.bloquearAgora = bloquearAgora;
+    LIMITE_MODALIDADES_POR_ALUNO = limAluno;
+    LIMITE_QUEIMADA_TOTAL = limQueimadaTot;
+    LIMITE_QUEIMADA_POR_SEXO = limQueimadaSex;
+    LIMITE_MODALIDADE_TURMA = limitesModalidadeTurma;
+    configEvento.nomeEvento = nomeEvento;
+    configEvento.anoEvento = anoEvento;
+    configEvento.textoInicial = textoInicial;
+
+    document.getElementById("tituloEvento").textContent = "Inscrições " + (configEvento.nomeEvento || "Movimenta Odisseia");
+    if (configEvento.textoInicial){
+      document.getElementById("subEvento").textContent = configEvento.textoInicial;
+    }
+
+    atualizarStatusInscricoes();
+    atualizarDisponibilidadeModalidades();
+    alert("Configurações salvas com sucesso.");
+  }catch(e){
+    console.error(e);
+    alert("Erro ao salvar configurações.");
+  }
+}
+
+/* ========== AUTORIZAÇÕES UI (novidade) ========== */
+
+function atualizarAutorizacoesUI(){
+  // popula select de turmas no bloco de autorizações
+  const sel = document.getElementById("cfgAutTurma");
+  const cont = document.getElementById("cfgAutModalidadesContainer");
+  if (!sel || !cont) return;
+  sel.innerHTML = '<option value="">Selecione a turma...</option>';
+  TODAS_TURMAS.forEach(t => {
+    const o = document.createElement("option");
+    o.value = t; o.textContent = t;
+    sel.appendChild(o);
   });
-  return mapa;
-}
 
-function renderTop10Modal(){
-  const mapa = calcularPontuacaoPorTurma();
-  const arr = Object.keys(mapa).map(t => ({ turma: t, pontos: mapa[t] }));
-  arr.sort((a,b) => b.pontos - a.pontos);
-  const top = arr.slice(0,10);
+  // construir checkboxes de modalidades (apenas uma vez)
+  cont.innerHTML = "";
+  MODALIDADES.forEach(m => {
+    const id = "cfgAutChk_" + m.replace(/\s+/g,"_");
+    const wrapper = document.createElement("label");
+    wrapper.style.marginRight = "10px";
+    wrapper.style.fontSize = "0.9rem";
+    wrapper.style.display = "inline-flex";
+    wrapper.style.alignItems = "center";
+    wrapper.style.gap = "6px";
+    const chk = document.createElement("input");
+    chk.type = "checkbox";
+    chk.id = id;
+    chk.dataset.mod = m;
+    chk.className = "cfgAutChk";
+    wrapper.appendChild(chk);
+    const span = document.createElement("span");
+    span.textContent = "Permitir " + m;
+    wrapper.appendChild(span);
+    cont.appendChild(wrapper);
+  });
 
-  const cont = document.getElementById('top10Content');
-  cont.innerHTML = '';
-  if(!top.length){ cont.innerHTML = '<div style="padding:8px 6px;">Ainda não há jogos finalizados para calcular o Top 10.</div>'; return; }
-  top.forEach((it, idx) => {
-    const div = document.createElement('div'); div.className='top10-item';
-    const left = document.createElement('div'); left.textContent = (idx+1)+'. '+it.turma;
-    const right = document.createElement('div'); right.textContent = it.pontos + ' pts';
-    div.appendChild(left); div.appendChild(right); cont.appendChild(div);
+  // quando selecionar turma, preencher checkboxes com configEvento.autorizacoes[turma]
+  sel.addEventListener("change", () => {
+    const turma = sel.value;
+    const autorz = (configEvento.autorizacoes && configEvento.autorizacoes[turma]) || {};
+    const chks = document.querySelectorAll(".cfgAutChk");
+    chks.forEach(chk => {
+      const mod = chk.dataset.mod;
+      chk.checked = !!autorz[mod];
+      // escuta alteração para atualizar configEvento em tempo real
+      chk.onchange = () => {
+        if (!configEvento.autorizacoes) configEvento.autorizacoes = {};
+        if (!configEvento.autorizacoes[turma]) configEvento.autorizacoes[turma] = {};
+        configEvento.autorizacoes[turma][mod] = chk.checked ? true : false;
+      };
+    });
   });
 }
 
-/* abrir/fechar TOP10 */
-document.addEventListener('click', function(e){
-  const t = e.target;
-  if(t && t.id === 'btnTop10'){
-    renderTop10Modal();
-    document.getElementById('top10Modal').style.display = 'flex';
-  }
-  if(t && t.id === 'btnCloseTop10'){
-    document.getElementById('top10Modal').style.display = 'none';
-  }
-});
+/* ========== DISPONIBILIDADE MODALIDADES ========== */
 
-/* ========== Helper: render video embed from URL (simples heurísticas) ========== */
-function buildVideoEmbedHTML(url){
-  if(!url) return '<div style="padding:14px;color:#fff;">Nenhuma transmissão configurada.</div>';
-  const u = url.toLowerCase();
-  if(u.includes('youtube.com') || u.includes('youtu.be') || u.includes('twitch.tv')){
-    return '<iframe src="'+url+'" allowfullscreen></iframe>';
-  }
-  if(u.endsWith('.m3u8') || u.includes('.m3u8')){
-    return '<video controls playsinline><source src="'+url+'" type="application/vnd.apple.mpegurl"></video>';
-  }
-  if(u.endsWith('.mp4')){
-    return '<video controls playsinline><source src="'+url+'" type="video/mp4"></video>';
-  }
-  return '<iframe src="'+url+'" allowfullscreen></iframe>';
+function atualizarDisponibilidadeModalidades(){
+  const turma = document.getElementById("turma").value;
+  const sexo = document.getElementById("sexo").value;
+  const spans = document.querySelectorAll(".modalidade-vagas");
+  const chks = document.querySelectorAll(".chkModalidade");
+
+  spans.forEach(span => {
+    const mod = span.dataset.mod;
+    if (!turma){
+      span.textContent = mod + " (selecione turno e turma)";
+
+      span.classList.remove("modalidade-lotado");
+      return;
+    }
+
+    // se autorizado para essa turma/ modalidade -> mostrar "AUTORIZADO"
+    const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
+
+    if (mod === "QUEIMADA MISTA"){
+      const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
+      const gen = countsQueimadaGenero[turma] || {Masculino:0, Feminino:0};
+      span.textContent = mod + " ("+tot+"/"+LIMITE_QUEIMADA_TOTAL+" / Meninos: "+gen.Masculino+"/"+LIMITE_QUEIMADA_POR_SEXO+" / Meninas: "+gen.Feminino+"/"+LIMITE_QUEIMADA_POR_SEXO+")" + (autorizada ? " — AUTORIZADO" : "");
+      if (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada) span.classList.add("modalidade-lotado");
+      else span.classList.remove("modalidade-lotado");
+    } else {
+      const lim = LIMITE_MODALIDADE_TURMA[mod] || 0;
+      const qtd = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
+      span.textContent = mod + " ("+qtd+"/"+lim+" vagas)" + (autorizada ? " — AUTORIZADO" : "");
+      if (qtd >= lim && !autorizada) span.classList.add("modalidade-lotado");
+      else span.classList.remove("modalidade-lotado");
+    }
+  });
+
+  chks.forEach(chk => {
+    const mod = chk.value;
+    if (!turma){
+      chk.disabled = true;
+      chk.checked = false;
+      return;
+    }
+
+    const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
+
+    if (mod === "QUEIMADA MISTA"){
+      const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
+      const gen = countsQueimadaGenero[turma] || {Masculino:0,Feminino:0};
+      if (!sexo || (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada)){
+        chk.disabled = true; chk.checked = false; return;
+      }
+      if (sexo === "Masculino" && gen.Masculino >= LIMITE_QUEIMADA_POR_SEXO && !autorizada){
+        chk.disabled = true; chk.checked = false; return;
+      }
+      if (sexo === "Feminino" && gen.Feminino >= LIMITE_QUEIMADA_POR_SEXO && !autorizada){
+        chk.disabled = true; chk.checked = false; return;
+      }
+      chk.disabled = false;
+    } else {
+      const lim = LIMITE_MODALIDADE_TURMA[mod] || 0;
+      const qtd = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
+      if (qtd >= lim && !autorizada){
+        chk.disabled = true; chk.checked = false;
+      } else {
+        chk.disabled = false;
+      }
+    }
+  });
 }
 
-/* ========== RENDER PLACAR AO VIVO (public) com vídeo quando transmitir ========== */
-function renderPlacarAoVivo(){
-  const container = document.getElementById("placarAoVivoContainer");
-  if(!container) return;
+/* ========== INSCRIÇÃO ========== */
+
+async function handleSubmitInscricao(e){
+  e.preventDefault();
+  if (inscricoesEncerradas){
+    msgForm(configEvento.msgEncerradas || "As inscrições foram encerradas.", false);
+    return;
+  }
+  // primeiro tente emailAtual -> localStorage fallback
+  if (!emailAtual){
+    try{
+      const fromStorage = localStorage.getItem('insc_email');
+      if (validarEmail(fromStorage)) emailAtual = fromStorage;
+    }catch(e){}
+  }
+  if (!emailAtual || !validarEmail(emailAtual)){
+    alert("Informe um e-mail válido antes de se inscrever.");
+    return;
+  }
+
+  const nome = document.getElementById("nome").value.trim();
+  const sexo = document.getElementById("sexo").value;
+  const turno = document.getElementById("turno").value;
+  const turma = document.getElementById("turma").value;
+  const camisaNumero = document.getElementById("camisaNumero").value.trim();
+  const observacoes = document.getElementById("observacoes").value.trim();
+
+  const nomeNorm = normalizarNome(nome);
+  if (!nome || !sexo || !turno || !turma){
+    msgForm("Preencha nome, sexo, turno e turma.", false);
+    return;
+  }
+
+  const chks = document.querySelectorAll(".chkModalidade:checked");
+  const mods = [];
+  chks.forEach(chk => mods.push(chk.value));
+  if (!mods.length){
+    msgForm("Escolha pelo menos 1 modalidade.", false);
+    return;
+  }
+  if (mods.length > LIMITE_MODALIDADES_POR_ALUNO){
+    msgForm("Você só pode escolher até "+LIMITE_MODALIDADES_POR_ALUNO+" modalidades.", false);
+    return;
+  }
+
+  for (const ins of todasInscricoes){
+    if (ins.nomeNormalizado === nomeNorm && ins.turma === turma){
+      msgForm("Já existe inscrição para este nome nesta turma.", false);
+      return;
+    }
+  }
+
+  // verificação por modalidade com consideração de autorizações
+  for (const mod of mods){
+    // se existe autorização para a turma/mod => pular validação
+    const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
+    if (autorizada) continue;
+
+    if (mod === "QUEIMADA MISTA"){
+      const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
+      const gen = countsQueimadaGenero[turma] || {Masculino:0,Feminino:0};
+      if (tot >= LIMITE_QUEIMADA_TOTAL){
+        msgForm("QUEIMADA MISTA está lotada para a turma "+turma+".", false); return;
+      }
+      if (sexo === "Masculino" && gen.Masculino >= LIMITE_QUEIMADA_POR_SEXO){
+        msgForm("Limite de meninos na QUEIMADA MISTA da turma "+turma+" já foi atingido.", false); return;
+      }
+      if (sexo === "Feminino" && gen.Feminino >= LIMITE_QUEIMADA_POR_SEXO){
+        msgForm("Limite de meninas na QUEIMADA MISTA da turma "+turma+" já foi atingido.", false); return;
+      }
+    } else {
+      const lim = LIMITE_MODALIDADE_TURMA[mod] || 0;
+      const qtd = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
+      if (qtd >= lim){
+        msgForm('A modalidade "'+mod+'" está lotada para a turma '+turma+".", false); return;
+      }
+    }
+  }
+
+  try{
+    await db.collection("inscricoes").add({
+      nome: nome,
+      nomeNormalizado: nomeNorm,
+      email: emailAtual,
+      sexo: sexo,
+      turno: turno,
+      turma: turma,
+      camisaNumero: camisaNumero || null,
+      modalidades: mods,
+      observacoes: observacoes || null,
+      naoAutorizadoPor: [], // indicações de professores
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    msgForm("Inscrição realizada com sucesso! ✅", true);
+    document.getElementById("formInscricao").reset();
+    document.getElementById("turma").innerHTML = '<option value="">Selecione o turno primeiro...</option>';
+    document.getElementById("turma").disabled = true;
+    atualizarDisponibilidadeModalidades();
+  }catch(err){
+    console.error(err);
+    msgForm("Erro ao salvar inscrição. Tente novamente.", false);
+  }
+}
+
+/* CANCELAR INSCRIÇÃO (ADMIN) */
+
+async function cancelarInscricao(){
+  if (!isAdmin){
+    alert("Apenas o administrador pode cancelar inscrições.");
+    return;
+  }
+  const sel = document.getElementById("selectCancelar");
+  const raw = sel.value;
+  if (!raw){
+    alert("Selecione uma inscrição."); return;
+  }
+  const partes = raw.split("|||");
+  const id = partes[0];
+  const modalidadeSelecionada = partes[1] || null;
+
+  const ins = todasInscricoes.find(i => i.id === id);
+  if (!ins){
+    alert("Inscrição não encontrada."); return;
+  }
+
+  if (!modalidadeSelecionada){
+    alert("Modalidade inválida."); return;
+  }
+
+  const mensagemConfirm = 'Cancelar a modalidade "'+modalidadeSelecionada+'" do aluno "'+ins.nome+'" da turma '+ins.turma+'?\n\nSe esta for a única modalidade, a inscrição inteira será removida.';
+  if (!confirm(mensagemConfirm)) return;
+
+  try{
+    const modalidadesAtuais = Array.isArray(ins.modalidades) ? ins.modalidades.slice() : [];
+    const filtradas = modalidadesAtuais.filter(m => m !== modalidadeSelecionada);
+
+    if (filtradas.length === 0){
+      await db.collection("inscricoes").doc(id).delete();
+      alert("Inscrição completa cancelada.");
+    } else {
+      await db.collection("inscricoes").doc(id).update({
+        modalidades: filtradas
+      });
+      alert("Modalidade cancelada com sucesso.");
+    }
+  }catch(e){
+    console.error(e);
+    alert("Erro ao cancelar inscrição.");
+  }
+}
+
+/* ========== TABELAS ========== */
+
+function renderPublico(){
+  const corpo = document.querySelector("#tabelaPublica tbody");
+  const filtroTurnoEl = document.getElementById("filtroTurno");
+  const filtroTurmaEl = document.getElementById("filtroTurma");
+  const filtroModEl = document.getElementById("filtroModalidade");
+
+  if (!corpo || !filtroTurnoEl || !filtroTurmaEl || !filtroModEl) return;
+
+  const turno = filtroTurnoEl.value;
+  const turma = filtroTurmaEl.value;
+  const mod = filtroModEl.value;
+
+  corpo.innerHTML = "";
+
+  if (!turno || !turma || !mod){
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 2;
+    td.textContent = "Selecione turno, turma e modalidade para ver os inscritos.";
+    tr.appendChild(td);
+    corpo.appendChild(tr);
+    return;
+  }
+
+  const lista = todasInscricoes.filter(ins => {
+    if (ins.turno !== turno) return false;
+    if (ins.turma !== turma) return false;
+    if (!ins.modalidades || !ins.modalidades.includes(mod)) return false;
+    return true;
+  });
+
+  if (!lista.length){
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 2;
+    td.textContent = "Nenhum inscrito para esses filtros.";
+    tr.appendChild(td);
+    corpo.appendChild(tr);
+    return;
+  }
+
+  lista.forEach(ins => {
+    const tr = document.createElement("tr");
+    const tdN = document.createElement("td");
+    const tdT = document.createElement("td");
+    tdN.textContent = ins.nome;
+    tdT.textContent = ins.turma;
+    tr.appendChild(tdN);
+    tr.appendChild(tdT);
+    corpo.appendChild(tr);
+  });
+}
+
+function renderAdmin(){
+  if (!isAdmin) return;
+  const corpo = document.querySelector("#tabelaAdmin tbody");
+  corpo.innerHTML = "";
+  const nomeFiltro = (document.getElementById("adminFiltroNome").value || "").toLowerCase();
+  const turmaFiltro = document.getElementById("adminFiltroTurma").value;
+  const modFiltro = document.getElementById("adminFiltroModalidade").value;
+
+  const lista = todasInscricoes.filter(ins => {
+    if (nomeFiltro && !(ins.nome || "").toLowerCase().includes(nomeFiltro)) return false;
+    if (turmaFiltro && ins.turma !== turmaFiltro) return false;
+    if (modFiltro && (!ins.modalidades || !ins.modalidades.includes(modFiltro))) return false;
+    return true;
+  });
+
+  if (!lista.length){
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 9;
+    td.textContent = "Nenhuma inscrição com esses filtros.";
+    tr.appendChild(td);
+    corpo.appendChild(tr);
+    return;
+  }
+
+  lista.forEach(ins => {
+    const tr = document.createElement("tr");
+    const tdN = document.createElement("td");
+    const tdE = document.createElement("td");
+    const tdS = document.createElement("td");
+    const tdT = document.createElement("td");
+    const tdTu = document.createElement("td");
+    const tdC = document.createElement("td");
+    const tdM = document.createElement("td");
+    const tdO = document.createElement("td");
+    const tdD = document.createElement("td");
+
+    tdN.textContent = ins.nome || "";
+    tdE.textContent = ins.email || "";
+    tdS.textContent = ins.sexo || "";
+    tdT.textContent = ins.turma || "";
+    tdTu.textContent = ins.turno || "";
+    tdC.textContent = ins.camisaNumero || "";
+    tdM.textContent = (ins.modalidades || []).join(", ");
+    tdO.textContent = ins.observacoes || "";
+
+    if (ins.timestamp && ins.timestamp.toDate){
+      const d = ins.timestamp.toDate();
+      tdD.textContent = d.toLocaleDateString("pt-BR") + " " + d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+    } else tdD.textContent = "-";
+
+    tr.appendChild(tdN);
+    tr.appendChild(tdE);
+    tr.appendChild(tdS);
+    tr.appendChild(tdT);
+    tr.appendChild(tdTu);
+    tr.appendChild(tdC);
+    tr.appendChild(tdM);
+    tr.appendChild(tdO);
+    tr.appendChild(tdD);
+    corpo.appendChild(tr);
+  });
+}
+
+/* RELATÓRIO IMPRESSO */
+
+function renderRelatorio(){
+  const tbody = document.querySelector("#tabelaRelatorio tbody");
+  const turnoEl = document.getElementById("relatorioTurno");
+  const turmaEl = document.getElementById("relatorioTurma");
+  const modEl = document.getElementById("relatorioModalidade");
+  const tituloLinha1 = document.getElementById("relatorioTituloLinha1");
+  const tituloLinha2 = document.getElementById("relatorioTituloLinha2");
+
+  if (!tbody || !turnoEl || !turmaEl || !modEl) return;
+
+  const turno = turnoEl.value;
+  const turma = turmaEl.value;
+  const modalidade = modEl.value;
+
+  tbody.innerHTML = "";
+
+  tituloLinha1.textContent = "Relatório de inscritos – " + (configEvento.nomeEvento || "Movimenta Odisseia");
+
+  if (!turno || !turma || !modalidade){
+    tituloLinha2.textContent = "Selecione turno, turma e modalidade para gerar o relatório.";
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Selecione turno, turma e modalidade para gerar o relatório.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  let lista = todasInscricoes.filter(ins => {
+    if (ins.turno !== turno) return false;
+    if (ins.turma !== turma) return false;
+    if (!ins.modalidades || !ins.modalidades.includes(modalidade)) return false;
+    return true;
+  });
+
+  lista = lista.slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
+
+  if (!lista.length){
+    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – 0 inscritos.`;
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Nenhuma inscrição para esses filtros.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – Total: ${lista.length} inscrito(s).`;
+
+  lista.forEach(ins => {
+    const tr = document.createElement("tr");
+
+    const tdNome = document.createElement("td");
+    const tdSexo = document.createElement("td");
+    const tdTurma = document.createElement("td");
+    const tdTurno = document.createElement("td");
+    const tdModalidades = document.createElement("td");
+    const tdEmail = document.createElement("td");
+    const tdCamisa = document.createElement("td");
+    const tdObs = document.createElement("td");
+
+    tdNome.textContent = ins.nome || "";
+    tdSexo.textContent = ins.sexo || "";
+    tdTurma.textContent = ins.turma || "";
+    tdTurno.textContent = ins.turno || "";
+    tdModalidades.textContent = modalidade;
+    tdEmail.textContent = ins.email || "";
+    tdCamisa.textContent = ins.camisaNumero || "";
+    tdObs.textContent = ins.observacoes || "";
+
+    tr.appendChild(tdNome);
+    tr.appendChild(tdSexo);
+    tr.appendChild(tdTurma);
+    tr.appendChild(tdTurno);
+    tr.appendChild(tdModalidades);
+    tr.appendChild(tdEmail);
+    tr.appendChild(tdCamisa);
+    tr.appendChild(tdObs);
+
+    tbody.appendChild(tr);
+  });
+}
+
+/* NOVA FUNÇÃO: Relatório de TODA TURMA (todas as modalidades) */
+function renderRelatorioTodaTurma(){
+  const tbody = document.querySelector("#tabelaRelatorio tbody");
+  const turnoEl = document.getElementById("relatorioTurno");
+  const turmaEl = document.getElementById("relatorioTurma");
+  const tituloLinha1 = document.getElementById("relatorioTituloLinha1");
+  const tituloLinha2 = document.getElementById("relatorioTituloLinha2");
+
+  if (!tbody || !turnoEl || !turmaEl) return;
+
+  const turno = turnoEl.value;
+  const turma = turmaEl.value;
+
+  tbody.innerHTML = "";
+  tituloLinha1.textContent = "Relatório completo da turma – " + (configEvento.nomeEvento || "Movimenta Odisseia");
+
+  if (!turno || !turma){
+    tituloLinha2.textContent = "Selecione turno e turma para gerar o relatório da turma inteira.";
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Selecione turno e turma para gerar o relatório da turma inteira.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  let lista = todasInscricoes.filter(ins => {
+    if (ins.turno !== turno) return false;
+    if (ins.turma !== turma) return false;
+    return true;
+  });
+
+  lista = lista.slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
+
+  if (!lista.length){
+    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} – Total: 0 inscritos.`;
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Nenhuma inscrição nesta turma.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} – Total: ${lista.length} inscrito(s).`;
+
+  lista.forEach(ins => {
+    const tr = document.createElement("tr");
+
+    const tdNome = document.createElement("td");
+    const tdSexo = document.createElement("td");
+    const tdTurma = document.createElement("td");
+    const tdTurno = document.createElement("td");
+    const tdModalidades = document.createElement("td");
+    const tdEmail = document.createElement("td");
+    const tdCamisa = document.createElement("td");
+    const tdObs = document.createElement("td");
+
+    tdNome.textContent = ins.nome || "";
+    tdSexo.textContent = ins.sexo || "";
+    tdTurma.textContent = ins.turma || "";
+    tdTurno.textContent = ins.turno || "";
+    tdModalidades.textContent = (ins.modalidades || []).join(", ");
+    tdEmail.textContent = ins.email || "";
+    tdCamisa.textContent = ins.camisaNumero || "";
+    tdObs.textContent = ins.observacoes || "";
+
+    tr.appendChild(tdNome);
+    tr.appendChild(tdSexo);
+    tr.appendChild(tdTurma);
+    tr.appendChild(tdTurno);
+    tr.appendChild(tdModalidades);
+    tr.appendChild(tdEmail);
+    tr.appendChild(tdCamisa);
+    tr.appendChild(tdObs);
+
+    tbody.appendChild(tr);
+  });
+}
+
+/* preencher selects (filtros e cancelar) */
+function atualizarSelectsAdminPublico(){
+  const filtroTurma = document.getElementById("filtroTurma");
+  const filtroMod = document.getElementById("filtroModalidade");
+  const adminTurma = document.getElementById("adminFiltroTurma");
+  const adminMod = document.getElementById("adminFiltroModalidade");
+  const selectCancel = document.getElementById("selectCancelar");
+
+  const turmasSet = new Set();
+  todasInscricoes.forEach(i => { if (i.turma) turmasSet.add(i.turma); });
+  const turmasOrd = Array.from(turmasSet).sort();
+
+  adminTurma.innerHTML = '<option value="">Todas</option>';
+  turmasOrd.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t; opt.textContent = t;
+    adminTurma.appendChild(opt);
+  });
+
+  filtroMod.innerHTML = '<option value="">Selecione a modalidade...</option>';
+  adminMod.innerHTML = '<option value="">Todas</option>';
+  MODALIDADES.forEach(m => {
+    const o1 = document.createElement("option");
+    o1.value = m; o1.textContent = m;
+    filtroMod.appendChild(o1);
+    const o2 = document.createElement("option");
+    o2.value = m; o2.textContent = m;
+    adminMod.appendChild(o2);
+  });
+
+  const nomeFiltro = (document.getElementById("adminFiltroNome").value || "").toLowerCase();
+  const turmaFiltro = document.getElementById("adminFiltroTurma").value;
+
+  selectCancel.innerHTML = '<option value="">Selecione uma inscrição...</option>';
+  todasInscricoes.forEach(ins => {
+    if (nomeFiltro && !(ins.nome || "").toLowerCase().includes(nomeFiltro)) return;
+    if (turmaFiltro && ins.turma !== turmaFiltro) return;
+
+    (ins.modalidades || []).forEach(mod => {
+      const opt = document.createElement("option");
+      opt.value = ins.id + "|||" + mod;
+      opt.textContent = ins.nome + " — " + ins.turma + " — " + mod;
+      selectCancel.appendChild(opt);
+    });
+  });
+}
+
+/* ========== JOGOS (ALUNO) ========== */
+
+function renderJogosAluno(){
+  const serieEl = document.getElementById("filtroSerieJogo");
+  const modalidadeEl = document.getElementById("filtroModalidadeJogo");
+  const dataEl = document.getElementById("filtroDataJogo");
+  const container = document.getElementById("listaJogosContainer");
+
+  if (!serieEl || !modalidadeEl || !dataEl || !container) return;
+
+  const serie = serieEl.value;
+  const modalidade = modalidadeEl.value;
+  const dataFiltro = dataEl.value;
+
   container.innerHTML = "";
 
-  const statusLabel = { "AGENDADO":"Agendado", "PRESTES":"Prestes a começar", "EM_ANDAMENTO":"Em andamento", "FINALIZADO":"Finalizado" };
+  if (!serie || !modalidade){
+    container.textContent = "Selecione a série e a modalidade para ver os jogos.";
+    return;
+  }
+
+  let lista = todosJogos.filter(j => {
+    const s1 = getSerieFromTurma(j.turma1);
+    const s2 = getSerieFromTurma(j.turma2);
+    if (s1 !== serie && s2 !== serie) return false;
+    if (j.modalidade !== modalidade) return false;
+    if (dataFiltro && j.dataJogo !== dataFiltro) return false;
+    return true;
+  });
+
+  if (!lista.length){
+    container.textContent = "Nenhum jogo para esses filtros.";
+    return;
+  }
+
+  lista = lista.slice().sort((a,b) => {
+    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
+    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
+    return da.localeCompare(db);
+  });
+
+  lista.forEach(j => {
+    const div = document.createElement("div");
+    div.className = "jogo-bloco";
+    div.innerHTML =
+      "<strong>"+(j.modalidade || "-")+"</strong><br>"+
+      "Data: "+formatarDataBR(j.dataJogo)+" — Horário: "+(j.horarioJogo || "-")+"<br>"+
+      "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+"<br>"+
+      "Local: "+(j.localJogo || "-");
+    container.appendChild(div);
+  });
+}
+
+/* ========== PLACAR AO VIVO (ALUNO) ========== */
+
+function renderPlacarAoVivo(){
+  const container = document.getElementById("placarAoVivoContainer");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const statusLabel = {
+    "AGENDADO": "Agendado",
+    "PRESTES": "Prestes a começar",
+    "EM_ANDAMENTO": "Em andamento",
+    "FINALIZADO": "Finalizado"
+  };
+
   const jogosAoVivo = todosJogos.filter(j => j.status === "EM_ANDAMENTO" || j.status === "PRESTES");
 
-  if(!jogosAoVivo.length){
+  if (!jogosAoVivo.length){
     const p = document.createElement("p");
     p.textContent = "Nenhum jogo em andamento ou prestes a começar neste momento.";
     container.appendChild(p);
     return;
   }
 
-  jogosAoVivo.sort((a,b) => ((a.dataJogo||"") + " " + (a.horarioJogo||"")).localeCompare((b.dataJogo||"") + " " + (b.horarioJogo||"")));
+  jogosAoVivo.sort((a,b) => {
+    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
+    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
+    return da.localeCompare(db);
+  });
 
   jogosAoVivo.forEach(j => {
     const card = document.createElement("div");
     card.className = "placar-card";
+    card.style.position = "relative";
 
     const topo = document.createElement("div");
     topo.className = "placar-linha-principal";
@@ -617,6 +2133,7 @@ function renderPlacarAoVivo(){
     const info = document.createElement("div");
     info.innerHTML =
       "Local: "+(j.localJogo || "-")+"<br>"+
+
       (j.turma1 || "")+" <strong>"+(j.placar1 ?? 0)+"</strong> x <strong>"+(j.placar2 ?? 0)+"</strong> "+(j.turma2 || "");
     card.appendChild(info);
 
@@ -627,78 +2144,247 @@ function renderPlacarAoVivo(){
     statusSpan.textContent = statusLabel[j.status] || j.status || "–";
     card.appendChild(statusSpan);
 
-    // se transmitir ativo e tem cameras -> mostrar live wrapper com overlay
-    if(j.transmitir && Array.isArray(j.cameras) && j.cameras.length){
-      const live = document.createElement("div");
-      live.className = "live-wrapper";
-      live.style.marginTop = "8px";
-      const videoContainer = document.createElement("div");
-      videoContainer.className = "live-video-container";
-      const activeIndex = (typeof j.activeCameraIndex === 'number') ? j.activeCameraIndex : 0;
-      const cam = j.cameras[activeIndex] || j.cameras[0];
-      videoContainer.innerHTML = buildVideoEmbedHTML(cam ? cam.url : '');
-      live.appendChild(videoContainer);
-
+    // ===== NOVO: AREA DE VIDEO (se houver stream cadastrada para este jogo) =====
+    const stream = streamsData[j.id];
+    if (stream && Array.isArray(stream.cameras) && stream.cameras.length){
+      // overlay do placar (visível sobre o video)
       const overlay = document.createElement("div");
-      overlay.className = "live-overlay-placar";
-      const equipes = document.createElement("div");
-      equipes.className = "equipes";
-      equipes.textContent = (j.turma1||'')+' '+(j.placar1??0)+' x '+(j.placar2??0)+' '+(j.turma2||'');
-      const infoRight = document.createElement("div");
-      infoRight.style.fontSize = "0.85rem";
-      infoRight.textContent = cam ? (cam.name || ('Câmera '+(activeIndex+1))) : 'Sem câmera ativa';
-      overlay.appendChild(equipes);
-      overlay.appendChild(infoRight);
-      live.appendChild(overlay);
-
-      card.appendChild(live);
+      overlay.className = "overlay-placar";
+      overlay.textContent = (j.turma1 || "") + " " + (j.placar1 ?? 0) + " x " + (j.placar2 ?? 0) + " " + (j.turma2 || "");
+      // video frame
+      const frame = document.createElement("div");
+      frame.className = "live-video-frame";
+      // escolher camera ativa
+      const activeIndex = (typeof stream.active === "number") ? stream.active : 0;
+      const cam = stream.cameras[activeIndex] || stream.cameras[0];
+      if (cam && cam.url){
+        // se for youtube / twitch embed -> usamos iframe. Se for .m3u8 -> usar video if browser supports HLS via <video> nativo será limitado; recomendamos HLS via player externo.
+        let el;
+        if (cam.url.includes("youtube.com") || cam.url.includes("youtu.be") || cam.url.includes("twitch.tv") || cam.url.includes("player.vimeo.com")){
+          // iframe
+          el = document.createElement("iframe");
+          el.setAttribute("allowfullscreen", "");
+          el.setAttribute("frameborder", "0");
+          // transformar youtube watch?v= para embed
+          let src = cam.url;
+          if (src.includes("watch?v=")){
+            src = src.replace("watch?v=", "embed/");
+          }
+          // se for youtu.be
+          if (src.includes("youtu.be/")){
+            const id = src.split("youtu.be/")[1].split(/[?&]/)[0];
+            src = "https://www.youtube.com/embed/" + id + "?autoplay=0&rel=0";
+          }
+          // if twitch clip / channel embed handling (basic)
+          if (cam.url.includes("twitch.tv") && !src.includes("embed/")){
+            // basic embed that may require parent param; fallback to original url in iframe
+            // keep original url (may not embed); admin should provide embed URL when possible
+          }
+          el.src = src;
+        } else {
+          // otherwise, use video tag (most generic). Note: browsers may not play HLS (.m3u8) nativamente; recommended to push via YouTube/OBS.
+          el = document.createElement("video");
+          el.controls = true;
+          el.autoplay = false;
+          el.playsInline = true;
+          el.src = cam.url;
+        }
+        frame.appendChild(el);
+        frame.appendChild(overlay);
+        card.appendChild(frame);
+      }
     }
 
     container.appendChild(card);
   });
 }
 
-/* ========== ADMIN: gerenciar cameras por jogo (cameras array, activeCameraIndex, transmitir) ========== */
-async function adicionarCameraAoJogo(jogoId, nome, url){
-  if(!isAdmin) return alert('Apenas administrador.');
-  try{
-    const docRef = db.collection('jogos').doc(jogoId);
-    const doc = await docRef.get();
-    const d = doc.exists ? doc.data() : {};
-    const cams = Array.isArray(d.cameras) ? d.cameras.slice() : [];
-    cams.push({ name: nome, url: url });
-    await docRef.update({ cameras: cams });
-    alert('Câmera adicionada.');
-  }catch(e){ console.error(e); alert('Erro ao adicionar câmera.'); }
-}
-async function definirCameraAtiva(jogoId, idx){
-  if(!isAdmin) return alert('Apenas administrador.');
-  try{ await db.collection('jogos').doc(jogoId).update({ activeCameraIndex: idx }); alert('Câmera ativa atualizada.'); }catch(e){ console.error(e); alert('Erro ao atualizar câmera ativa.'); }
-}
-async function removerCameraDoJogo(jogoId, idx){
-  if(!isAdmin) return alert('Apenas administrador.');
-  try{
-    const ref = db.collection('jogos').doc(jogoId);
-    const snap = await ref.get(); const d = snap.exists ? snap.data() : {};
-    const cams = Array.isArray(d.cameras) ? d.cameras.slice() : [];
-    if(idx < 0 || idx >= cams.length) return alert('Índice inválido');
-    cams.splice(idx,1);
-    await ref.update({ cameras: cams });
-    alert('Câmera removida.');
-  }catch(e){ console.error(e); alert('Erro ao remover câmera.'); }
-}
-async function toggleTransmitirJogo(jogoId, flag){
-  if(!isAdmin) return alert('Apenas administrador.');
-  try{ await db.collection('jogos').doc(jogoId).update({ transmitir: !!flag }); alert('Alteração salva.'); }catch(e){ console.error(e); alert('Erro ao atualizar transmissão.'); }
-}
+/* ========== CLASSIFICAÇÃO / CLASSIFICADOS (ALUNO) ========== */
 
-/* ========== RENDER ADMIN JOGOS (atualizado com controles de câmera) ========== */
-function renderAdminJogos(){
-  const container = document.getElementById("listaAdminJogos");
-  if(!container) return;
+function renderClassificacao(){
+  const container = document.getElementById("classificacaoContainer");
+  if (!container) return;
   container.innerHTML = "";
 
-  if(!todosJogos.length){
+  if (!todosJogos.length){
+    container.textContent = "Nenhum jogo registrado ainda.";
+    return;
+  }
+
+  const finalizados = todosJogos.filter(j => j.status === "FINALIZADO");
+
+  if (!finalizados.length){
+    container.textContent = "Nenhum jogo finalizado ainda para mostrar classificados.";
+    return;
+  }
+
+  finalizados.sort((a,b) => {
+    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
+    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
+    return da.localeCompare(db);
+  });
+
+  finalizados.forEach(j => {
+    const card = document.createElement("div");
+    card.className = "jogo-bloco";
+
+    const header = document.createElement("div");
+    header.style.fontWeight = "600";
+    header.style.marginBottom = "4px";
+    header.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-");
+    card.appendChild(header);
+
+    const p1 = j.placar1 ?? 0;
+    const p2 = j.placar2 ?? 0;
+
+    let vencedor = null;
+    if (p1 > p2) vencedor = "t1";
+    else if (p2 > p1) vencedor = "t2";
+
+    function montarLinha(turma, placar, pos){
+      const linha = document.createElement("div");
+      linha.className = "linha-classificado";
+      const bol = document.createElement("span");
+      bol.className = "bolinha-resultado";
+
+      if (!vencedor){
+        bol.classList.add("bolinha-neutra");
+      } else if ((vencedor === "t1" && pos === 1) || (vencedor === "t2" && pos === 2)){
+        bol.classList.add("bolinha-verde");
+      } else {
+        bol.classList.add("bolinha-vermelha");
+      }
+
+      const nomeSpan = document.createElement("span");
+      nomeSpan.textContent = turma || "-";
+      nomeSpan.style.marginRight = "6px";
+
+      const placarSpan = document.createElement("strong");
+      placarSpan.textContent = placar;
+
+      linha.appendChild(bol);
+      linha.appendChild(nomeSpan);
+      linha.appendChild(document.createTextNode(" — "));
+      linha.appendChild(placarSpan);
+      return linha;
+    }
+
+    card.appendChild(montarLinha(j.turma1, p1, 1));
+    card.appendChild(montarLinha(j.turma2, p2, 2));
+
+    const info = document.createElement("div");
+    info.style.marginTop = "4px";
+    if (vencedor === "t1"){
+      info.textContent = "Classificado: " + (j.turma1 || "-");
+    } else if (vencedor === "t2"){
+      info.textContent = "Classificado: " + (j.turma2 || "-");
+    } else {
+      info.textContent = "Empate – sem classificado definido.";
+    }
+    card.appendChild(info);
+
+    container.appendChild(card);
+  });
+}
+
+/* ========== JOGOS ADMIN: CADASTRAR / EXCLUIR / EDITAR PLACAR ========== */
+
+async function cadastrarJogo(){
+  if (!isAdmin){
+    alert("Apenas o administrador pode cadastrar jogos.");
+    return;
+  }
+  const dataJogo = document.getElementById("jogoData").value;
+  const turma1 = document.getElementById("jogoTurma1").value;
+  const turma2 = document.getElementById("jogoTurma2").value;
+  const modalidade = document.getElementById("jogoModalidade").value;
+  const horario = document.getElementById("jogoHorario").value;
+  const local = (document.getElementById("jogoLocal").value || "").trim();
+
+  if (!dataJogo || !turma1 || !turma2 || !modalidade || !horario || !local){
+    alert("Preencha todos os campos do jogo.");
+    return;
+  }
+  if (turma1 === turma2){
+    alert("Turma 1 e Turma 2 devem ser diferentes.");
+    return;
+  }
+
+  try{
+    await db.collection("jogos").add({
+      dataJogo: dataJogo,
+      turma1: turma1,
+      turma2: turma2,
+      modalidade: modalidade,
+      horarioJogo: horario,
+      localJogo: local,
+      status: "AGENDADO",
+      placar1: 0,
+      placar2: 0,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    alert("Jogo cadastrado com sucesso.");
+    document.getElementById("jogoData").value = "";
+    document.getElementById("jogoTurma1").value = "";
+    document.getElementById("jogoTurma2").value = "";
+    document.getElementById("jogoModalidade").value = "";
+    document.getElementById("jogoHorario").value = "";
+    document.getElementById("jogoLocal").value = "";
+  }catch(e){
+    console.error(e);
+    alert("Erro ao cadastrar jogo.");
+  }
+}
+
+function atualizarSelectExcluirJogo(){
+  const sel = document.getElementById("selectExcluirJogo");
+  if (!sel) return;
+  const filtroInput = document.getElementById("filtroExcluirJogo");
+  const termo = filtroInput ? (filtroInput.value || "").toLowerCase() : "";
+
+  sel.innerHTML = '<option value="">Selecione um jogo...</option>';
+  todosJogos.forEach(j => {
+    const label = (j.modalidade || "")+" — "+formatarDataBR(j.dataJogo)+" "+(j.horarioJogo || "")+" — "+(j.turma1 || "")+" x "+(j.turma2 || "");
+    if (termo && !label.toLowerCase().includes(termo)) return;
+    const opt = document.createElement("option");
+    opt.value = j.id;
+    opt.textContent = label;
+    sel.appendChild(opt);
+  });
+}
+
+async function excluirJogo(){
+  if (!isAdmin){
+    alert("Apenas o administrador pode excluir jogos.");
+    return;
+  }
+  const sel = document.getElementById("selectExcluirJogo");
+  const id = sel.value;
+  if (!id){
+    alert("Selecione um jogo."); return;
+  }
+  const jogo = todosJogos.find(j => j.id === id);
+  const desc = jogo ? ((jogo.modalidade || "")+" — "+formatarDataBR(jogo.dataJogo)+" "+(jogo.horarioJogo || "")+" — "+(jogo.turma1 || "")+" x "+(jogo.turma2 || "")) : "";
+  if (!confirm("Excluir o jogo: "+desc+" ?")) return;
+  try{
+    await db.collection("jogos").doc(id).delete();
+    // remover streams vinculados (opcional)
+    try { await db.collection("streams").doc(id).delete(); } catch(e){}
+    alert("Jogo excluído.");
+  }catch(e){
+    console.error(e);
+    alert("Erro ao excluir jogo.");
+  }
+}
+
+/* Painel de placar ao vivo / status (admin) */
+
+function renderAdminJogos(){
+  const container = document.getElementById("listaAdminJogos");
+  if (!container) return;
+  container.innerHTML = "";
+
+  if (!todosJogos.length){
     container.textContent = "Nenhum jogo cadastrado.";
     return;
   }
@@ -710,11 +2396,11 @@ function renderAdminJogos(){
     bloco.className = "jogo-bloco";
 
     const linha1 = document.createElement("div");
-    linha1.innerHTML = "<strong>"+(j.modalidade||"-")+"</strong> — "+formatarDataBR(j.dataJogo)+" às "+(j.horarioJogo||"-");
+    linha1.innerHTML = "<strong>"+(j.modalidade || "-")+"</strong> — "+formatarDataBR(j.dataJogo)+" às "+(j.horarioJogo || "-");
     bloco.appendChild(linha1);
 
     const linha2 = document.createElement("div");
-    linha2.textContent = "Jogo: "+(j.turma1||"")+" x "+(j.turma2||"")+" — Local: "+(j.localJogo||"-");
+    linha2.textContent = "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+" — Local: "+(j.localJogo || "-");
     bloco.appendChild(linha2);
 
     const controles = document.createElement("div");
@@ -770,207 +2456,20 @@ function renderAdminJogos(){
 
     bloco.appendChild(controles);
 
-    // CONTROLES DE CÂMERA
-    const camBlock = document.createElement('div');
-    camBlock.style.marginTop = '8px';
-    camBlock.style.borderTop = '1px dashed #dfe8f8';
-    camBlock.style.paddingTop = '8px';
-    const tituloCam = document.createElement('div'); tituloCam.style.fontWeight='600'; tituloCam.textContent='Câmeras / Transmissão deste jogo'; camBlock.appendChild(tituloCam);
+    // ===== NOVO: Painel de câmeras para este jogo =====
+    const camPanel = document.createElement("div");
+    camPanel.className = "admin-cameras";
+    camPanel.innerHTML = "<strong>Câmeras / Streams deste jogo</strong><br><small>Adicione URLs (YouTube embed, Twitch embed, HLS, MP4, etc.).</small>";
 
-    const transmitirLabel = document.createElement('label');
-    transmitirLabel.style.display='inline-flex';
-    transmitirLabel.style.alignItems='center';
-    transmitirLabel.style.gap='8px';
-    transmitirLabel.style.marginTop='6px';
-    const chkTransmitir = document.createElement('input');
-    chkTransmitir.type='checkbox';
-    chkTransmitir.checked = !!j.transmitir;
-    chkTransmitir.addEventListener('change', () => { toggleTransmitirJogo(j.id, chkTransmitir.checked); });
-    transmitirLabel.appendChild(chkTransmitir);
-    transmitirLabel.appendChild(document.createTextNode('Ativar transmissão pública'));
-    camBlock.appendChild(transmitirLabel);
+    const inputRow = document.createElement("div");
+    inputRow.style.display = "flex";
+    inputRow.style.gap = "6px";
+    inputRow.style.marginTop = "8px";
 
-    const listaCams = document.createElement('div');
-    listaCams.style.marginTop='6px';
-    const cams = Array.isArray(j.cameras) ? j.cameras : [];
-    if(!cams.length){ listaCams.innerHTML = '<div style="font-size:0.9rem;color:#555;">Nenhuma câmera cadastrada ainda.</div>'; }
-    cams.forEach((c, idx) => {
-      const linha = document.createElement('div');
-      linha.style.display='flex'; linha.style.alignItems='center'; linha.style.gap='8px'; linha.style.marginTop='6px';
-      const nome = document.createElement('div'); nome.style.flex='1'; nome.textContent = (c.name || ('Câmera '+(idx+1)));
-      const btnAtivar = document.createElement('button'); btnAtivar.className='btn btn-primaria'; btnAtivar.textContent = ( (j.activeCameraIndex===idx)?'Ativa':'Definir ativa' );
-      btnAtivar.addEventListener('click', () => definirCameraAtiva(j.id, idx));
-      const btnRem = document.createElement('button'); btnRem.className='btn btn-ghost'; btnRem.textContent='Remover';
-      btnRem.addEventListener('click', () => { if(confirm('Remover câmera '+(c.name||('Câmera '+(idx+1)))+'?')) removerCameraDoJogo(j.id, idx); });
-      linha.appendChild(nome); linha.appendChild(btnAtivar); linha.appendChild(btnRem); listaCams.appendChild(linha);
-    });
-    camBlock.appendChild(listaCams);
+    const camNameInput = document.createElement("input");
+    camNameInput.type = "text";
+    camNameInput.placeholder = "Nome da câmera (Ex: Câmera 1)";
+    camNameInput.style.flex = "0.8";
 
-    const formAdd = document.createElement('div'); formAdd.style.display='flex'; formAdd.style.gap='6px'; formAdd.style.marginTop='8px';
-    const inpNome = document.createElement('input'); inpNome.placeholder='Nome da câmera'; inpNome.style.flex='1';
-    const inpUrl = document.createElement('input'); inpUrl.placeholder='URL (YouTube, HLS, MP4, embed...)'; inpUrl.style.flex='2';
-    const btnAddCam = document.createElement('button'); btnAddCam.className='btn btn-primaria'; btnAddCam.textContent='Adicionar câmera';
-    btnAddCam.addEventListener('click', (ev)=>{ ev.preventDefault(); if(!inpNome.value||!inpUrl.value) return alert('Preencha nome e URL.'); adicionarCameraAoJogo(j.id, inpNome.value.trim(), inpUrl.value.trim()); });
-    formAdd.appendChild(inpNome); formAdd.appendChild(inpUrl); formAdd.appendChild(btnAddCam);
-    camBlock.appendChild(formAdd);
-
-    bloco.appendChild(camBlock);
-
-    document.getElementById('listaAdminJogos').appendChild(bloco);
-  });
-
-  // handles save buttons
-  container.querySelectorAll('.btnSalvarJogo').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      if(!isAdmin){ alert('Apenas o administrador pode atualizar jogos.'); return; }
-      const id = btn.dataset.id;
-      const bloco = btn.closest('.jogo-bloco');
-      const selStatus = bloco.querySelector('select');
-      const inpP1 = bloco.querySelector('input[data-tipo="p1"]');
-      const inpP2 = bloco.querySelector('input[data-tipo="p2"]');
-
-      const novoStatus = selStatus.value;
-      const placar1 = parseInt(inpP1.value,10) || 0;
-      const placar2 = parseInt(inpP2.value,10) || 0;
-
-      try{
-        await db.collection('jogos').doc(id).update({
-          status: novoStatus,
-          placar1: placar1,
-          placar2: placar2
-        });
-        alert('Jogo atualizado com sucesso.');
-      }catch(e){
-        console.error(e);
-        alert('Erro ao atualizar jogo.');
-      }
-    });
-  });
-}
-
-/* ========== LISTENERS FIRESTORE (atualizado p/ incluir campos de cameras/transmitir) ========== */
-function iniciarListeners(){
-  db.collection("professoresAcesso").onSnapshot(snap => {
-    todosProfessores = [];
-    snap.forEach(doc => {
-      const d = doc.data();
-      todosProfessores.push({ id: doc.id, nome: d.nome || "", tipo: d.tipo || "Professor", senha: d.senha || "" });
-    });
-    renderProfessoresAdmin();
-  });
-
-  db.collection("inscricoes").orderBy("timestamp","asc").onSnapshot(snap => {
-    todasInscricoes = [];
-    countsPorTurmaModalidade = {};
-    countsQueimadaGenero = {};
-    snap.forEach(doc => {
-      const d = doc.data();
-      const ins = {
-        id: doc.id,
-        nome: d.nome || "",
-        nomeNormalizado: d.nomeNormalizado || normalizarNome(d.nome || ""),
-        email: d.email || "",
-        sexo: d.sexo || "",
-        turno: d.turno || "",
-        turma: d.turma || "",
-        camisaNumero: d.camisaNumero || "",
-        modalidades: d.modalidades || [],
-        observacoes: d.observacoes || "",
-        naoAutorizadoPor: d.naoAutorizadoPor || [],
-        timestamp: d.timestamp
-      };
-      todasInscricoes.push(ins);
-
-      if (!countsPorTurmaModalidade[ins.turma]) countsPorTurmaModalidade[ins.turma] = {};
-      ins.modalidades.forEach(m => {
-        if (!countsPorTurmaModalidade[ins.turma][m]) countsPorTurmaModalidade[ins.turma][m] = 0;
-        countsPorTurmaModalidade[ins.turma][m]++;
-        if (m === "QUEIMADA MISTA"){
-          if (!countsQueimadaGenero[ins.turma]) countsQueimadaGenero[ins.turma] = {Masculino:0, Feminino:0};
-          if (ins.sexo === "Masculino") countsQueimadaGenero[ins.turma].Masculino++;
-          if (ins.sexo === "Feminino") countsQueimadaGenero[ins.turma].Feminino++;
-        }
-      });
-    });
-    atualizarDisponibilidadeModalidades();
-    atualizarSelectsAdminPublico();
-    renderPublico();
-    renderAdmin();
-    renderRelatorio();
-    if (currentRole && currentRole !== "ADMIN"){
-      renderPainelProfessores();
-    }
-  });
-
-  db.collection("jogos").orderBy("dataJogo","asc").onSnapshot(snap => {
-    todosJogos = [];
-    snap.forEach(doc => {
-      const d = doc.data();
-      let p1 = d.placar1;
-      let p2 = d.placar2;
-      if (typeof p1 === "string") p1 = parseInt(p1,10);
-      if (typeof p2 === "string") p2 = parseInt(p2,10);
-      todosJogos.push({
-        id: doc.id,
-        turno: d.turno || "",
-        serie: d.serie || "",
-        turma1: d.turma1 || "",
-        turma2: d.turma2 || "",
-        dataJogo: d.dataJogo || "",
-        modalidade: d.modalidade || "",
-        horarioJogo: d.horarioJogo || "",
-        localJogo: d.localJogo || "",
-        status: d.status || "AGENDADO",
-        placar1: Number.isFinite(p1) ? p1 : 0,
-        placar2: Number.isFinite(p2) ? p2 : 0,
-        cameras: Array.isArray(d.cameras) ? d.cameras : [],
-        activeCameraIndex: (typeof d.activeCameraIndex === 'number') ? d.activeCameraIndex : 0,
-        transmitir: !!d.transmitir
-      });
-    });
-    atualizarSelectExcluirJogo();
-    renderJogosAluno();
-    renderPlacarAoVivo();
-    renderClassificacao();
-    renderAdminJogos();
-  });
-}
-
-/* ========== INICIALIZAÇÃO E RESTANTE DO CÓDIGO ========== */
-/* O restante das funções originais (handleSubmitInscricao, cancelarInscricao, renderPublico, renderAdmin, renderRelatorio, renderRelatorioTodaTurma, atualizarSelectsAdminPublico, renderJogosAluno, renderClassificacao, cadastrarJogo, atualizarSelectExcluirJogo, excluirJogo, adicionarProfessorAcesso, excluirProfessorAcesso, renderProfessoresAdmin, renderPainelProfessores, indicarAlunoNaoParticipa, mostrarSecao, abrirAdmin, fecharAdmin, fecharProfessores, configurarAbasAdmin, salvarConfiguracoes, carregarConfiguracoes, atualizarAutorizacoesUI, atualizarDisponibilidadeModalidades, etc.) permanecem como no seu arquivo original — apenas acrescentei/atualizei as partes relacionadas ao TOP10 e à transmissão/câmeras. */
-
-function init(){
-  try {
-    const saved = localStorage.getItem('insc_email');
-    if (saved && saved.includes('@')){
-      emailAtual = saved;
-      const ov = document.getElementById('emailOverlay');
-      if (ov) ov.style.display = 'none';
-    }
-  } catch(e){}
-
-  // associar listeners mínimos (o resto das ligações está preservado no original)
-  const btnEntrar = document.getElementById("btnEntrarEmail");
-  if (btnEntrar) btnEntrar.addEventListener("click", () => {
-    const emailInput = document.getElementById("emailAluno");
-    const val = (emailInput.value || '').trim();
-    if (!validarEmail(val)) { document.getElementById('msgEmailOverlay').textContent = "Digite um e-mail válido."; return; }
-    emailAtual = val; try { localStorage.setItem('insc_email', val); } catch(e){}
-    document.getElementById('emailOverlay').style.display = 'none';
-  });
-
-  configurarAbasAdmin();
-  iniciarListeners();
-  carregarConfiguracoes();
-  mostrarSecao('inscricao');
-}
-
-if (document.readyState === "loading"){
-  document.addEventListener("DOMContentLoaded", init);
-} else {
-  init();
-}
-</script>
-
-</body>
-</html>
+    const camUrlInput = document.createElement("input");
+   
