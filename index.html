@@ -465,74 +465,97 @@
       }
     }
 
-    /* ===== ADIÇÕES DE ESTILO (TOP10 + AO VIVO VIDEO) ===== */
-    /* Modal TOP10 */
+    /* ========== NOVOS ESTILOS: TOP10 + LIVE VIDEO ========== */
+    /* Top10 modal/painel público */
     #top10Modal {
       position: fixed;
       inset: 0;
       display: none;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.45);
       align-items: center;
       justify-content: center;
-      z-index: 10000;
+      z-index: 99999;
     }
     #top10Card {
       background: #fff;
-      width: 92%;
-      max-width: 720px;
-      border-radius: 12px;
+      border-radius: 10px;
       padding: 14px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+      width: 94%;
+      max-width: 560px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
     }
-    #top10Card h3 { margin:0 0 8px; color:var(--azul); }
-    #top10Table { width:100%; border-collapse: collapse; font-size:0.9rem; margin-top:6px; }
-    #top10Table th, #top10Table td { padding:6px; border-bottom:1px solid #e6e9f2; text-align:left; }
+    #top10Card h3 {
+      margin: 0 0 8px;
+      color: var(--azul);
+      font-size: 1.05rem;
+    }
+    #top10List {
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+    .top10-item {
+      display:flex;
+      justify-content:space-between;
+      padding: 6px 8px;
+      border-bottom: 1px solid #eee;
+    }
 
-    /* Ao vivo - video container */
+    /* Live video area (public) */
     .live-video-frame {
       margin-top:8px;
-      background:#000;
       border-radius:8px;
       overflow:hidden;
-      position:relative;
-      padding-top: 56.25%; /* 16:9 */
+      background:#000;
+      position: relative;
+      min-height:220px;
     }
-    .live-video-frame iframe, .live-video-frame video {
+    .live-overlay-placar {
       position:absolute;
-      top:0; left:0; width:100%; height:100%;
+      left:0; right:0; top:0;
+      display:flex;
+      justify-content:center;
+      gap:20px;
+      padding:8px;
+      z-index:20;
+      background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.15));
+      color:#fff;
+      font-weight:700;
+      font-size:1rem;
+      align-items:center;
     }
-    .overlay-placar {
-      position:absolute;
-      left:12px;
-      top:12px;
-      background: rgba(255,255,255,0.95);
-      padding:6px 10px;
+    .live-video-elem {
+      width:100%;
+      height:100%;
+      min-height:200px;
+      background:#000;
+      display:block;
+    }
+    .live-controls-public {
+      margin-top:6px;
+      font-size:0.85rem;
+      color:#333;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    /* Admin: camera list */
+    .camera-list { margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; }
+    .camera-chip {
+      background:#fff;
+      border:1px solid #cfd8e6;
+      padding:6px 8px;
       border-radius:8px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-      z-index: 5;
-      font-weight:600;
-      color: var(--azul);
-    }
-    .admin-cameras {
-      margin-top:8px;
-      border-top:1px dashed #dfe7f5;
-      padding-top:8px;
-    }
-    .camera-item {
       display:flex;
       gap:8px;
       align-items:center;
-      margin-top:6px;
+      font-size:0.85rem;
+      min-width:160px;
     }
-    .camera-item input[type="text"]{ flex:1; }
-    .camera-actions { display:flex; gap:6px; }
-    .camera-active-badge {
-      background:#e5ffe9;
-      color:#0c7a2a;
-      padding:3px 8px;
-      border-radius:999px;
-      font-size:0.75rem;
-    }
+    .camera-chip.active { border-color:var(--verde); box-shadow:0 4px 10px rgba(40,167,69,0.08); }
+    .camera-chip .actions { margin-left:auto; display:flex; gap:6px; }
+    .small-input { width:220px; padding:6px; border-radius:6px; border:1px solid #d9e0ea; background:#fff; }
   </style>
 </head>
 <body>
@@ -558,7 +581,7 @@
     <button class="btn btn-primaria" id="btnVerJogos">🏆 Ver jogos</button>
     <button class="btn btn-primaria" id="btnClassificados">✅ Classificados</button>
     <button class="btn btn-primaria" id="btnPlacarAoVivo">⚡ Placar ao vivo</button>
-    <!-- NOVO: Botão TOP 10 -->
+    <!-- NOVO: Botão TOP 10 (público) -->
     <button class="btn btn-primaria" id="btnTop10">🏅 TOP 10</button>
     <button class="btn btn-admin" id="btnAdminArea">🔐 Área administrativa</button>
   </div>
@@ -723,6 +746,21 @@
     <div id="placarAoVivoContainer"></div>
   </section>
 
+  <!-- Top10 modal (PÚBLICO) - NOVO -->
+  <div id="top10Modal" role="dialog" aria-hidden="true">
+    <div id="top10Card" class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <h3>🏅 Top 10 — Turmas com mais pontos</h3>
+        <button id="btnCloseTop10" class="btn btn-admin" style="border-radius:8px;">Fechar</button>
+      </div>
+      <small>Pontuação calculada a partir de jogos FINALIZADOS. (Vitória = 3 pontos • Empate = 1 ponto)</small>
+      <div id="top10List"></div>
+      <div style="margin-top:8px; font-size:0.85rem; color:#444;">
+        <strong>Nota:</strong> regra adotada: vitória = 3 pontos, empate = 1 ponto para cada lado. Caso queira outra regra, posso ajustar.
+      </div>
+    </div>
+  </div>
+
   <!-- ADMIN -->
   <section class="card" id="adminSection">
     <div class="admin-header">
@@ -853,7 +891,7 @@
 
       <div class="admin-bloco" id="adminPainelJogos">
         <strong>Placar ao vivo / Status dos jogos</strong>
-        <small style="display:block;margin-top:2px;">Atualize o status e o placar. As mudanças aparecem em tempo real no site público.</small>
+        <small style="display:block;margin-top:2px;">Atualize o status, o placar e gerencie câmeras/transmissão por jogo. As mudanças aparecem em tempo real no site público.</small>
         <div id="listaAdminJogos" style="margin-top:6px;"></div>
       </div>
     </div>
@@ -1085,25 +1123,6 @@
 
 </main>
 
-<!-- NOVO: MODAL TOP 10 -->
-<div id="top10Modal">
-  <div id="top10Card">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-      <h3>TOP 10 — Turmas com mais pontuações</h3>
-      <div>
-        <button class="btn btn-admin" id="btnFecharTop10">Fechar</button>
-      </div>
-    </div>
-    <p style="margin:6px 0 8px; font-size:0.9rem; color:#555;">Lista atualizada automaticamente quando jogos são finalizados. Critério: soma dos gols/pontos marcados em todos os jogos (desempate por número de vitórias).</p>
-    <table id="top10Table">
-      <thead>
-        <tr><th>#</th><th>Turma</th><th>Pontos (gols marcados)</th><th>Vitórias</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
 <script>
 "use strict";
 
@@ -1206,9 +1225,6 @@ let inscricoesEncerradas = false;
 let emailAtual = null;
 let isAdmin = false;
 const ADMIN_PASSWORD = "52090949";
-
-/* ===== NOVO: Streams / Câmeras por jogo (armazenamento em Firestore 'streams' collection) ===== */
-let streamsData = {}; // estrutura local: { jogoId: { cameras: [{name, url}], active: index } }
 
 /* ========== FUNÇÕES AUXILIARES ========== */
 
@@ -2084,6 +2100,7 @@ function renderJogosAluno(){
     div.className = "jogo-bloco";
     div.innerHTML =
       "<strong>"+(j.modalidade || "-")+"</strong><br>"+
+
       "Data: "+formatarDataBR(j.dataJogo)+" — Horário: "+(j.horarioJogo || "-")+"<br>"+
       "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+"<br>"+
       "Local: "+(j.localJogo || "-");
@@ -2093,6 +2110,15 @@ function renderJogosAluno(){
 
 /* ========== PLACAR AO VIVO (ALUNO) ========== */
 
+/* 
+  Render público ao vivo:
+  - Se jogo possui campo `broadcastEnabled: true` e `activeCameraUrl`, exibimos a área de vídeo com overlay do placar.
+  - Caso não haja vídeo, mostramos o placar como antes.
+  - a lógica de câmeras e broadcast é gerenciada no admin: cada jogo pode ter fields:
+      cameras: [{ id: <uuid>, name: <string>, url: <string> }, ...]
+      activeCameraIndex: <number>
+      broadcastEnabled: <boolean>
+*/
 function renderPlacarAoVivo(){
   const container = document.getElementById("placarAoVivoContainer");
   if (!container) return;
@@ -2123,7 +2149,6 @@ function renderPlacarAoVivo(){
   jogosAoVivo.forEach(j => {
     const card = document.createElement("div");
     card.className = "placar-card";
-    card.style.position = "relative";
 
     const topo = document.createElement("div");
     topo.className = "placar-linha-principal";
@@ -2134,7 +2159,7 @@ function renderPlacarAoVivo(){
     info.innerHTML =
       "Local: "+(j.localJogo || "-")+"<br>"+
 
-      (j.turma1 || "")+" <strong>"+(j.placar1 ?? 0)+"</strong> x <strong>"+(j.placar2 ?? 0)+"</strong> "+(j.turma2 || "");
+      (j.turma1 || "")+" <strong id='placar-"+j.id+"-1'>"+(j.placar1 ?? 0)+"</strong> x <strong id='placar-"+j.id+"-2'>"+(j.placar2 ?? 0)+"</strong> "+(j.turma2 || "");
     card.appendChild(info);
 
     const statusSpan = document.createElement("span");
@@ -2144,55 +2169,70 @@ function renderPlacarAoVivo(){
     statusSpan.textContent = statusLabel[j.status] || j.status || "–";
     card.appendChild(statusSpan);
 
-    // ===== NOVO: AREA DE VIDEO (se houver stream cadastrada para este jogo) =====
-    const stream = streamsData[j.id];
-    if (stream && Array.isArray(stream.cameras) && stream.cameras.length){
-      // overlay do placar (visível sobre o video)
+    // Se broadcast habilitado e existe câmera ativa -> exibir vídeo com overlay do placar
+    const broadcast = !!j.broadcastEnabled;
+    let activeUrl = null;
+    if (Array.isArray(j.cameras) && j.cameras.length){
+      const idx = (typeof j.activeCameraIndex === "number") ? j.activeCameraIndex : 0;
+      if (j.cameras[idx]) activeUrl = j.cameras[idx].url;
+    }
+
+    if (broadcast && activeUrl){
+      const liveWrap = document.createElement("div");
+      liveWrap.className = "live-video-frame";
       const overlay = document.createElement("div");
-      overlay.className = "overlay-placar";
-      overlay.textContent = (j.turma1 || "") + " " + (j.placar1 ?? 0) + " x " + (j.placar2 ?? 0) + " " + (j.turma2 || "");
-      // video frame
-      const frame = document.createElement("div");
-      frame.className = "live-video-frame";
-      // escolher camera ativa
-      const activeIndex = (typeof stream.active === "number") ? stream.active : 0;
-      const cam = stream.cameras[activeIndex] || stream.cameras[0];
-      if (cam && cam.url){
-        // se for youtube / twitch embed -> usamos iframe. Se for .m3u8 -> usar video if browser supports HLS via <video> nativo será limitado; recomendamos HLS via player externo.
-        let el;
-        if (cam.url.includes("youtube.com") || cam.url.includes("youtu.be") || cam.url.includes("twitch.tv") || cam.url.includes("player.vimeo.com")){
-          // iframe
-          el = document.createElement("iframe");
-          el.setAttribute("allowfullscreen", "");
-          el.setAttribute("frameborder", "0");
-          // transformar youtube watch?v= para embed
-          let src = cam.url;
-          if (src.includes("watch?v=")){
-            src = src.replace("watch?v=", "embed/");
-          }
-          // se for youtu.be
-          if (src.includes("youtu.be/")){
-            const id = src.split("youtu.be/")[1].split(/[?&]/)[0];
-            src = "https://www.youtube.com/embed/" + id + "?autoplay=0&rel=0";
-          }
-          // if twitch clip / channel embed handling (basic)
-          if (cam.url.includes("twitch.tv") && !src.includes("embed/")){
-            // basic embed that may require parent param; fallback to original url in iframe
-            // keep original url (may not embed); admin should provide embed URL when possible
-          }
-          el.src = src;
-        } else {
-          // otherwise, use video tag (most generic). Note: browsers may not play HLS (.m3u8) nativamente; recommended to push via YouTube/OBS.
-          el = document.createElement("video");
-          el.controls = true;
-          el.autoplay = false;
-          el.playsInline = true;
-          el.src = cam.url;
+      overlay.className = "live-overlay-placar";
+      // cria placar no overlay (duas colunas)
+      const left = document.createElement("div");
+      left.style.display="flex"; left.style.gap="10px"; left.style.alignItems="center";
+      left.innerHTML = `<span style="font-weight:600;">${j.turma1 || "-"}</span><span id="ov-${j.id}-p1">${j.placar1 ?? 0}</span>`;
+      const center = document.createElement("div");
+      center.textContent = " X ";
+      const right = document.createElement("div");
+      right.style.display="flex"; right.style.gap="10px"; right.style.alignItems="center";
+      right.innerHTML = `<span id="ov-${j.id}-p2">${j.placar2 ?? 0}</span><span style="font-weight:600;">${j.turma2 || "-"}</span>`;
+
+      overlay.appendChild(left);
+      overlay.appendChild(center);
+      overlay.appendChild(right);
+
+      // vídeo/iframe
+      const low = activeUrl.toLowerCase();
+      const videoElemWrapper = document.createElement("div");
+      videoElemWrapper.style.position = "relative";
+      videoElemWrapper.style.height = "320px";
+      const videoElem = document.createElement(low.includes("youtube.com") || low.includes("youtu.be") || low.includes("twitch.tv") ? "iframe" : "video");
+      videoElem.className = "live-video-elem";
+      videoElem.setAttribute("allowfullscreen","true");
+      videoElem.setAttribute("frameborder","0");
+      videoElem.style.height="320px";
+      videoElem.style.border="none";
+      // Se for iframe provider (youtube/twitch) inserimos a url em src direto.
+      if (videoElem.tagName.toLowerCase() === "iframe"){
+        // Caso a URL seja um watch?v=... do youtube, transformar para embed
+        let iframeSrc = activeUrl;
+        if (activeUrl.includes("watch?v=") && activeUrl.includes("youtube")){
+          iframeSrc = activeUrl.replace("watch?v=","embed/");
         }
-        frame.appendChild(el);
-        frame.appendChild(overlay);
-        card.appendChild(frame);
+        // twitch embed costuma requerer remoção de query—de qualquer forma, o admin deve colar URL embed.
+        videoElem.src = iframeSrc;
+      } else {
+        // tag <video> - usar src direto (HLS sem hls.js pode não reproduzir em todos os navegadores)
+        videoElem.controls = true;
+        videoElem.src = activeUrl;
       }
+      videoElemWrapper.appendChild(videoElem);
+
+      liveWrap.appendChild(overlay);
+      liveWrap.appendChild(videoElemWrapper);
+
+      card.appendChild(liveWrap);
+
+      // Informação pública sobre transmissão (pequeno status)
+      const publicControls = document.createElement("div");
+      publicControls.className = "live-controls-public";
+      publicControls.innerHTML = `<div>Transmissão ativa — câmera ao vivo</div>`;
+      card.appendChild(publicControls);
     }
 
     container.appendChild(card);
@@ -2287,6 +2327,84 @@ function renderClassificacao(){
   });
 }
 
+/* ========== TOP10 (NOVO) ========== */
+
+/*
+  Lógica:
+  - Calcula pontuação das turmas com base nos jogos FINALIZADOS.
+  - Regra adotada (padrão): vitória = 3 pontos; empate = 1 ponto cada; derrota = 0.
+  - Ordena por pontos (desc), em caso de empate ordena por gols pró (soma de placares).
+  - Exibe as top 10 turmas no modal público.
+*/
+function calcularPontuacaoTurmas(){
+  const pontos = {}; // { turma: { pontos: n, golsPro: n, jogos: n, v: n, e: n, d: n } }
+
+  todosJogos.forEach(j => {
+    if (j.status !== "FINALIZADO") return;
+    const t1 = j.turma1 || "";
+    const t2 = j.turma2 || "";
+    const g1 = Number.isFinite(j.placar1) ? j.placar1 : 0;
+    const g2 = Number.isFinite(j.placar2) ? j.placar2 : 0;
+
+    if (!pontos[t1]) pontos[t1] = { pontos:0, golsPro:0, jogos:0, v:0, e:0, d:0 };
+    if (!pontos[t2]) pontos[t2] = { pontos:0, golsPro:0, jogos:0, v:0, e:0, d:0 };
+
+    // atualizar gols e jogos
+    pontos[t1].golsPro += g1;
+    pontos[t2].golsPro += g2;
+    pontos[t1].jogos += 1;
+    pontos[t2].jogos += 1;
+
+    // resultado: vitória/empate/derrota
+    if (g1 > g2){
+      // t1 vence
+      pontos[t1].pontos += 3;
+      pontos[t1].v += 1;
+      pontos[t2].d += 1;
+    } else if (g2 > g1){
+      pontos[t2].pontos += 3;
+      pontos[t2].v += 1;
+      pontos[t1].d += 1;
+    } else {
+      // empate
+      pontos[t1].pontos += 1;
+      pontos[t2].pontos += 1;
+      pontos[t1].e += 1;
+      pontos[t2].e += 1;
+    }
+  });
+
+  // transformar em array
+  const arr = Object.keys(pontos).map(t => ({ turma: t, ...pontos[t] }));
+  // ordenar: pontos desc, depois golsPro desc, depois nome
+  arr.sort((a,b) => {
+    if (b.pontos !== a.pontos) return b.pontos - a.pontos;
+    if (b.golsPro !== a.golsPro) return b.golsPro - a.golsPro;
+    return a.turma.localeCompare(b.turma,"pt-BR");
+  });
+  return arr;
+}
+
+function renderTop10Modal(){
+  const arr = calcularPontuacaoTurmas();
+  const top = arr.slice(0,10);
+  const list = document.getElementById("top10List");
+  if (!list) return;
+  list.innerHTML = "";
+
+  if (!top.length){
+    list.textContent = "Ainda não há jogos finalizados para computar o TOP 10.";
+    return;
+  }
+
+  top.forEach((t, idx) => {
+    const r = document.createElement("div");
+    r.className = "top10-item";
+    r.innerHTML = `<div>#${idx+1} — ${t.turma} <small style="color:#666; font-weight:400; margin-left:6px;">(jogos: ${t.jogos})</small></div><div>${t.pontos} pts — ${t.golsPro} GP</div>`;
+    list.appendChild(r);
+  });
+}
+
 /* ========== JOGOS ADMIN: CADASTRAR / EXCLUIR / EDITAR PLACAR ========== */
 
 async function cadastrarJogo(){
@@ -2321,6 +2439,10 @@ async function cadastrarJogo(){
       status: "AGENDADO",
       placar1: 0,
       placar2: 0,
+      // campos novos para transmissão (inicialmente vazios)
+      cameras: [], // array de { id: <ts>, name: <string>, url: <string> }
+      activeCameraIndex: 0,
+      broadcastEnabled: false,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     alert("Jogo cadastrado com sucesso.");
@@ -2368,8 +2490,6 @@ async function excluirJogo(){
   if (!confirm("Excluir o jogo: "+desc+" ?")) return;
   try{
     await db.collection("jogos").doc(id).delete();
-    // remover streams vinculados (opcional)
-    try { await db.collection("streams").doc(id).delete(); } catch(e){}
     alert("Jogo excluído.");
   }catch(e){
     console.error(e);
@@ -2377,99 +2497,4 @@ async function excluirJogo(){
   }
 }
 
-/* Painel de placar ao vivo / status (admin) */
-
-function renderAdminJogos(){
-  const container = document.getElementById("listaAdminJogos");
-  if (!container) return;
-  container.innerHTML = "";
-
-  if (!todosJogos.length){
-    container.textContent = "Nenhum jogo cadastrado.";
-    return;
-  }
-
-  const statusOptions = ["AGENDADO","PRESTES","EM_ANDAMENTO","FINALIZADO"];
-
-  todosJogos.forEach(j => {
-    const bloco = document.createElement("div");
-    bloco.className = "jogo-bloco";
-
-    const linha1 = document.createElement("div");
-    linha1.innerHTML = "<strong>"+(j.modalidade || "-")+"</strong> — "+formatarDataBR(j.dataJogo)+" às "+(j.horarioJogo || "-");
-    bloco.appendChild(linha1);
-
-    const linha2 = document.createElement("div");
-    linha2.textContent = "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+" — Local: "+(j.localJogo || "-");
-    bloco.appendChild(linha2);
-
-    const controles = document.createElement("div");
-    controles.style.marginTop = "4px";
-    controles.style.display = "flex";
-    controles.style.flexWrap = "wrap";
-    controles.style.gap = "6px";
-    controles.style.alignItems = "center";
-
-    const selStatus = document.createElement("select");
-    selStatus.dataset.id = j.id;
-    statusOptions.forEach(st => {
-      const opt = document.createElement("option");
-      opt.value = st;
-      opt.textContent = st;
-      if (j.status === st) opt.selected = true;
-      selStatus.appendChild(opt);
-    });
-
-    const inpP1 = document.createElement("input");
-    inpP1.type = "number";
-    inpP1.min = "0";
-    inpP1.value = (j.placar1 ?? 0);
-    inpP1.style.width = "60px";
-    inpP1.dataset.id = j.id;
-    inpP1.dataset.tipo = "p1";
-
-    const inpP2 = document.createElement("input");
-    inpP2.type = "number";
-    inpP2.min = "0";
-    inpP2.value = (j.placar2 ?? 0);
-    inpP2.style.width = "60px";
-    inpP2.dataset.id = j.id;
-    inpP2.dataset.tipo = "p2";
-
-    const labelP1 = document.createElement("span");
-    labelP1.textContent = (j.turma1 || "T1")+":";
-    const labelP2 = document.createElement("span");
-    labelP2.textContent = (j.turma2 || "T2")+":"; 
-
-    const btnSalvar = document.createElement("button");
-    btnSalvar.className = "btn btn-primaria btnSalvarJogo";
-    btnSalvar.textContent = "Salvar";
-    btnSalvar.dataset.id = j.id;
-
-    controles.appendChild(document.createTextNode("Status:"));
-    controles.appendChild(selStatus);
-    controles.appendChild(labelP1);
-    controles.appendChild(inpP1);
-    controles.appendChild(labelP2);
-    controles.appendChild(inpP2);
-    controles.appendChild(btnSalvar);
-
-    bloco.appendChild(controles);
-
-    // ===== NOVO: Painel de câmeras para este jogo =====
-    const camPanel = document.createElement("div");
-    camPanel.className = "admin-cameras";
-    camPanel.innerHTML = "<strong>Câmeras / Streams deste jogo</strong><br><small>Adicione URLs (YouTube embed, Twitch embed, HLS, MP4, etc.).</small>";
-
-    const inputRow = document.createElement("div");
-    inputRow.style.display = "flex";
-    inputRow.style.gap = "6px";
-    inputRow.style.marginTop = "8px";
-
-    const camNameInput = document.createElement("input");
-    camNameInput.type = "text";
-    camNameInput.placeholder = "Nome da câmera (Ex: Câmera 1)";
-    camNameInput.style.flex = "0.8";
-
-    const camUrlInput = document.createElement("input");
-   
+/* Painel de placar ao vivo / status (admin)
