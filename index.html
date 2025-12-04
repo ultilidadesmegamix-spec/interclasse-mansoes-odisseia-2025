@@ -392,79 +392,6 @@
       margin-top:8px;
     }
 
-    /* NOVO: Top10 modal */
-    #top10Modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 10010;
-    }
-    #top10Card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 14px;
-      width: 360px;
-      max-width: 95%;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.3);
-    }
-    #top10Card h3 { margin:0 0 8px; color:var(--azul); }
-    #top10List { list-style:none; padding:0; margin:0; font-size:0.95rem; }
-    #top10List li { padding:6px 8px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; }
-    #top10Close { margin-top:8px; display:flex; justify-content:flex-end; }
-
-    /* NOVO: transmissão (área de vídeo) */
-    .live-video-grid {
-      display:grid;
-      grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
-      gap:8px;
-      margin-top:8px;
-    }
-    .live-video-card {
-      background:#fff;
-      border:1px solid #e2e8f0;
-      border-radius:8px;
-      padding:6px;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      align-items:center;
-    }
-    .live-video-card video {
-      width:100%;
-      height:120px;
-      background:#000;
-      border-radius:6px;
-    }
-    .main-live {
-      margin-top:8px;
-      display:flex;
-      gap:8px;
-      align-items:flex-start;
-      flex-wrap:wrap;
-    }
-    .main-live .main-player {
-      flex:1 1 480px;
-      border-radius:8px;
-      overflow:hidden;
-      border:1px solid #cfd9ed;
-      background:#000;
-    }
-    .main-live .main-player video {
-      width:100%;
-      height:320px;
-      display:block;
-    }
-    .main-live .side-controls {
-      width:220px;
-      min-width:200px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-
     /* ESTILO DE IMPRESSÃO – mostrar SOMENTE a tabela do relatório */
     @media print {
       body {
@@ -484,7 +411,6 @@
       .admin-header,
       .admin-tabs,
       #tab-inscricoes,
-      #tab-jogos,
       #tab-config,
       #btnFecharAdmin,
       #tab-relatorio .admin-bloco,
@@ -537,6 +463,99 @@
         padding: 4px 6px;
       }
     }
+
+    /* ====== NOVO: Estilos para transmissão Ao Vivo ====== */
+    .video-area {
+      margin-top:8px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:flex-start;
+    }
+    .video-main {
+      flex:1 1 480px;
+      min-width:280px;
+      background:#000;
+      border-radius:8px;
+      overflow:hidden;
+      position:relative;
+    }
+    .video-main video {
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:cover;
+      background:#000;
+    }
+    .video-overlay-placar {
+      position:absolute;
+      left:8px;
+      right:8px;
+      top:8px;
+      display:flex;
+      justify-content:center;
+      pointer-events:none;
+    }
+    .placar-overlay-box {
+      background:rgba(0,0,0,0.55);
+      color:#fff;
+      padding:6px 10px;
+      border-radius:8px;
+      font-weight:700;
+      pointer-events:none;
+    }
+    .video-thumbs {
+      width:220px;
+      max-width:40%;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .thumb {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding:6px;
+      border-radius:8px;
+      background:#fff;
+      border:1px solid var(--borda);
+    }
+    .thumb video {
+      width:88px;
+      height:60px;
+      object-fit:cover;
+      background:#000;
+      border-radius:6px;
+    }
+    .thumb .meta {
+      flex:1;
+      font-size:0.8rem;
+    }
+    .thumb .meta .id {
+      font-weight:600;
+      color:#333;
+    }
+    .thumb .meta .small {
+      font-size:0.75rem;
+      color:#666;
+    }
+    .thumb .actions {
+      display:flex;
+      gap:6px;
+      flex-direction:column;
+    }
+    .thumb button {
+      padding:6px 8px;
+      border-radius:6px;
+      font-size:0.8rem;
+      cursor:pointer;
+    }
+    /* responsivo */
+    @media (max-width:900px){
+      .video-area { flex-direction:column; }
+      .video-thumbs { width:100%; max-width:100%; flex-direction:row; overflow:auto; }
+      .thumb { min-width:180px; }
+    }
   </style>
 </head>
 <body>
@@ -562,7 +581,6 @@
     <button class="btn btn-primaria" id="btnVerJogos">🏆 Ver jogos</button>
     <button class="btn btn-primaria" id="btnClassificados">✅ Classificados</button>
     <button class="btn btn-primaria" id="btnPlacarAoVivo">⚡ Placar ao vivo</button>
-    <button class="btn btn-primaria" id="btnTop10Public">🏅 TOP 10</button>
     <button class="btn btn-admin" id="btnAdminArea">🔐 Área administrativa</button>
   </div>
 </header>
@@ -721,22 +739,9 @@
   <!-- PLACAR AO VIVO (ALUNO) -->
   <section class="card" id="secPlacarAoVivo">
     <h2>Placar ao vivo</h2>
-    <small>Veja os jogos que estão em andamento ou prestes a começar. Se uma transmissão estiver ativa, aparecerá o player abaixo do placar.</small>
+    <small>Veja os jogos que estão em andamento ou prestes a começar.</small>
 
     <div id="placarAoVivoContainer"></div>
-
-    <!-- AREA DE TRANSMISSÃO PRINCIPAL (pública) -->
-    <div id="livePublicArea" style="margin-top:10px; display:none;">
-      <div class="main-live">
-        <div class="main-player">
-          <video id="publicMainPlayer" controls autoplay playsinline></video>
-        </div>
-        <div class="side-controls">
-          <strong>Feeds disponíveis</strong>
-          <div id="publicFeedsList" style="max-height:320px; overflow:auto;"></div>
-        </div>
-      </div>
-    </div>
   </section>
 
   <!-- ADMIN -->
@@ -869,36 +874,19 @@
 
       <div class="admin-bloco" id="adminPainelJogos">
         <strong>Placar ao vivo / Status dos jogos</strong>
-        <small style="display:block;margin-top:2px;">Atualize o status e o placar. As mudanças aparecem em tempo real no site público. Também pode ativar transmissão e convidar câmeras.</small>
+        <small style="display:block;margin-top:2px;">Atualize o status e o placar. As mudanças aparecem em tempo real no site público.</small>
         <div id="listaAdminJogos" style="margin-top:6px;"></div>
       </div>
 
-      <!-- Painel de transmissões -->
-      <div class="admin-bloco">
-        <strong>Transmissões (câmeras)</strong>
-        <small style="display:block;margin-top:2px;">Aqui você cria links que os celulares usarão como "câmeras". Depois selecione qual stream ficará como principal para o público.</small>
-
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; align-items:center;">
-          <select id="selectStreamJogo" style="min-width:220px;">
-            <option value="">Selecione o jogo para vincular a câmera...</option>
-          </select>
-          <button class="btn btn-primaria" id="btnGerarLinkCamera">🔗 Gerar link câmera</button>
-        </div>
-
-        <div style="margin-top:8px;">
-          <strong>Streams ativas</strong>
-          <div id="streamsList" style="margin-top:8px;"></div>
-
-          <div style="margin-top:10px;">
-            <strong>Visão pública (selecionar feed principal)</strong>
-            <select id="selectActivePublicStream">
-              <option value="">Nenhum</option>
-            </select>
-            <button class="btn btn-primaria" id="btnSetActivePublicStream">Tornar principal</button>
-          </div>
-        </div>
+      <!-- NOVO: Painel de câmeras (Admin) -->
+      <div class="admin-bloco" id="adminCamerasPanel">
+        <strong>Transmissão Ao Vivo — Painel de Câmeras</strong>
+        <small style="display:block;margin-top:2px;">Os celulares (câmeras) se conectam a uma sala por jogo. Escolha a câmera principal para cada jogo.</small>
+        <div id="adminCamerasList" style="margin-top:8px;"></div>
+        <p style="margin-top:6px; font-size:0.82rem; color:#333;">
+          Observação: a transmissão depende de um signaling server (WebSocket). Configure <code>SIGNALING_SERVER_URL</code> no código.
+        </p>
       </div>
-
     </div>
 
     <!-- TAB RELATÓRIO -->
@@ -1128,17 +1116,6 @@
 
 </main>
 
-<!-- TOP 10 MODAL -->
-<div id="top10Modal">
-  <div id="top10Card">
-    <h3>TOP 10 — Turmas com melhor pontuação</h3>
-    <ol id="top10List"></ol>
-    <div id="top10Close">
-      <button class="btn btn-primaria" id="btnFecharTop10">Fechar</button>
-    </div>
-  </div>
-</div>
-
 <script>
 "use strict";
 
@@ -1154,7 +1131,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* ========== CONSTANTES e VARIÁVEIS ADICIONAIS ========== */
+/* ========== CONSTANTES ========== */
 
 const MODALIDADES = [
   "FUTSAL",
@@ -1183,6 +1160,7 @@ const TURMAS_NOTURNO = [
   "3ºA","3ºB","3ºC"
 ];
 
+/* TODAS AS TURMAS (para cadastro de jogos sem depender de turno/série) */
 const TODAS_TURMAS = [
   ...TURMAS_MATUTINO,
   ...TURMAS_VESPERTINO,
@@ -1214,21 +1192,11 @@ let LIMITE_MODALIDADE_TURMA = {
 let LIMITE_QUEIMADA_TOTAL = 10;
 let LIMITE_QUEIMADA_POR_SEXO = 5;
 
-/* controle */
+/* controle de inscrições por turma/mod e queimada */
 let countsPorTurmaModalidade = {};
 let countsQueimadaGenero = {};
 let todasInscricoes = [];
 let todosJogos = [];
-let prevJogosStatus = {}; // para detectar finalizações novas
-
-/* NOVO: streams (câmeras) */
-let localStream = null;
-let pcLocal = null;
-const STUN_SERVERS = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
-
-/* NOVO: lista de streams (em memória) */
-let allStreams = []; // [{id, jogoId, createdAt, active}]
-let currentPublicStreamId = null;
 
 /* NOVO: professores e papéis */
 let todosProfessores = []; // {id, nome, tipo, senha}
@@ -1237,13 +1205,13 @@ let currentProfessor = null; // objeto do professor logado
 
 /* config evento */
 let configEvento = {
-  dataLimite: null,
+  dataLimite: null,           // yyyy-mm-dd
   msgEncerradas: "",
   bloquearAgora: false,
   nomeEvento: "Movimenta Odisseia",
   anoEvento: "",
   textoInicial: "",
-  autorizacoes: {}
+  autorizacoes: {} // estrutura: { turma: { "FUTSAL": true, "QUEIMADA MISTA": true, ... } }
 };
 
 let inscricoesEncerradas = false;
@@ -1251,7 +1219,7 @@ let emailAtual = null;
 let isAdmin = false;
 const ADMIN_PASSWORD = "52090949";
 
-/* ========== FUNÇÕES AUXILIARES (mantive suas funções originais) ========== */
+/* ========== FUNÇÕES AUXILIARES ========== */
 
 function normalizarNome(str){
   return (str || "")
@@ -1282,7 +1250,7 @@ function formatarDataBR(yyyyMMdd){
   return p[2] + "/" + p[1] + "/" + p[0];
 }
 
-/* ========== CONTROLE DE FECHAMENTO (mantive) ========== */
+/* ========== CONTROLE DE FECHAMENTO ========== */
 
 function atualizarStatusInscricoes(){
   const hoje = new Date();
@@ -1324,7 +1292,7 @@ function atualizarStatusInscricoes(){
   }
 }
 
-/* ========== CONFIG FIRESTORE (mantive) ========== */
+/* ========== CONFIG FIRESTORE ========== */
 
 async function carregarConfiguracoes(){
   try{
@@ -1379,13 +1347,15 @@ async function carregarConfiguracoes(){
     document.getElementById("subEvento").textContent = "Inscrições para o " + configEvento.nomeEvento + " " + configEvento.anoEvento;
   }
 
+  // carregar autorizações na UI (se houver)
   atualizarAutorizacoesUI();
 
   atualizarStatusInscricoes();
   atualizarDisponibilidadeModalidades();
 }
 
-/* SALVAR CONFIG (mantive) */
+/* SALVAR CONFIG */
+
 async function salvarConfiguracoes(){
   if (!isAdmin){
     alert("Apenas o administrador pode salvar as configurações.");
@@ -1419,6 +1389,14 @@ async function salvarConfiguracoes(){
     "VOLEI": limVolei
   };
 
+  // coletar autorizações (estado atual da UI)
+  const autorizacoes = {};
+  const selTurmaAut = document.getElementById("cfgAutTurma");
+  if (selTurmaAut){
+    // vamos usar configEvento.autorizacoes já mantida no código
+    // antes de salvar, atualizamos configEvento.autorizacoes a partir da UI geral
+    // para simplicidade, usamos configEvento.autorizacoes atual (a UI já sincroniza ao selecionar turma)
+  }
   try{
     await db.collection("config").doc("geral").set({
       dataLimiteInscricao: dataLimite || null,
@@ -1459,9 +1437,10 @@ async function salvarConfiguracoes(){
   }
 }
 
-/* ========== AUTORIZAÇÕES UI (mantive) ========== */
+/* ========== AUTORIZAÇÕES UI (novidade) ========== */
 
 function atualizarAutorizacoesUI(){
+  // popula select de turmas no bloco de autorizações
   const sel = document.getElementById("cfgAutTurma");
   const cont = document.getElementById("cfgAutModalidadesContainer");
   if (!sel || !cont) return;
@@ -1472,6 +1451,7 @@ function atualizarAutorizacoesUI(){
     sel.appendChild(o);
   });
 
+  // construir checkboxes de modalidades (apenas uma vez)
   cont.innerHTML = "";
   MODALIDADES.forEach(m => {
     const id = "cfgAutChk_" + m.replace(/\s+/g,"_");
@@ -1493,6 +1473,7 @@ function atualizarAutorizacoesUI(){
     cont.appendChild(wrapper);
   });
 
+  // quando selecionar turma, preencher checkboxes com configEvento.autorizacoes[turma]
   sel.addEventListener("change", () => {
     const turma = sel.value;
     const autorz = (configEvento.autorizacoes && configEvento.autorizacoes[turma]) || {};
@@ -1500,6 +1481,7 @@ function atualizarAutorizacoesUI(){
     chks.forEach(chk => {
       const mod = chk.dataset.mod;
       chk.checked = !!autorz[mod];
+      // escuta alteração para atualizar configEvento em tempo real
       chk.onchange = () => {
         if (!configEvento.autorizacoes) configEvento.autorizacoes = {};
         if (!configEvento.autorizacoes[turma]) configEvento.autorizacoes[turma] = {};
@@ -1509,7 +1491,7 @@ function atualizarAutorizacoesUI(){
   });
 }
 
-/* ========== DISPONIBILIDADE MODALIDADES (mantive) ========== */
+/* ========== DISPONIBILIDADE MODALIDADES ========== */
 
 function atualizarDisponibilidadeModalidades(){
   const turma = document.getElementById("turma").value;
@@ -1521,10 +1503,12 @@ function atualizarDisponibilidadeModalidades(){
     const mod = span.dataset.mod;
     if (!turma){
       span.textContent = mod + " (selecione turno e turma)";
+
       span.classList.remove("modalidade-lotado");
       return;
     }
 
+    // se autorizado para essa turma/ modalidade -> mostrar "AUTORIZADO"
     const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
 
     if (mod === "QUEIMADA MISTA"){
@@ -1554,7 +1538,7 @@ function atualizarDisponibilidadeModalidades(){
 
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      const gen = countsQueimadaGenero[turma] || {Masculino:0,Feminino:0};
+      const gen = countsQueimadaGenero[turma] || {Masculino:0, Feminino:0};
       if (!sexo || (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada)){
         chk.disabled = true; chk.checked = false; return;
       }
@@ -1577,7 +1561,7 @@ function atualizarDisponibilidadeModalidades(){
   });
 }
 
-/* ========== INSCRIÇÃO (mantive) ========== */
+/* ========== INSCRIÇÃO ========== */
 
 async function handleSubmitInscricao(e){
   e.preventDefault();
@@ -1585,6 +1569,7 @@ async function handleSubmitInscricao(e){
     msgForm(configEvento.msgEncerradas || "As inscrições foram encerradas.", false);
     return;
   }
+  // primeiro tente emailAtual -> localStorage fallback
   if (!emailAtual){
     try{
       const fromStorage = localStorage.getItem('insc_email');
@@ -1628,7 +1613,9 @@ async function handleSubmitInscricao(e){
     }
   }
 
+  // verificação por modalidade com consideração de autorizações
   for (const mod of mods){
+    // se existe autorização para a turma/mod => pular validação
     const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
     if (autorizada) continue;
 
@@ -1664,7 +1651,7 @@ async function handleSubmitInscricao(e){
       camisaNumero: camisaNumero || null,
       modalidades: mods,
       observacoes: observacoes || null,
-      naoAutorizadoPor: [],
+      naoAutorizadoPor: [], // indicações de professores
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     msgForm("Inscrição realizada com sucesso! ✅", true);
@@ -1678,7 +1665,7 @@ async function handleSubmitInscricao(e){
   }
 }
 
-/* CANCELAR INSCRIÇÃO (mantive) */
+/* CANCELAR INSCRIÇÃO (ADMIN) */
 
 async function cancelarInscricao(){
   if (!isAdmin){
@@ -1725,7 +1712,7 @@ async function cancelarInscricao(){
   }
 }
 
-/* ========== TABELAS (mantive) ========== */
+/* ========== TABELAS ========== */
 
 function renderPublico(){
   const corpo = document.querySelector("#tabelaPublica tbody");
@@ -1844,7 +1831,7 @@ function renderAdmin(){
   });
 }
 
-/* RELATÓRIO IMPRESSO (mantive) */
+/* RELATÓRIO IMPRESSO */
 
 function renderRelatorio(){
   const tbody = document.querySelector("#tabelaRelatorio tbody");
@@ -1931,7 +1918,7 @@ function renderRelatorio(){
   });
 }
 
-/* RELATÓRIO TODA TURMA (mantive) */
+/* NOVA FUNÇÃO: Relatório de TODA TURMA (todas as modalidades) */
 function renderRelatorioTodaTurma(){
   const tbody = document.querySelector("#tabelaRelatorio tbody");
   const turnoEl = document.getElementById("relatorioTurno");
@@ -2013,7 +2000,7 @@ function renderRelatorioTodaTurma(){
   });
 }
 
-/* preencher selects (filtros e cancelar) (mantive) */
+/* preencher selects (filtros e cancelar) */
 function atualizarSelectsAdminPublico(){
   const filtroTurma = document.getElementById("filtroTurma");
   const filtroMod = document.getElementById("filtroModalidade");
@@ -2060,7 +2047,7 @@ function atualizarSelectsAdminPublico(){
   });
 }
 
-/* ========== JOGOS (ALUNO) (mantive) ========== */
+/* ========== JOGOS (ALUNO) ========== */
 
 function renderJogosAluno(){
   const serieEl = document.getElementById("filtroSerieJogo");
@@ -2113,1416 +2100,364 @@ function renderJogosAluno(){
   });
 }
 
-/* ========== PLACAR AO VIVO (ALUNO) (mantive, com integração de player) ========== */
+/* ========== PLACAR AO VIVO (ALUNO) + TRANSMISSÃO AO VIVO ====== */
 
-function renderPlacarAoVivo(){
-  const container = document.getElementById("placarAoVivoContainer");
-  if (!container) return;
-  container.innerHTML = "";
+/*
+  Implementação:
+  - cada JOGO tem um "roomId" que usamos para sala WebRTC (usar j.id).
+  - celulares (quem vai filmar) devem abrir uma página que se conecte ao signaling e enviar stream como "publisher" para a sala do jogo.
+  - espectadores (público) e admin se conectam como "viewer" e recebem a stream principal do jogo (ou múltiplas miniaturas).
+  - admin pode alternar câmera principal (essa ação manda mensagem ao signaling para que viewers mudem de stream principal).
+  - O código cliente assume existência de um signaling server WebSocket com mensagens JSON simples (veja SIGNALING_SERVER_URL e o protocolo comentado mais abaixo).
+*/
 
-  const statusLabel = {
-    "AGENDADO": "Agendado",
-    "PRESTES": "Prestes a começar",
-    "EM_ANDAMENTO": "Em andamento",
-    "FINALIZADO": "Finalizado"
+const SIGNALING_SERVER_URL = ""; // <<< CONFIGURE AQUI: ex "wss://meu-signaling.example.com"
+// protocolo mínimo (exemplo):
+// mensagens JSON:
+// { type: "join", role:"publisher"|"viewer", room: "<gameId>", clientId: "<uuid>" }
+// { type: "offer", from:"<clientId>", to:"<clientId or 'server'>", room:"<room>", sdp: "<...>" }
+// { type: "answer", from:"<clientId>", to:"<clientId>", room:"<room>", sdp:"<...>" }
+// { type: "candidate", from:"...", to:"...", room:"...", candidate:{...} }
+// { type: "publisher-joined", room:"<room>", publisherId:"<id>", info:{...} }  // optional
+// { type: "publisher-left", room:"...", publisherId:"..." }
+// { type: "set-main", room:"...", publisherId:"..." } // admin requests change main camera
+// Nota: este cliente tenta ser compatível com um signaling server simples; adapte conforme seu servidor.
+
+/* Estruturas de runtime para gerenciamento de streams/cameras */
+const liveState = {
+  ws: null,
+  connected: false,
+  myClientId: null,
+  // por room: lista de publishers {id, stream, meta}, mainPublisherId
+  rooms: {}
+};
+
+// gera id simples (não criptográfico)
+function shortId(){
+  return 'c' + Math.random().toString(36).slice(2,9);
+}
+
+/* Conectar ao signaling (opcional) */
+function initSignaling(){
+  if (!SIGNALING_SERVER_URL) {
+    console.warn("SIGNALING_SERVER_URL vazio — funcionalidade Ao Vivo não estará disponível até configurar um signaling server.");
+    return;
+  }
+  try{
+    liveState.ws = new WebSocket(SIGNALING_SERVER_URL);
+    liveState.ws.addEventListener('open', () => {
+      liveState.connected = true;
+      liveState.myClientId = shortId();
+      console.log("Signaling conectado (id):", liveState.myClientId);
+    });
+    liveState.ws.addEventListener('message', ev => {
+      try{
+        const msg = JSON.parse(ev.data);
+        handleSignalingMessage(msg);
+      }catch(e){
+        console.error("Mensagem signaling inválida",e);
+      }
+    });
+    liveState.ws.addEventListener('close', () => {
+      liveState.connected = false;
+      console.warn("Signaling desconectado.");
+    });
+    liveState.ws.addEventListener('error', err => {
+      console.error("Erro websocket signaling", err);
+    });
+  }catch(e){
+    console.error("Erro ao conectar signaling:", e);
+  }
+}
+
+function sendSignaling(msg){
+  if (!liveState.ws || liveState.ws.readyState !== WebSocket.OPEN){
+    console.warn("Signaling indisponível para enviar:", msg);
+    return;
+  }
+  try{ liveState.ws.send(JSON.stringify(msg)); }catch(e){ console.error(e); }
+}
+
+/* ======= PUBLISHER: celular que envia câmera =======
+   Fluxo básico (no celular):
+   - obter getUserMedia()
+   - conectar signaling -> join room as publisher
+   - criar RTCPeerConnection e enviar tracks (offer)
+   - server ou viewers farão resposta/consumo
+   * Observação: a lógica abaixo é cliente-side. O signaling server deve orquestrar offer/answer ou forward para viewers.
+*/
+
+async function startPublishingForGame(roomId, label){
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    alert("Seu dispositivo não permite capturar vídeo (getUserMedia). Use um celular/Chrome/Firefox.");
+    return;
+  }
+  // pede permissão e pega câmera
+  const constraints = { video: { facingMode: "environment", width:{ ideal:1280 }, height:{ ideal:720 } }, audio: true };
+  let stream = null;
+  try{
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+  }catch(e){
+    alert("Erro ao acessar câmera/microfone: " + (e.message || e));
+    return;
+  }
+
+  // marcar local preview (opcional)
+  // construímos um elemento temporário para o publisher (se quiser testar diretamente no celular)
+  const previewId = "localPreview_"+roomId;
+  let preview = document.getElementById(previewId);
+  if (!preview){
+    preview = document.createElement("video");
+    preview.id = previewId;
+    preview.autoplay = true;
+    preview.muted = true;
+    preview.playsInline = true;
+    preview.style.width = "100%";
+    document.body.appendChild(preview); // se quiser, reorganize onde inserir no DOM
+  }
+  preview.srcObject = stream;
+
+  // informar signaling que entrou como publisher
+  const clientId = liveState.myClientId || shortId();
+  liveState.myClientId = clientId;
+  sendSignaling({ type:"join", role:"publisher", room:roomId, clientId: clientId, info: { label: label || clientId } });
+
+  // Criar peer connection para enviar track(s) para o servidor (ou para quem o signaling indicar)
+  // Aqui criamos uma conexão que espera resposta do "server" (adaptar se o signaling traduz para viewers).
+  const pc = new RTCPeerConnection({
+    iceServers: [
+      { urls: "stun:stun.l.google.com:19302" }
+      // adicionar TURN se disponível
+    ]
+  });
+  // enviar tracks
+  stream.getTracks().forEach(t => pc.addTrack(t, stream));
+
+  pc.onicecandidate = (ev) => {
+    if (ev.candidate){
+      sendSignaling({ type:"candidate", from:clientId, room:roomId, candidate: ev.candidate });
+    }
   };
 
-  const jogosAoVivo = todosJogos.filter(j => j.status === "EM_ANDAMENTO" || j.status === "PRESTES");
+  pc.onconnectionstatechange = () => {
+    console.log("PC state:", pc.connectionState);
+  };
 
-  if (!jogosAoVivo.length){
-    const p = document.createElement("p");
-    p.textContent = "Nenhum jogo em andamento ou prestes a começar neste momento.";
-    container.appendChild(p);
-    // hide public live area if no streams active and no selected
-    document.getElementById("livePublicArea").style.display = (currentPublicStreamId ? "block" : "none");
-    return;
-  }
-
-  jogosAoVivo.sort((a,b) => {
-    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
-    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
-    return da.localeCompare(db);
-  });
-
-  jogosAoVivo.forEach(j => {
-    const card = document.createElement("div");
-    card.className = "placar-card";
-
-    const topo = document.createElement("div");
-    topo.className = "placar-linha-principal";
-    topo.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-");
-    card.appendChild(topo);
-
-    const info = document.createElement("div");
-    info.innerHTML =
-      "Local: "+(j.localJogo || "-")+"<br>"+
-      (j.turma1 || "")+" <strong>"+(j.placar1 ?? 0)+"</strong> x <strong>"+(j.placar2 ?? 0)+"</strong> "+(j.turma2 || "");
-    card.appendChild(info);
-
-    const statusSpan = document.createElement("span");
-    statusSpan.className = "placar-status";
-    if (j.status === "EM_ANDAMENTO") statusSpan.classList.add("andamento");
-    if (j.status === "PRESTES") statusSpan.classList.add("prestes");
-    statusSpan.textContent = statusLabel[j.status] || j.status || "–";
-    card.appendChild(statusSpan);
-
-    // se este jogo tiver streams vinculadas, mostra mini-grid de streams
-    const related = allStreams.filter(s => s.jogoId === j.id && s.active);
-    if (related.length){
-      const liveGrid = document.createElement("div");
-      liveGrid.className = "live-video-grid";
-      related.forEach(s => {
-        const vcard = document.createElement("div");
-        vcard.className = "live-video-card";
-        const title = document.createElement("div");
-        title.style.fontSize="0.85rem";
-        title.style.fontWeight="600";
-        title.textContent = "Câmera: " + s.id.substring(0,6);
-        const vid = document.createElement("video");
-        vid.id = "public_preview_" + s.id;
-        vid.autoplay = true;
-        vid.playsInline = true;
-        vid.muted = true;
-        vid.controls = true;
-        // viewers will attach remote streams to these video elements when answers are created
-        vcard.appendChild(title);
-        vcard.appendChild(vid);
-        liveGrid.appendChild(vcard);
-      });
-      card.appendChild(liveGrid);
-    }
-
-    container.appendChild(card);
-  });
-
-  // show public live area if a public stream selected
-  document.getElementById("livePublicArea").style.display = (currentPublicStreamId ? "block" : "none");
-}
-
-/* ========== CLASSIFICAÇÃO / CLASSIFICADOS (mantive) ========== */
-
-function renderClassificacao(){
-  const container = document.getElementById("classificacaoContainer");
-  if (!container) return;
-  container.innerHTML = "";
-
-  if (!todosJogos.length){
-    container.textContent = "Nenhum jogo registrado ainda.";
-    return;
-  }
-
-  const finalizados = todosJogos.filter(j => j.status === "FINALIZADO");
-
-  if (!finalizados.length){
-    container.textContent = "Nenhum jogo finalizado ainda para mostrar classificados.";
-    return;
-  }
-
-  finalizados.sort((a,b) => {
-    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
-    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
-    return da.localeCompare(db);
-  });
-
-  finalizados.forEach(j => {
-    const card = document.createElement("div");
-    card.className = "jogo-bloco";
-
-    const header = document.createElement("div");
-    header.style.fontWeight = "600";
-    header.style.marginBottom = "4px";
-    header.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-");
-    card.appendChild(header);
-
-    const p1 = j.placar1 ?? 0;
-    const p2 = j.placar2 ?? 0;
-
-    let vencedor = null;
-    if (p1 > p2) vencedor = "t1";
-    else if (p2 > p1) vencedor = "t2";
-
-    function montarLinha(turma, placar, pos){
-      const linha = document.createElement("div");
-      linha.className = "linha-classificado";
-      const bol = document.createElement("span");
-      bol.className = "bolinha-resultado";
-
-      if (!vencedor){
-        bol.classList.add("bolinha-neutra");
-      } else if ((vencedor === "t1" && pos === 1) || (vencedor === "t2" && pos === 2)){
-        bol.classList.add("bolinha-verde");
-      } else {
-        bol.classList.add("bolinha-vermelha");
-      }
-
-      const nomeSpan = document.createElement("span");
-      nomeSpan.textContent = turma || "-";
-      nomeSpan.style.marginRight = "6px";
-
-      const placarSpan = document.createElement("strong");
-      placarSpan.textContent = placar;
-
-      linha.appendChild(bol);
-      linha.appendChild(nomeSpan);
-      linha.appendChild(document.createTextNode(" — "));
-      linha.appendChild(placarSpan);
-      return linha;
-    }
-
-    card.appendChild(montarLinha(j.turma1, p1, 1));
-    card.appendChild(montarLinha(j.turma2, p2, 2));
-
-    const info = document.createElement("div");
-    info.style.marginTop = "4px";
-    if (vencedor === "t1"){
-      info.textContent = "Classificado: " + (j.turma1 || "-");
-    } else if (vencedor === "t2"){
-      info.textContent = "Classificado: " + (j.turma2 || "-");
-    } else {
-      info.textContent = "Empate – sem classificado definido.";
-    }
-    card.appendChild(info);
-
-    container.appendChild(card);
-  });
-}
-
-/* ========== JOGOS ADMIN: CADASTRAR / EXCLUIR / EDITAR PLACAR (mantive) ========== */
-
-async function cadastrarJogo(){
-  if (!isAdmin){
-    alert("Apenas o administrador pode cadastrar jogos.");
-    return;
-  }
-  const dataJogo = document.getElementById("jogoData").value;
-  const turma1 = document.getElementById("jogoTurma1").value;
-  const turma2 = document.getElementById("jogoTurma2").value;
-  const modalidade = document.getElementById("jogoModalidade").value;
-  const horario = document.getElementById("jogoHorario").value;
-  const local = (document.getElementById("jogoLocal").value || "").trim();
-
-  if (!dataJogo || !turma1 || !turma2 || !modalidade || !horario || !local){
-    alert("Preencha todos os campos do jogo.");
-    return;
-  }
-  if (turma1 === turma2){
-    alert("Turma 1 e Turma 2 devem ser diferentes.");
-    return;
-  }
-
+  // Criar offer e enviar
   try{
-    await db.collection("jogos").add({
-      dataJogo: dataJogo,
-      turma1: turma1,
-      turma2: turma2,
-      modalidade: modalidade,
-      horarioJogo: horario,
-      localJogo: local,
-      status: "AGENDADO",
-      placar1: 0,
-      placar2: 0,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    alert("Jogo cadastrado com sucesso.");
-    document.getElementById("jogoData").value = "";
-    document.getElementById("jogoTurma1").value = "";
-    document.getElementById("jogoTurma2").value = "";
-    document.getElementById("jogoModalidade").value = "";
-    document.getElementById("jogoHorario").value = "";
-    document.getElementById("jogoLocal").value = "";
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    sendSignaling({ type:"offer", from:clientId, room:roomId, sdp: offer.sdp });
   }catch(e){
-    console.error(e);
-    alert("Erro ao cadastrar jogo.");
+    console.error("Erro ao criar offer publisher:", e);
   }
+
+  // guardar referência local (para poder parar)
+  if (!liveState.rooms[roomId]) liveState.rooms[roomId] = { publishers: {}, mainPublisherId: null };
+  liveState.rooms[roomId].publishers[clientId] = { id: clientId, pc, stream, label: label || clientId };
+  return clientId;
 }
 
-function atualizarSelectExcluirJogo(){
-  const sel = document.getElementById("selectExcluirJogo");
-  if (!sel) return;
-  const filtroInput = document.getElementById("filtroExcluirJogo");
-  const termo = filtroInput ? (filtroInput.value || "").toLowerCase() : "";
-
-  sel.innerHTML = '<option value="">Selecione um jogo...</option>';
-  todosJogos.forEach(j => {
-    const label = (j.modalidade || "")+" — "+formatarDataBR(j.dataJogo)+" "+(j.horarioJogo || "")+" — "+(j.turma1 || "")+" x "+(j.turma2 || "");
-    if (termo && !label.toLowerCase().includes(termo)) return;
-    const opt = document.createElement("option");
-    opt.value = j.id;
-    opt.textContent = label;
-    sel.appendChild(opt);
-  });
-}
-
-async function excluirJogo(){
-  if (!isAdmin){
-    alert("Apenas o administrador pode excluir jogos.");
-    return;
-  }
-  const sel = document.getElementById("selectExcluirJogo");
-  const id = sel.value;
-  if (!id){
-    alert("Selecione um jogo."); return;
-  }
-  const jogo = todosJogos.find(j => j.id === id);
-  const desc = jogo ? ((jogo.modalidade || "")+" — "+formatarDataBR(jogo.dataJogo)+" "+(jogo.horarioJogo || "")+" — "+(jogo.turma1 || "")+" x "+(jogo.turma2 || "")) : "";
-  if (!confirm("Excluir o jogo: "+desc+" ?")) return;
-  try{
-    await db.collection("jogos").doc(id).delete();
-    alert("Jogo excluído.");
-  }catch(e){
-    console.error(e);
-    alert("Erro ao excluir jogo.");
-  }
-}
-
-/* Painel de placar ao vivo / status (admin) - agora com controles de stream */
-function renderAdminJogos(){
-  const container = document.getElementById("listaAdminJogos");
-  if (!container) return;
-  container.innerHTML = "";
-
-  if (!todosJogos.length){
-    container.textContent = "Nenhum jogo cadastrado.";
-    return;
-  }
-
-  const statusOptions = ["AGENDADO","PRESTES","EM_ANDAMENTO","FINALIZADO"];
-
-  // preencher select de jogos para streams
-  const selectStreamJogo = document.getElementById("selectStreamJogo");
-  if (selectStreamJogo){
-    selectStreamJogo.innerHTML = '<option value="">Selecione o jogo para vincular a câmera...</option>';
-    todosJogos.forEach(j => {
-      const opt = document.createElement("option");
-      opt.value = j.id;
-      opt.textContent = (j.modalidade || "") + " — " + (j.turma1 || "") + " x " + (j.turma2 || "") + " — " + formatarDataBR(j.dataJogo);
-      selectStreamJogo.appendChild(opt);
-    });
-  }
-
-  todosJogos.forEach(j => {
-    const bloco = document.createElement("div");
-    bloco.className = "jogo-bloco";
-
-    const linha1 = document.createElement("div");
-    linha1.innerHTML = "<strong>"+(j.modalidade || "-")+"</strong> — "+formatarDataBR(j.dataJogo)+" às "+(j.horarioJogo || "-");
-    bloco.appendChild(linha1);
-
-    const linha2 = document.createElement("div");
-    linha2.textContent = "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+" — Local: "+(j.localJogo || "-");
-    bloco.appendChild(linha2);
-
-    const controles = document.createElement("div");
-    controles.style.marginTop = "4px";
-    controles.style.display = "flex";
-    controles.style.flexWrap = "wrap";
-    controles.style.gap = "6px";
-    controles.style.alignItems = "center";
-
-    const selStatus = document.createElement("select");
-    selStatus.dataset.id = j.id;
-    statusOptions.forEach(st => {
-      const opt = document.createElement("option");
-      opt.value = st;
-      opt.textContent = st;
-      if (j.status === st) opt.selected = true;
-      selStatus.appendChild(opt);
-    });
-
-    const inpP1 = document.createElement("input");
-    inpP1.type = "number";
-    inpP1.min = "0";
-    inpP1.value = (j.placar1 ?? 0);
-    inpP1.style.width = "60px";
-    inpP1.dataset.id = j.id;
-    inpP1.dataset.tipo = "p1";
-
-    const inpP2 = document.createElement("input");
-    inpP2.type = "number";
-    inpP2.min = "0";
-    inpP2.value = (j.placar2 ?? 0);
-    inpP2.style.width = "60px";
-    inpP2.dataset.id = j.id;
-    inpP2.dataset.tipo = "p2";
-
-    const labelP1 = document.createElement("span");
-    labelP1.textContent = (j.turma1 || "T1")+":";
-    const labelP2 = document.createElement("span");
-    labelP2.textContent = (j.turma2 || "T2")+":"; 
-
-    const btnSalvar = document.createElement("button");
-    btnSalvar.className = "btn btn-primaria btnSalvarJogo";
-    btnSalvar.textContent = "Salvar";
-    btnSalvar.dataset.id = j.id;
-
-    // controle de gerar link de câmera vinculado ao jogo (admin pode gerar também na seção de streams)
-    const btnGenCamera = document.createElement("button");
-    btnGenCamera.className = "btn btn-primaria";
-    btnGenCamera.textContent = "Gerar link câmera";
-    btnGenCamera.style.marginLeft = "6px";
-    btnGenCamera.addEventListener("click", async () => {
-      const streamDoc = await criarStreamParaJogo(j.id);
-      alert("Link gerado. Envie este link para o celular que será a câmera:\n\n" + window.location.origin + window.location.pathname + "?streamId=" + streamDoc.id);
-    });
-
-    controles.appendChild(document.createTextNode("Status:"));
-    controles.appendChild(selStatus);
-    controles.appendChild(labelP1);
-    controles.appendChild(inpP1);
-    controles.appendChild(labelP2);
-    controles.appendChild(inpP2);
-    controles.appendChild(btnSalvar);
-    controles.appendChild(btnGenCamera);
-
-    bloco.appendChild(controles);
-    container.appendChild(bloco);
-  });
-
-  container.querySelectorAll(".btnSalvarJogo").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      if (!isAdmin){
-        alert("Apenas o administrador pode atualizar jogos.");
-        return;
-      }
-      const id = btn.dataset.id;
-      const bloco = btn.closest(".jogo-bloco");
-      const selStatus = bloco.querySelector("select");
-      const inpP1 = bloco.querySelector('input[data-tipo="p1"]');
-      const inpP2 = bloco.querySelector('input[data-tipo="p2"]');
-
-      const novoStatus = selStatus.value;
-      const placar1 = parseInt(inpP1.value,10) || 0;
-      const placar2 = parseInt(inpP2.value,10) || 0;
-
-      try{
-        await db.collection("jogos").doc(id).update({
-          status: novoStatus,
-          placar1: placar1,
-          placar2: placar2
-        });
-        alert("Jogo atualizado com sucesso.");
-      }catch(e){
-        console.error(e);
-        alert("Erro ao atualizar jogo.");
-      }
-    });
-  });
-}
-
-/* ========== PROFESSORES (mantive) ========== */
-
-async function adicionarProfessorAcesso(){
-  if (!isAdmin){
-    alert("Apenas o administrador pode cadastrar acessos de professores.");
-    return;
-  }
-  const nome = (document.getElementById("profNomeCadastro").value || "").trim();
-  const tipo = document.getElementById("profTipoCadastro").value || "Professor";
-  const senha = (document.getElementById("profSenhaCadastro").value || "").trim();
-
-  if (!nome || !senha){
-    alert("Preencha nome e senha.");
-    return;
-  }
-
-  try{
-    await db.collection("professoresAcesso").add({
-      nome: nome,
-      tipo: tipo,
-      senha: senha
-    });
-    alert("Acesso cadastrado com sucesso.");
-    document.getElementById("profNomeCadastro").value = "";
-    document.getElementById("profSenhaCadastro").value = "";
-    document.getElementById("profTipoCadastro").value = "Professor";
-  }catch(e){
-    console.error(e);
-    alert("Erro ao cadastrar acesso.");
-  }
-}
-
-async function excluirProfessorAcesso(id){
-  if (!isAdmin){
-    alert("Apenas o administrador pode excluir acessos.");
-    return;
-  }
-  if (!confirm("Excluir este acesso de professor?")) return;
-  try{
-    await db.collection("professoresAcesso").doc(id).delete();
-    alert("Acesso excluído.");
-  }catch(e){
-    console.error(e);
-    alert("Erro ao excluir acesso.");
-  }
-}
-
-function renderProfessoresAdmin(){
-  const tbody = document.getElementById("tabelaProfessoresAdmin");
-  if (!tbody) return;
-  tbody.innerHTML = "";
-
-  if (!todosProfessores.length){
-    const tr = document.createElement("tr");
-    const td = document.createElement("td");
-    td.colSpan = 4;
-    td.textContent = "Nenhum acesso cadastrado.";
-    tr.appendChild(td);
-    tbody.appendChild(tr);
-    return;
-  }
-
-  todosProfessores.forEach(p => {
-    const tr = document.createElement("tr");
-    const tdNome = document.createElement("td");
-    const tdTipo = document.createElement("td");
-    const tdSenha = document.createElement("td");
-    const tdAcoes = document.createElement("td");
-
-    tdNome.textContent = p.nome || "";
-    tdTipo.textContent = p.tipo || "";
-    tdSenha.textContent = p.senha || "";
-
-    const btn = document.createElement("button");
-    btn.className = "btn btn-primaria";
-    btn.style.padding = "3px 8px";
-    btn.textContent = "Excluir";
-    btn.addEventListener("click", () => excluirProfessorAcesso(p.id));
-
-    tdAcoes.appendChild(btn);
-
-    tr.appendChild(tdNome);
-    tr.appendChild(tdTipo);
-    tr.appendChild(tdSenha);
-    tr.appendChild(tdAcoes);
-    tbody.appendChild(tr);
-  });
-}
-
-/* ========== PAINEL PROFESSORES (mantive) ========== */
-
-function renderPainelProfessores(){
-  const listaDiv = document.getElementById("profListaAlunos");
-  const turnoSel = document.getElementById("profTurnoSelect");
-  const turmaSel = document.getElementById("profTurmaSelect");
-  const labelProf = document.getElementById("profUsuarioAtivo");
-
-  if (!listaDiv || !turnoSel || !turmaSel) return;
-
-  if (currentProfessor && labelProf){
-    labelProf.textContent = currentProfessor.nome + " (" + currentProfessor.tipo + ")";
-  }
-
-  const turno = turnoSel.value;
-  const turma = turmaSel.value;
-
-  listaDiv.innerHTML = "";
-
-  if (!turno || !turma){
-    listaDiv.textContent = "Selecione turno e turma para ver os alunos inscritos.";
-    return;
-  }
-
-  const lista = todasInscricoes.filter(ins => ins.turno === turno && ins.turma === turma);
-
-  if (!lista.length){
-    listaDiv.textContent = "Nenhum inscrito nesta turma para estes filtros.";
-    return;
-  }
-
-  lista.forEach(ins => {
-    const bloqueios = Array.isArray(ins.naoAutorizadoPor) ? ins.naoAutorizadoPor : [];
-    const jaIndicou = currentProfessor ? bloqueios.includes(currentProfessor.id) : false;
-
-    const card = document.createElement("div");
-    card.className = "jogo-bloco";
-
-    const nome = document.createElement("div");
-    nome.innerHTML = "<strong>"+(ins.nome || "")+"</strong>";
-    card.appendChild(nome);
-
-    const detalhe = document.createElement("div");
-    detalhe.style.fontSize = "0.8rem";
-    detalhe.innerHTML =
-      "Turma: "+(ins.turma || "-")+" — Turno: "+(ins.turno || "-")+"<br>"+
-      "Modalidades: "+((ins.modalidades || []).join(", ") || "-");
-    card.appendChild(detalhe);
-
-    const info = document.createElement("div");
-    info.style.marginTop = "4px";
-    info.style.fontSize = "0.78rem";
-    info.textContent = "Já indicado por "+bloqueios.length+" professor(es).";
-    card.appendChild(info);
-
-    const btn = document.createElement("button");
-    btn.className = "btn btn-primaria";
-    btn.style.marginTop = "4px";
-    btn.textContent = jaIndicou ? "Você já indicou este aluno" : "Indicar que NÃO pode participar";
-    btn.disabled = jaIndicou;
-    btn.addEventListener("click", () => indicarAlunoNaoParticipa(ins.id));
-
-    card.appendChild(btn);
-    listaDiv.appendChild(card);
-  });
-}
-
-function configurarSelectTurmaProfessor(){
-  const turnoSel = document.getElementById("profTurnoSelect");
-  const turmaSel = document.getElementById("profTurmaSelect");
-  if (!turnoSel || !turmaSel) return;
-
-  const turno = turnoSel.value;
-  turmaSel.innerHTML = "";
-  const optDefault = document.createElement("option");
-  if (!turno){
-    optDefault.value = "";
-    optDefault.textContent = "Selecione o turno primeiro...";
-    turmaSel.appendChild(optDefault);
-  } else {
-    optDefault.value = "";
-    optDefault.textContent = "Selecione a turma...";
-    turmaSel.appendChild(optDefault);
-    const turmasTurno = getTurmasPorTurno(turno);
-    turmasTurno.forEach(t => {
-      const opt = document.createElement("option");
-      opt.value = t;
-      opt.textContent = t;
-      turmaSel.appendChild(opt);
-    });
-  }
-}
-
-async function indicarAlunoNaoParticipa(inscricaoId){
-  if (!currentProfessor){
-    alert("Faça login como professor/coordenador/gestor para indicar alunos.");
-    return;
-  }
-  if (!confirm("Confirmar indicação de que este aluno NÃO pode participar?")){
-    return;
-  }
-
-  const ref = db.collection("inscricoes").doc(inscricaoId);
-  try{
-    await db.runTransaction(function(tx){
-      return tx.get(ref).then(doc => {
-        if (!doc.exists) return;
-        const data = doc.data();
-        let lista = Array.isArray(data.naoAutorizadoPor) ? data.naoAutorizadoPor.slice() : [];
-        if (!lista.includes(currentProfessor.id)){
-          lista.push(currentProfessor.id);
-        }
-
-        if (lista.length >= 2){
-          tx.delete(ref);
-        } else {
-          tx.update(ref, { naoAutorizadoPor: lista });
-        }
-      });
-    });
-    alert("Indicação registrada. Se mais um professor indicar este aluno, a inscrição será cancelada automaticamente.");
-  }catch(e){
-    console.error(e);
-    alert("Erro ao registrar indicação.");
-  }
-}
-
-/* ========== TROCA DE TELAS (mantive) ========== */
-
-function mostrarSecao(sec){
-  document.getElementById("secInscricao").style.display = (sec==="inscricao"?"block":"none");
-  document.getElementById("secInscritos").style.display = (sec==="inscritos"?"block":"none");
-  document.getElementById("secJogos").style.display = (sec==="jogos"?"block":"none");
-  document.getElementById("secClassificados").style.display = (sec==="classificados"?"block":"none");
-  document.getElementById("secPlacarAoVivo").style.display = (sec==="placar"?"block":"none");
-  document.getElementById("adminSection").style.display = (sec==="admin"?"block":"none");
-  document.getElementById("professoresSection").style.display = (sec==="professores"?"block":"none");
-}
-
-function abrirAdmin(){
-  const opcao = prompt(
-    "Selecione o tipo de acesso:\n" +
-    "1 - Administrador\n" +
-    "2 - Professor\n" +
-    "3 - Coordenador\n" +
-    "4 - Gestor"
-  );
-  if (opcao === null) return;
-
-  let role = null;
-  if (opcao === "1") role = "ADMIN";
-  else if (opcao === "2") role = "Professor";
-  else if (opcao === "3") role = "Coordenador";
-  else if (opcao === "4") role = "Gestor";
-  else {
-    alert("Opção inválida.");
-    return;
-  }
-
-  const senha = prompt("Digite a senha:");
-  if (senha === null || senha === "") return;
-
-  if (role === "ADMIN"){
-    if (senha !== ADMIN_PASSWORD){
-      alert("Senha incorreta.");
-      return;
-    }
-    isAdmin = true;
-    currentRole = "ADMIN";
-    currentProfessor = null;
-    mostrarSecao("admin");
-    renderAdmin();
-    renderAdminJogos();
-    return;
-  }
-
-  const prof = todosProfessores.find(p => p.senha === senha && p.tipo === role);
-  if (!prof){
-    alert("Senha incorreta ou acesso não encontrado para este tipo.");
-    return;
-  }
-
-  isAdmin = false;
-  currentRole = role;
-  currentProfessor = prof;
-  mostrarSecao("professores");
-  renderPainelProfessores();
-}
-
-function fecharAdmin(){
-  mostrarSecao("inscricao");
-  currentRole = null;
-  isAdmin = false;
-}
-
-function fecharProfessores(){
-  mostrarSecao("inscricao");
-  currentRole = null;
-  currentProfessor = null;
-}
-
-/* abas admin */
-function configurarAbasAdmin(){
-  const botoes = document.querySelectorAll(".admin-tab-btn");
-  botoes.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const tab = btn.dataset.tab;
-      botoes.forEach(b => b.classList.remove("ativo"));
-      btn.classList.add("ativo");
-      document.querySelectorAll(".admin-tab-content").forEach(c => c.classList.remove("ativo"));
-      document.getElementById("tab-"+tab).classList.add("ativo");
-    });
-  });
-}
-
-/* ========== LISTENERS FIRESTORE (mantive e adicionei lógica Top10 / streams) ========== */
-
-function iniciarListeners(){
-  db.collection("professoresAcesso").onSnapshot(snap => {
-    todosProfessores = [];
-    snap.forEach(doc => {
-      const d = doc.data();
-      todosProfessores.push({
-        id: doc.id,
-        nome: d.nome || "",
-        tipo: d.tipo || "Professor",
-        senha: d.senha || ""
-      });
-    });
-    renderProfessoresAdmin();
-  });
-
-  db.collection("inscricoes").orderBy("timestamp","asc").onSnapshot(snap => {
-    todasInscricoes = [];
-    countsPorTurmaModalidade = {};
-    countsQueimadaGenero = {};
-    snap.forEach(doc => {
-      const d = doc.data();
-      const ins = {
-        id: doc.id,
-        nome: d.nome || "",
-        nomeNormalizado: d.nomeNormalizado || normalizarNome(d.nome || ""),
-        email: d.email || "",
-        sexo: d.sexo || "",
-        turno: d.turno || "",
-        turma: d.turma || "",
-        camisaNumero: d.camisaNumero || "",
-        modalidades: d.modalidades || [],
-        observacoes: d.observacoes || "",
-        naoAutorizadoPor: d.naoAutorizadoPor || [],
-        timestamp: d.timestamp
-      };
-      todasInscricoes.push(ins);
-
-      if (!countsPorTurmaModalidade[ins.turma]) countsPorTurmaModalidade[ins.turma] = {};
-      ins.modalidades.forEach(m => {
-        if (!countsPorTurmaModalidade[ins.turma][m]) countsPorTurmaModalidade[ins.turma][m] = 0;
-        countsPorTurmaModalidade[ins.turma][m]++;
-        if (m === "QUEIMADA MISTA"){
-          if (!countsQueimadaGenero[ins.turma]) countsQueimadaGenero[ins.turma] = {Masculino:0, Feminino:0};
-          if (ins.sexo === "Masculino") countsQueimadaGenero[ins.turma].Masculino++;
-          if (ins.sexo === "Feminino") countsQueimadaGenero[ins.turma].Feminino++;
-        }
-      });
-    });
-    atualizarDisponibilidadeModalidades();
-    atualizarSelectsAdminPublico();
-    renderPublico();
-    renderAdmin();
-    renderRelatorio();
-    if (currentRole && currentRole !== "ADMIN"){
-      renderPainelProfessores();
-    }
-  });
-
-  db.collection("jogos").orderBy("dataJogo","asc").onSnapshot(snap => {
-    // detectar finalizações novas
-    const newlyFinalized = [];
-    todosJogos = [];
-    snap.forEach(doc => {
-      const d = doc.data();
-      let p1 = d.placar1;
-      let p2 = d.placar2;
-      if (typeof p1 === "string") p1 = parseInt(p1,10);
-      if (typeof p2 === "string") p2 = parseInt(p2,10);
-      const jObj = {
-        id: doc.id,
-        turno: d.turno || "",
-        serie: d.serie || "",
-        turma1: d.turma1 || "",
-        turma2: d.turma2 || "",
-        dataJogo: d.dataJogo || "",
-        modalidade: d.modalidade || "",
-        horarioJogo: d.horarioJogo || "",
-        localJogo: d.localJogo || "",
-        status: d.status || "AGENDADO",
-        placar1: Number.isFinite(p1) ? p1 : 0,
-        placar2: Number.isFinite(p2) ? p2 : 0
-      };
-      todosJogos.push(jObj);
-
-      // detectar mudança para FINALIZADO (comparar com prevJogosStatus)
-      const prev = prevJogosStatus[doc.id];
-      if (jObj.status === "FINALIZADO" && prev !== "FINALIZADO"){
-        newlyFinalized.push(jObj);
-      }
-      prevJogosStatus[doc.id] = jObj.status;
-    });
-    atualizarSelectExcluirJogo();
-    renderJogosAluno();
-    renderPlacarAoVivo();
-    renderClassificacao();
-    renderAdminJogos();
-
-    // recompute Top10 e atualizar UI de streams
-    recomputeTop10();
-    atualizarStreamsUI();
-
-    // se houver finalizações novas e usuário estiver na aba "placar", abrir Top10 modal automaticamente
-    if (newlyFinalized.length){
-      // mostrar Top10 somente se visitante estiver vendo Placar ao Vivo
-      const secPlac = document.getElementById("secPlacarAoVivo").style.display;
-      if (secPlac === "block"){
-        mostrarTop10Modal();
-      }
-    }
-  });
-
-  // streams (escuta as streams ativas)
-  db.collection("streams").onSnapshot(snap => {
-    allStreams = [];
-    snap.forEach(doc => {
-      const d = doc.data();
-      allStreams.push({
-        id: doc.id,
-        jogoId: d.jogoId || null,
-        createdAt: d.createdAt ? (d.createdAt.toDate ? d.createdAt.toDate() : null) : null,
-        active: !!d.active
-      });
-    });
-    atualizarStreamsUI();
-    renderPlacarAoVivo();
-  });
-}
-
-/* ========== INIT (mantive e acrescentei suporte a ?streamId=... para câmera) ========== */
-
-function init(){
-  try {
-    const saved = localStorage.getItem('insc_email');
-    if (saved && saved.includes('@')){
-      emailAtual = saved;
-      const ov = document.getElementById('emailOverlay');
-      if (ov) ov.style.display = 'none';
-    }
-  } catch(e){ /* ignore */ }
-
-  const overlay = document.getElementById("emailOverlay");
-  const emailInput = document.getElementById("emailAluno");
-  const msgEmail = document.getElementById("msgEmailOverlay");
-
-  function liberarEmail(){
-    const val = (emailInput.value || '').trim();
-    if (!validarEmail(val)){
-      msgEmail.textContent = "Digite um e-mail válido.";
-      return;
-    }
-    emailAtual = val;
-    try { localStorage.setItem('insc_email', val); } catch(e){}
-    try { window._inscricao_email_fallback = val; } catch(e){}
-    if (overlay) overlay.style.display = "none";
-  }
-  const btnEntrar = document.getElementById("btnEntrarEmail");
-  if (btnEntrar) btnEntrar.addEventListener("click", liberarEmail);
-  if (emailInput){
-    emailInput.addEventListener("keydown", e => {
-      if (e.key === "Enter"){
-        e.preventDefault();
-        liberarEmail();
-      }
-    });
-  }
-
-  /* montar modalidades (mantive) */
-  const contMods = document.getElementById("modalidadesContainer");
-  MODALIDADES.forEach(m => {
-    const item = document.createElement("div");
-    item.className = "modalidade-item";
-    const chk = document.createElement("input");
-    chk.type = "checkbox";
-    chk.className = "chkModalidade";
-    chk.value = m;
-    const info = document.createElement("div");
-    const lbl = document.createElement("span");
-    lbl.className = "modalidade-label";
-    lbl.textContent = m;
-    const vagas = document.createElement("span");
-    vagas.className = "modalidade-vagas";
-    vagas.dataset.mod = m;
-    vagas.textContent = "Selecione turno e turma para ver vagas.";
-    info.appendChild(lbl);
-    info.appendChild(vagas);
-    item.appendChild(chk);
-    item.appendChild(info);
-    contMods.appendChild(item);
-  });
-
-  contMods.addEventListener("change", e => {
-    if (e.target.classList.contains("chkModalidade")){
-      const marcados = contMods.querySelectorAll(".chkModalidade:checked");
-      if (marcados.length > LIMITE_MODALIDADES_POR_ALUNO){
-        e.target.checked = false;
-        alert("Máximo de "+LIMITE_MODALIDADES_POR_ALUNO+" modalidades por aluno.");
-      }
-    }
-  });
-
-  const turnoSel = document.getElementById("turno");
-  const turmaSel = document.getElementById("turma");
-  turmaSel.disabled = true;
-  turnoSel.addEventListener("change", () => {
-    const turno = turnoSel.value;
-    turmaSel.innerHTML = "";
-    if (!turno){
-      turmaSel.disabled = true;
-      turmaSel.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
-    } else {
-      turmaSel.disabled = false;
-      const turmasTurno = getTurmasPorTurno(turno);
-      const optDefault = document.createElement("option");
-      optDefault.value = "";
-      optDefault.textContent = "Selecione a turma...";
-      turmaSel.appendChild(optDefault);
-      turmasTurno.forEach(t => {
-        const opt = document.createElement("option");
-        opt.value = t; opt.textContent = t;
-        turmaSel.appendChild(opt);
-      });
-    }
-    atualizarDisponibilidadeModalidades();
-  });
-  turmaSel.addEventListener("change", atualizarDisponibilidadeModalidades);
-  document.getElementById("sexo").addEventListener("change", atualizarDisponibilidadeModalidades);
-
-  const filtroTurno = document.getElementById("filtroTurno");
-  const filtroTurma = document.getElementById("filtroTurma");
-  const filtroModalidade = document.getElementById("filtroModalidade");
-
-  filtroTurma.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
-  filtroModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
-
-  filtroTurno.addEventListener("change", () => {
-    const turno = filtroTurno.value;
-    filtroTurma.innerHTML = "";
-    const optDefault = document.createElement("option");
-    if (!turno){
-      optDefault.value = "";
-      optDefault.textContent = "Selecione o turno primeiro...";
-      filtroTurma.appendChild(optDefault);
-    } else {
-      optDefault.value = "";
-      optDefault.textContent = "Selecione a turma...";
-      filtroTurma.appendChild(optDefault);
-      const turmasTurno = getTurmasPorTurno(turno);
-      turmasTurno.forEach(t => {
-        const opt = document.createElement("option");
-        opt.value = t;
-        opt.textContent = t;
-        filtroTurma.appendChild(opt);
-      });
-    }
-    renderPublico();
-  });
-
-  filtroTurma.addEventListener("change", renderPublico);
-  filtroModalidade.addEventListener("change", renderPublico);
-
-  /* JOGOS ADMIN WITHOUT SÉRIE (mantive) */
-  const jogoTurma1 = document.getElementById("jogoTurma1");
-  const jogoTurma2 = document.getElementById("jogoTurma2");
-
-  if (jogoTurma1 && jogoTurma2){
-    jogoTurma1.innerHTML = '<option value="">Selecione a turma 1...</option>';
-    jogoTurma2.innerHTML = '<option value="">Selecione a turma 2...</option>';
-
-    TODAS_TURMAS.forEach(t => {
-      const o1 = document.createElement("option");
-      o1.value = t;
-      o1.textContent = t;
-      jogoTurma1.appendChild(o1);
-
-      const o2 = document.createElement("option");
-      o2.value = t;
-      o2.textContent = t;
-      jogoTurma2.appendChild(o2);
-    });
-  }
-
-  const jogoModalidade = document.getElementById("jogoModalidade");
-  MODALIDADES.forEach(m => {
-    const opt = document.createElement("option");
-    opt.value = m; opt.textContent = m;
-    jogoModalidade.appendChild(opt);
-  });
-
-  const relatorioTurno = document.getElementById("relatorioTurno");
-  const relatorioTurma = document.getElementById("relatorioTurma");
-  const relatorioModalidade = document.getElementById("relatorioModalidade");
-
-  if (relatorioModalidade){
-    relatorioModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
-    MODALIDADES.forEach(m => {
-      const opt = document.createElement("option");
-      opt.value = m;
-      opt.textContent = m;
-      relatorioModalidade.appendChild(opt);
-    });
-  }
-
-  if (relatorioTurno && relatorioTurma){
-    relatorioTurno.addEventListener("change", () => {
-      const turno = relatorioTurno.value;
-      relatorioTurma.innerHTML = "";
-      const optDefault = document.createElement("option");
-      if (!turno){
-        optDefault.value = "";
-        optDefault.textContent = "Selecione o turno primeiro...";
-        relatorioTurma.appendChild(optDefault);
-      } else {
-        optDefault.value = "";
-        optDefault.textContent = "Selecione a turma...";
-        relatorioTurma.appendChild(optDefault);
-        const turmasTurno = getTurmasPorTurno(turno);
-        turmasTurno.forEach(t => {
-          const opt = document.createElement("option");
-          opt.value = t;
-          opt.textContent = t;
-          relatorioTurma.appendChild(opt);
-        });
-      }
-      renderRelatorio();
-    });
-
-    relatorioTurma.addEventListener("change", renderRelatorio);
-  }
-
-  if (relatorioModalidade){
-    relatorioModalidade.addEventListener("change", renderRelatorio);
-  }
-
-  const btnImprimirRelatorio = document.getElementById("btnImprimirRelatorio");
-  if (btnImprimirRelatorio){
-    btnImprimirRelatorio.addEventListener("click", () => {
-      renderRelatorio();
-      window.print();
-    });
-  }
-
-  const btnImprimirTodaTurma = document.getElementById("btnImprimirTodaTurma");
-  if (btnImprimirTodaTurma){
-    btnImprimirTodaTurma.addEventListener("click", () => {
-      renderRelatorioTodaTurma();
-      window.print();
-    });
-  }
-
-  document.getElementById("btnToggleInscritos").addEventListener("click", () => {
-    const sec = document.getElementById("secInscritos").style.display === "block";
-    const btn = document.getElementById("btnToggleInscritos");
-    if (sec){
-      mostrarSecao("inscricao");
-      btn.textContent = "👀 Ver inscritos";
-    } else {
-      mostrarSecao("inscritos");
-      btn.textContent = "⬅ Voltar para inscrição";
-    }
-  });
-
-  document.getElementById("btnVerJogos").addEventListener("click", () => {
-    const sec = document.getElementById("secJogos").style.display === "block";
-    const btn = document.getElementById("btnVerJogos");
-    if (sec){
-      mostrarSecao("inscricao");
-      btn.textContent = "🏆 Ver jogos";
-    } else {
-      mostrarSecao("jogos");
-      btn.textContent = "⬅ Voltar para inscrição";
-    }
-  });
-
-  document.getElementById("btnClassificados").addEventListener("click", () => {
-    const sec = document.getElementById("secClassificados").style.display === "block";
-    const btn = document.getElementById("btnClassificados");
-    if (sec){
-      mostrarSecao("inscricao");
-      btn.textContent = "✅ Classificados";
-    } else {
-      mostrarSecao("classificados");
-      btn.textContent = "⬅ Voltar para inscrição";
-    }
-  });
-
-  document.getElementById("btnPlacarAoVivo").addEventListener("click", () => {
-    const sec = document.getElementById("secPlacarAoVivo").style.display === "block";
-    const btn = document.getElementById("btnPlacarAoVivo");
-    if (sec){
-      mostrarSecao("inscricao");
-      btn.textContent = "⚡ Placar ao vivo";
-    } else {
-      mostrarSecao("placar");
-      btn.textContent = "⬅ Voltar para inscrição";
-    }
-  });
-
-  document.getElementById("btnTop10Public").addEventListener("click", () => {
-    mostrarTop10Modal();
-  });
-
-  document.getElementById("btnAdminArea").addEventListener("click", abrirAdmin);
-  document.getElementById("btnFecharAdmin").addEventListener("click", fecharAdmin);
-  document.getElementById("btnFecharProfessores").addEventListener("click", fecharProfessores);
-
-  document.getElementById("formInscricao").addEventListener("submit", handleSubmitInscricao);
-
-  document.getElementById("adminFiltroNome").addEventListener("input", () => {
-    renderAdmin();
-    atualizarSelectsAdminPublico();
-  });
-  document.getElementById("adminFiltroTurma").addEventListener("change", () => {
-    renderAdmin();
-    atualizarSelectsAdminPublico();
-  });
-  document.getElementById("adminFiltroModalidade").addEventListener("change", renderAdmin);
-  document.getElementById("btnCancelarInscricao").addEventListener("click", cancelarInscricao);
-
-  const filtroModalidadeJogo = document.getElementById("filtroModalidadeJogo");
-  if (filtroModalidadeJogo){
-    filtroModalidadeJogo.innerHTML = '<option value="">Selecione...</option>';
-    MODALIDADES.forEach(m => {
-      const opt = document.createElement("option");
-      opt.value = m;
-      opt.textContent = m;
-      filtroModalidadeJogo.appendChild(opt);
-    });
-    filtroModalidadeJogo.addEventListener("change", renderJogosAluno);
-  }
-
-  document.getElementById("filtroSerieJogo").addEventListener("change", renderJogosAluno);
-  document.getElementById("filtroDataJogo").addEventListener("change", renderJogosAluno);
-
-  const filtroExcluirJogo = document.getElementById("filtroExcluirJogo");
-  if (filtroExcluirJogo){
-    filtroExcluirJogo.addEventListener("input", atualizarSelectExcluirJogo);
-  }
-
-  document.getElementById("btnCadastrarJogo").addEventListener("click", cadastrarJogo);
-  document.getElementById("btnExcluirJogo").addEventListener("click", excluirJogo);
-
-  document.getElementById("btnSalvarConfig").addEventListener("click", e => {
-    e.preventDefault();
-    salvarConfiguracoes();
-  });
-
-  document.getElementById("btnAdicionarProfessor").addEventListener("click", e => {
-    e.preventDefault();
-    adicionarProfessorAcesso();
-  });
-
-  const btnGerarSenha = document.getElementById("btnGerarSenhaProfessor");
-  if (btnGerarSenha){
-    btnGerarSenha.addEventListener("click", e => {
-      e.preventDefault();
-      let senha = "";
-      for (let i = 0; i < 5; i++) {
-        senha += Math.floor(Math.random() * 10);
-      }
-      document.getElementById("profSenhaCadastro").value = senha;
-    });
-  }
-
-  const profTurnoSelect = document.getElementById("profTurnoSelect");
-  const profTurmaSelect = document.getElementById("profTurmaSelect");
-  if (profTurnoSelect && profTurmaSelect){
-    profTurnoSelect.addEventListener("change", () => {
-      configurarSelectTurmaProfessor();
-      renderPainelProfessores();
-    });
-    profTurmaSelect.addEventListener("change", renderPainelProfessores);
-  }
-
-  configurarAbasAdmin();
-  iniciarListeners();
-  carregarConfiguracoes();
-
-  // listeners específicos de streams/admin
-  document.getElementById("btnGerarLinkCamera").addEventListener("click", async () => {
-    const jogoId = document.getElementById("selectStreamJogo").value;
-    if (!jogoId){ alert("Selecione um jogo para vincular a câmera."); return; }
-    const doc = await criarStreamParaJogo(jogoId);
-    const url = window.location.origin + window.location.pathname + "?streamId=" + doc.id;
-    // tentar copiar para clipboard
-    try { await navigator.clipboard.writeText(url); alert("Link copiado para a área de transferência:\n\n" + url); } catch(e){ alert("Link gerado:\n\n" + url); }
-  });
-
-  document.getElementById("btnSetActivePublicStream").addEventListener("click", async () => {
-    const id = document.getElementById("selectActivePublicStream").value;
-    if (!id){ alert("Selecione um stream para tornar principal."); return; }
-    try{
-      // salva active stream no firestore para persistência pública
-      await db.collection("streams").doc(id).set({ active: true }, { merge:true });
-      // desativar outros streams publicamente (opcional)
-      allStreams.forEach(s => { if (s.id !== id) db.collection("streams").doc(s.id).set({ active: false }, { merge:true }) });
-      currentPublicStreamId = id;
-      // atualizar UI pública
-      attachPublicMainToStream(id);
-      alert("Stream definido como principal para o público.");
-    }catch(e){
-      console.error(e);
-      alert("Erro ao definir stream principal.");
-    }
-  });
-
-  document.getElementById("btnFecharTop10").addEventListener("click", () => {
-    document.getElementById("top10Modal").style.display = "none";
-  });
-
-  // detectar se pagina foi aberta com ?streamId=... -> modo câmera
-  const urlp = new URL(window.location.href);
-  const streamIdParam = urlp.searchParams.get("streamId");
-  if (streamIdParam){
-    // mostrar interface simples para câmera
-    initCameraPage(streamIdParam);
-  }
-
-  mostrarSecao("inscricao");
-}
-
-/* ========== TOP10: calcular e mostrar (NOVO) ========== */
-
-/**
- * recomputeTop10()
- * - percorre TODOS os jogos finalizados
- * - para cada turma calcula: pontos (win=3/draw=1/loss=0) e gols marcados
- * - ordena por pontos desc, gols desc
- * - atualiza lista interna e UI
- */
-let lastTop10 = [];
-function recomputeTop10(){
-  const scores = {}; // turma -> { pontos, gols }
-  todosJogos.forEach(j => {
-    if (j.status !== "FINALIZADO") return;
-    const t1 = j.turma1 || "";
-    const t2 = j.turma2 || "";
-    const p1 = Number.isFinite(j.placar1) ? j.placar1 : 0;
-    const p2 = Number.isFinite(j.placar2) ? j.placar2 : 0;
-
-    if (!scores[t1]) scores[t1] = { pontos:0, gols:0 };
-    if (!scores[t2]) scores[t2] = { pontos:0, gols:0 };
-
-    // gols
-    scores[t1].gols += p1;
-    scores[t2].gols += p2;
-
-    if (p1 > p2){
-      scores[t1].pontos += 3;
-    } else if (p2 > p1){
-      scores[t2].pontos += 3;
-    } else {
-      scores[t1].pontos += 1;
-      scores[t2].pontos += 1;
-    }
-  });
-
-  const arr = Object.keys(scores).map(t => ({ turma: t, pontos: scores[t].pontos, gols: scores[t].gols }));
-  arr.sort((a,b) => {
-    if (b.pontos !== a.pontos) return b.pontos - a.pontos;
-    if (b.gols !== a.gols) return b.gols - a.gols;
-    return a.turma.localeCompare(b.turma, "pt-BR");
-  });
-
-  lastTop10 = arr.slice(0,10);
-  // atualizar UI do modal (se estiver aberta ou para quando abrir)
-  const ol = document.getElementById("top10List");
-  if (ol){
-    ol.innerHTML = "";
-    lastTop10.forEach((it, idx) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<span>${idx+1}. ${it.turma}</span><strong>${it.pontos} pts (${it.gols} gols)</strong>`;
-      ol.appendChild(li);
-    });
-  }
-}
-
-/* mostra modal Top10 */
-function mostrarTop10Modal(){
-  recomputeTop10();
-  const modal = document.getElementById("top10Modal");
-  modal.style.display = "flex";
-}
-
-/* ========== STREAMS / WebRTC (NOVO) ========= */
-
-/**
- * criarStreamParaJogo(jogoId)
- * - cria um documento em collection 'streams' com metadata
- * - retorna o documentRef
- */
-async function criarStreamParaJogo(jogoId){
-  const docRef = await db.collection("streams").add({
-    jogoId: jogoId || null,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    active: true
-  });
-  return docRef;
-}
-
-/**
- * atualizarStreamsUI()
- * - atualiza painel admin com streams list e select de public stream
- */
-function atualizarStreamsUI(){
-  const container = document.getElementById("streamsList");
-  const selectPublic = document.getElementById("selectActivePublicStream");
-  const selectStreamJogo = document.getElementById("selectStreamJogo");
-
-  if (container) container.innerHTML = "";
-  if (selectPublic) {
-    selectPublic.innerHTML = '<option value="">Nenhum</option>';
-  }
-
-  allStreams.forEach(s => {
-    const div = document.createElement("div");
-    div.style.display = "flex";
-    div.style.justifyContent = "space-between";
-    div.style.alignItems = "center";
-    div.style.padding = "6px";
-    div.style.borderBottom = "1px solid #eee";
-
-    const left = document.createElement("div");
-    left.innerHTML = `<strong>${s.id.substring(0,8)}</strong> — jogo: ${s.jogoId || "-"} ${s.active ? '<small style="color:var(--verde)"> (ativo)</small>' : ''}`;
-    div.appendChild(left);
-
-    const right = document.createElement("div");
-    const btnCopy = document.createElement("button");
-    btnCopy.className = "btn btn-primaria";
-    btnCopy.style.padding = "4px 8px";
-    btnCopy.textContent = "Copiar link";
-    btnCopy.addEventListener("click", async () => {
-      const url = window.location.origin + window.location.pathname + "?streamId=" + s.id;
-      try { await navigator.clipboard.writeText(url); alert("Link copiado:\n\n" + url); } catch(e){ alert("Link: " + url); }
-    });
-    right.appendChild(btnCopy);
-
-    const btnRemove = document.createElement("button");
-    btnRemove.className = "btn";
-    btnRemove.style.border = "1px solid #ddd";
-    btnRemove.style.padding = "4px 8px";
-    btnRemove.textContent = "Desativar";
-    btnRemove.addEventListener("click", async () => {
-      if (!confirm("Desativar este stream?")) return;
-      await db.collection("streams").doc(s.id).set({ active: false }, { merge:true });
-    });
-    right.appendChild(btnRemove);
-
-    div.appendChild(right);
-    if (container) container.appendChild(div);
-
-    if (selectPublic){
-      const opt = document.createElement("option");
-      opt.value = s.id;
-      opt.textContent = s.id.substring(0,8) + (s.jogoId ? " — jogo " + s.jogoId : "");
-      selectPublic.appendChild(opt);
-    }
-  });
-
-  // preencher selects que listam streams (p.ex. previews)
-  // atualizar preview: para cada stream ativo criaremos uma área de preview na página pública (renderPlacarAoVivo fará attach)
-}
-
-/**
- * initCameraPage(streamId)
- * - Se a página abrir com ?streamId=xxx, transformamos essa página em interface simplificada para enviar câmera:
- * - Pede permissão getUserMedia, cria PeerConnection, cria offer e salva em streams/{streamId}/offer
- * - Escuta subcoleção 'answers' para receber answers dos viewers (uma por viewer)
- */
-async function initCameraPage(streamId){
-  // substitui corpo por interface simples
-  document.body.innerHTML = `
-    <main style="max-width:900px;margin:20px auto;padding:10px;">
-      <div class="card">
-        <h2>Modo Câmera — Stream ID: <small>${streamId}</small></h2>
-        <p>Esta página enviará vídeo ao vivo como câmera. Abra este link no celular que será usado como câmera.</p>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <video id="camPreview" autoplay playsinline muted style="width:360px;height:240px;background:#000;border-radius:8px;"></video>
-          <div style="flex:1">
-            <p><strong>Status:</strong> <span id="camStatus">Inativo</span></p>
-            <p><button id="btnStartCam" class="btn btn-primaria">Iniciar câmera</button> <button id="btnStopCam" class="btn" style="padding:7px 12px;">Parar</button></p>
-            <p id="camInfo" style="font-size:0.9rem;color:#555"></p>
-          </div>
-        </div>
-      </div>
-    </main>
-  `;
-  // eventos
-  document.getElementById("btnStartCam").addEventListener("click", () => startStreamingAsCamera(streamId));
-  document.getElementById("btnStopCam").addEventListener("click", stopLocalStream);
-}
-
-/* startStreamingAsCamera(streamId)
-   - pega getUserMedia
-   - cria RTCPeerConnection
-   - adiciona tracks
-   - cria offer e salva em streams/{streamId}/offer
-   - escuta subcollection 'answers' para aplicar cada resposta (multi-viewer)
+/* ======= VIEWER: espectador ou admin que recebe streams =======
+   - join room as viewer
+   - signaling server deve informar publishers e controlar seleção de stream principal
+   - criamos peer connections conforme publishers (ou usamos um único relayer/mediaserver dependendo da infra)
 */
-async function startStreamingAsCamera(streamId){
-  const statusEl = document.getElementById("camStatus");
-  const infoEl = document.getElementById("camInfo");
-  const preview = document.getElementById("camPreview");
-  statusEl.textContent = "Solicitando câmera...";
 
+async function joinAsViewer(roomId, onUpdateUI){
+  // onUpdateUI(roomState) -> usado para renderizar miniaturas / main
+  const clientId = liveState.myClientId || shortId();
+  liveState.myClientId = clientId;
+  if (!liveState.rooms[roomId]) liveState.rooms[roomId] = { publishers: {}, mainPublisherId: null, viewers: {} };
+
+  sendSignaling({ type:"join", role:"viewer", room:roomId, clientId });
+
+  // a resposta do signaling com listagem de publishers irá acionar handleSignalingMessage -> lançar conexões se necessário
+  // retornamos função para desconectar
+  return () => {
+    sendSignaling({ type:"leave", role:"viewer", room:roomId, clientId });
+    if (liveState.rooms[roomId] && liveState.rooms[roomId].viewers && liveState.rooms[roomId].viewers[clientId]){
+      // fechar PCS se houver
+      const entries = Object.values(liveState.rooms[roomId].viewers[clientId].pcs || {});
+      entries.forEach(pc => {
+        try{ pc.close(); }catch(e){}
+      });
+    }
+  };
+}
+
+/* ======= handleSignalingMessage: centraliza mensagens do signaling server ======= */
+async function handleSignalingMessage(msg){
+  if (!msg || !msg.type) return;
+
+  // Alguns tipos básicos que suportamos:
+  // - publisher-joined {room, publisherId, info}
+  // - publisher-left {room, publisherId}
+  // - offer/answer/candidate (forwarded)
+  // - set-main {room, publisherId} (admin ou servidor alterou main)
+  // - list-publishers {room, publishers:[{id,label}]}
+
+  switch(msg.type){
+    case "connected":
+      console.log("Signaling conectado (server):", msg);
+      break;
+    case "list-publishers":
+      // servidor entrega lista de publishers para room -> conectar/atualizar UI
+      if (!msg.room) break;
+      if (!liveState.rooms[msg.room]) liveState.rooms[msg.room] = { publishers: {}, mainPublisherId: null };
+      const pubs = msg.publishers || [];
+      pubs.forEach(p => {
+        if (!liveState.rooms[msg.room].publishers[p.id]){
+          liveState.rooms[msg.room].publishers[p.id] = { id: p.id, label: p.label || p.id, stream: null, pc: null };
+        } else {
+          liveState.rooms[msg.room].publishers[p.id].label = p.label || p.id;
+        }
+      });
+      updateAdminCamerasUI(msg.room);
+      break;
+
+    case "publisher-joined":
+      if (!msg.room || !msg.publisherId) break;
+      if (!liveState.rooms[msg.room]) liveState.rooms[msg.room] = { publishers: {}, mainPublisherId: null };
+      liveState.rooms[msg.room].publishers[msg.publisherId] = { id: msg.publisherId, label: (msg.info && msg.info.label) || msg.publisherId, stream: null, pc: null };
+      updateAdminCamerasUI(msg.room);
+      break;
+
+    case "publisher-left":
+      if (!msg.room || !msg.publisherId) break;
+      if (liveState.rooms[msg.room] && liveState.rooms[msg.room].publishers[msg.publisherId]){
+        // remover stream e fechar pc se existir
+        const p = liveState.rooms[msg.room].publishers[msg.publisherId];
+        if (p.pc) try{ p.pc.close(); }catch(e){}
+        delete liveState.rooms[msg.room].publishers[msg.publisherId];
+      }
+      updateAdminCamerasUI(msg.room);
+      break;
+
+    case "set-main":
+      // servidor/ admin definiu publisher principal para a sala
+      if (!msg.room) break;
+      if (!liveState.rooms[msg.room]) liveState.rooms[msg.room] = { publishers: {}, mainPublisherId: null };
+      liveState.rooms[msg.room].mainPublisherId = msg.publisherId || null;
+      // atualizar UI público
+      renderPlacarAoVivo(); // re-renderiza cards com main atualizado
+      updateAdminCamerasUI(msg.room);
+      break;
+
+    case "offer":
+      // se recebemos offer DE um viewer (ou servidor) => responder com answer
+      // ou se recebemos offer targeted to us (quando somos publisher)
+      await handleIncomingOffer(msg);
+      break;
+
+    case "answer":
+      // resposta a nosso offer (somos publisher ou viewer)
+      await handleIncomingAnswer(msg);
+      break;
+
+    case "candidate":
+      // candidato ICE
+      await handleIncomingCandidate(msg);
+      break;
+
+    default:
+      console.log("Signaling: tipo desconhecido", msg.type, msg);
+  }
+}
+
+/* ======= Handlers para SDP/CANDIDATES (dependem do design do signaling) ======= */
+
+async function handleIncomingOffer(msg){
+  // se msg.to é nosso id (ou broadcast), criamos/aceitamos conexão
   try{
-    localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
-    preview.srcObject = localStream;
-    statusEl.textContent = "Câmera ativa. Criando oferta...";
+    // Exemplo: servidor pode enviar offer para este cliente contendo sdp para criar PeerConnection
+    // Aqui simplificamos: se a offer vem para "viewer", criamos PC e setRemoteDescription + createAnswer
+    if (!msg.room) return;
+    // criar pc
+    const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+    pc.ontrack = (ev) => {
+      // recebendo stream remoto (publisher)
+      const stream = ev.streams && ev.streams[0];
+      if (!stream) return;
+      // identificar publisherId a partir de msg.from
+      const fromId = msg.from;
+      if (!liveState.rooms[msg.room]) liveState.rooms[msg.room] = { publishers:{}, mainPublisherId:null };
+      if (!liveState.rooms[msg.room].publishers[fromId]) liveState.rooms[msg.room].publishers[fromId] = { id: fromId, label: fromId, stream:null, pc: null };
+      liveState.rooms[msg.room].publishers[fromId].stream = stream;
+      liveState.rooms[msg.room].publishers[fromId].pc = pc;
+      updateAdminCamerasUI(msg.room);
+      renderPlacarAoVivo();
+    };
+    pc.onicecandidate = (ev) => {
+      if (ev.candidate){
+        sendSignaling({ type:"candidate", from: liveState.myClientId, to: msg.from, room: msg.room, candidate: ev.candidate });
+      }
+    };
+    await pc.setRemoteDescription({ type: "offer", sdp: msg.sdp });
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    sendSignaling({ type:"answer", from: liveState.myClientId, to: msg.from, room: msg.room, sdp: answer.sdp });
   }catch(e){
-    console.error(e);
-    alert("Não
+    console.error("Erro handleIncomingOffer", e);
+  }
+}
+
+async function handleIncomingAnswer(msg){
+  // quando somos publisher e recebemos answer do server/viewer
+  try{
+    const room = msg.room;
+    const from = msg.from;
+    if (!liveState.rooms[room]) return;
+    const pub = liveState.rooms[room].publishers && liveState.rooms[room].publishers[liveState.myClientId];
+    if (!pub || !pub.pc) return;
+    await pub.pc.setRemoteDescription({ type: "answer", sdp: msg.sdp });
+  }catch(e){
+    console.error("Erro handleIncomingAnswer", e);
+  }
+}
+
+async function handleIncomingCandidate(msg){
+  try{
+    const room = msg.room;
+    const from = msg.from;
+    const cand = msg.candidate;
+    if (!room || !cand) return;
+    // Encontrar pc que corresponda: publisher local -> pub.pc, ou remote publisher -> liveState.rooms[room].publishers[from].pc
+    if (liveState.rooms[room] && liveState.rooms[room].publishers && liveState.rooms[room].publishers[from] && liveState.rooms[room].publishers[from].pc){
+      const pc = liveState.rooms[room].publishers[from].pc;
+      await pc.addIceCandidate(new RTCIceCandidate(cand));
+      return;
+    }
+    // fallback: tentar add em publisher local
+    const localPub = liveState.rooms[room] && liveState.rooms[room].publishers && liveState.rooms[room].publishers[liveState.myClientId];
+    if (localPub && localPub.pc){
+      await localPub.pc.addIceCandidate(new RTCIceCandidate(cand));
+    }
+  }catch(e){
+    console.error("Erro handleIncomingCandidate", e);
+  }
+}
+
+/* ======= UI helpers para Ao Vivo: gerar elementos de vídeo nos cards ======= */
+
+function buildPlacarCardVideo(j) {
+  // cria o DOM do card que já mostrava info + adiciona área de vídeo e miniaturas
+  const card = document.createElement("div");
+  card.className = "placar-card";
+  card.dataset.gameId = j.id;
+
+  const topo = document.createElement("div");
+  topo.className = "placar-linha-principal";
+  topo.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-");
+  card.appendChild(topo);
+
+  const info = document.createElement("div");
+  info.innerHTML =
+    "Local: "+(j.localJogo || "-")+"<br>"+
+    (j.turma1 || "")+" <strong>"+(j.placar1 ?? 0)+"</strong> x <strong>"+(j.placar2 ?? 0)+"</strong> "+(j.turma2 || "");
+  card.appendChild(info);
+
+  const statusSpan = document.createElement("span");
+  statusSpan.className = "placar-status";
+  if (j.status === "EM_ANDAMENTO") statusSpan.classList.add("andamento");
+  if (j.status === "PRESTES") statusSpan.classList.add("prestes
