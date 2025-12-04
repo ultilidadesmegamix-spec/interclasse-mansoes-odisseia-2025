@@ -19,97 +19,450 @@
       --verde: #28a745;
       --texto: #222;
     }
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    body { margin: 0; background: #f0f4fb; color: var(--texto); }
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      background: #f0f4fb;
+      color: var(--texto);
+    }
 
-    header { background: linear-gradient(90deg, var(--azul), #007bff); color: #fff; padding: 14px 18px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
-    header h1 { margin: 0; font-size: 1.1rem; }
-    header small { display: block; font-size: 0.8rem; opacity: .9; }
-    .header-right { display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn { border: none; border-radius: 999px; padding: 7px 14px; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; }
-    .btn-primaria { background: #fff; color: var(--azul); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-    .btn-admin { background: transparent; border: 1px solid rgba(255,255,255,0.6); color: #fff; }
+    header {
+      background: linear-gradient(90deg, var(--azul), #007bff);
+      color: #fff;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    header small {
+      display: block;
+      font-size: 0.8rem;
+      opacity: .9;
+    }
+    .header-right {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primaria {
+      background: #fff;
+      color: var(--azul);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .btn-admin {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.6);
+      color: #fff;
+    }
 
-    main { max-width: 1100px; margin: 18px auto 30px; padding: 0 10px; }
-    .card { background: #fff; border-radius: 12px; border: 1px solid var(--borda); padding: 15px; margin-bottom: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    .card h2 { margin: 0 0 8px; font-size: 1.05rem; color: var(--azul); }
-    .card small { font-size: 0.8rem; color: #555; }
-    .grid-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
-    @media (max-width: 768px){ .grid-2{ grid-template-columns:1fr; } }
-    label { display:block; font-size:0.85rem; margin-bottom:3px; font-weight:500; }
-    input[type="text"], input[type="date"], input[type="time"], input[type="number"], select, textarea { width:100%; padding:7px 8px; border-radius:8px; border:1px solid var(--borda); background:#fafbff; font-size:0.9rem; }
-    textarea { resize:vertical; min-height:60px; }
-
-    .modalidades-lista { margin-top:6px; display:grid; grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap:6px; }
-    .modalidade-item { display:flex; gap:6px; padding:6px 8px; border-radius:8px; border:1px solid var(--borda); background:var(--azul-claro); font-size:0.8rem; }
-    .modalidade-item input { margin-top:3px; }
-    .modalidade-label { font-weight:600; font-size:0.85rem; }
-    .modalidade-vagas { display:block; font-size:0.75rem; color:#333; }
-    .modalidade-lotado { color:var(--vermelho); font-weight:600; }
-
-    .alerta { margin-top:4px; font-size:0.8rem; color:#555; }
-    .msg-erro { background:#ffe5e5; color:#b30000; padding:6px 8px; border-radius:8px; font-size:0.8rem; margin-bottom:6px; }
-    .msg-sucesso { background:#e5ffe9; color:#0c7a2a; padding:6px 8px; border-radius:8px; font-size:0.8rem; margin-bottom:6px; }
-
-    table { width:100%; border-collapse:collapse; margin-top:6px; font-size:0.8rem; }
-    th,td { padding:5px 6px; border-bottom:1px solid #e1e4eb; text-align:left; }
-    th { background:#f2f5ff; font-weight:600; }
-    tr:hover td { background:#f9fbff; }
-
-    .filtros { margin-top:6px; display:flex; flex-wrap:wrap; gap:8px; }
-    .filtros > div { min-width:150px; }
+    main {
+      max-width: 1100px;
+      margin: 18px auto 30px;
+      padding: 0 10px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid var(--borda);
+      padding: 15px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      color: var(--azul);
+    }
+    .card small {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 10px;
+    }
+    @media (max-width: 768px){
+      .grid-2{ grid-template-columns:1fr; }
+    }
+    label {
+      display:block;
+      font-size:0.85rem;
+      margin-bottom:3px;
+      font-weight:500;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    input[type="number"],
+    select,
+    textarea {
+      width:100%;
+      padding:7px 8px;
+      border-radius:8px;
+      border:1px solid var(--borda);
+      background:#fafbff;
+      font-size:0.9rem;
+    }
+    textarea {
+      resize:vertical;
+      min-height:60px;
+    }
+    .modalidades-lista {
+      margin-top:6px;
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(170px,1fr));
+      gap:6px;
+    }
+    .modalidade-item {
+      display:flex;
+      gap:6px;
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid var(--borda);
+      background:var(--azul-claro);
+      font-size:0.8rem;
+    }
+    .modalidade-item input {
+      margin-top:3px;
+    }
+    .modalidade-label {
+      font-weight:600;
+      font-size:0.85rem;
+    }
+    .modalidade-vagas {
+      display:block;
+      font-size:0.75rem;
+      color:#333;
+    }
+    .modalidade-lotado {
+      color:var(--vermelho);
+      font-weight:600;
+    }
+    .alerta {
+      margin-top:4px;
+      font-size:0.8rem;
+      color:#555;
+    }
+    .msg-erro {
+      background:#ffe5e5;
+      color:#b30000;
+      padding:6px 8px;
+      border-radius:8px;
+      font-size:0.8rem;
+      margin-bottom:6px;
+    }
+    .msg-sucesso {
+      background:#e5ffe9;
+      color:#0c7a2a;
+      padding:6px 8px;
+      border-radius:8px;
+      font-size:0.8rem;
+      margin-bottom:6px;
+    }
+    table {
+      width:100%;
+      border-collapse:collapse;
+      margin-top:6px;
+      font-size:0.8rem;
+    }
+    th,td {
+      padding:5px 6px;
+      border-bottom:1px solid #e1e4eb;
+      text-align:left;
+    }
+    th {
+      background:#f2f5ff;
+      font-weight:600;
+    }
+    tr:hover td {
+      background:#f9fbff;
+    }
+    .filtros {
+      margin-top:6px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .filtros > div {
+      min-width:150px;
+    }
 
     /* Responsividade tabela inscrições (admin) */
-    #tab-inscricoes { overflow-x: auto; }
-    #tab-inscricoes table { min-width: 700px; }
+    #tab-inscricoes {
+      overflow-x: auto;
+    }
+    #tab-inscricoes table {
+      min-width: 700px;
+    }
 
     /* admin */
     #adminSection { display:none; }
-    .admin-header { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
-    .admin-header h2 { margin:0; font-size:1rem; color:var(--azul); }
-    .admin-sub { font-size:0.8rem; color:#555; }
-    .admin-status { font-size:0.75rem; padding:3px 8px; border-radius:999px; background:#e5ffe9; color:#0c7a2a; }
-    .admin-status.fechado { background:#ffe5e5; color:#b30000; }
-    .admin-tabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; border-bottom:1px solid #e1e4eb; padding-bottom:4px; }
-    .admin-tab-btn { border:none; border-radius:999px; padding:5px 10px; font-size:0.8rem; background:#f1f3fb; cursor:pointer; }
-    .admin-tab-btn.ativo { background:var(--azul); color:#fff; }
+    .admin-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .admin-header h2 {
+      margin:0;
+      font-size:1rem;
+      color:var(--azul);
+    }
+    .admin-sub {
+      font-size:0.8rem;
+      color:#555;
+    }
+    .admin-status {
+      font-size:0.75rem;
+      padding:3px 8px;
+      border-radius:999px;
+      background:#e5ffe9;
+      color:#0c7a2a;
+    }
+    .admin-status.fechado {
+      background:#ffe5e5;
+      color:#b30000;
+    }
+    .admin-tabs {
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-bottom:8px;
+      border-bottom:1px solid #e1e4eb;
+      padding-bottom:4px;
+    }
+    .admin-tab-btn {
+      border:none;
+      border-radius:999px;
+      padding:5px 10px;
+      font-size:0.8rem;
+      background:#f1f3fb;
+      cursor:pointer;
+    }
+    .admin-tab-btn.ativo {
+      background:var(--azul);
+      color:#fff;
+    }
     .admin-tab-content { display:none; }
     .admin-tab-content.ativo { display:block; }
-    .admin-bloco { background:#f9fbff; border-radius:10px; border:1px dashed #c5cde0; padding:8px; margin-bottom:8px; font-size:0.82rem; }
-
+    .admin-bloco {
+      background:#f9fbff;
+      border-radius:10px;
+      border:1px dashed #c5cde0;
+      padding:8px;
+      margin-bottom:8px;
+      font-size:0.82rem;
+    }
     /* jogos / placar / classificação */
     #secInscritos, #secJogos, #secPlacarAoVivo, #secClassificados { display:none; }
+    .jogo-bloco {
+      border-radius:10px;
+      border:1px solid var(--borda);
+      padding:6px 8px;
+      margin-top:6px;
+      background:#f9fbff;
+    }
+    .placar-card {
+      border-radius:10px;
+      border:1px solid var(--borda);
+      padding:8px 10px;
+      margin-top:6px;
+      background:#f9fbff;
+      font-size:0.85rem;
+    }
+    .placar-linha-principal {
+      font-weight:600;
+      margin-bottom:4px;
+    }
+    .placar-status {
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:0.75rem;
+      margin-top:2px;
+    }
+    .placar-status.andamento {
+      background:#e5ffe9;
+      color:#0c7a2a;
+    }
+    .placar-status.prestes {
+      background:#fff4d6;
+      color:#8a6d3b;
+    }
+
+    /* NOVO: linha / bolinhas para CLASSIFICADOS */
+    .linha-classificado {
+      display:flex;
+      align-items:center;
+      gap:4px;
+      font-size:0.85rem;
+      margin-top:2px;
+    }
+    .bolinha-resultado {
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      display:inline-block;
+    }
+    .bolinha-verde {
+      background: var(--verde);
+    }
+    .bolinha-vermelha {
+      background: var(--vermelho);
+    }
+    .bolinha-neutra {
+      background:#ccc;
+    }
 
     /* overlay e-mail */
-    #emailOverlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; }
-    #emailOverlayCard { background:#fff; border-radius:10px; padding:15px; max-width:360px; width:90%; box-shadow:0 8px 20px rgba(0,0,0,0.3); }
-    #emailOverlayCard h2 { margin:0 0 6px; font-size:1rem; color:var(--azul); }
-    #emailOverlayCard p { margin:0 0 8px; font-size:0.85rem; }
-    #msgEmailOverlay { font-size:0.78rem; color:var(--vermelho); min-height:14px; margin-bottom:4px; }
+    #emailOverlay {
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.5);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+    }
+    #emailOverlayCard {
+      background:#fff;
+      border-radius:10px;
+      padding:15px;
+      max-width:360px;
+      width:90%;
+      box-shadow:0 8px 20px rgba(0,0,0,0.3);
+    }
+    #emailOverlayCard h2 {
+      margin:0 0 6px;
+      font-size:1rem;
+      color:var(--azul);
+    }
+    #emailOverlayCard p {
+      margin:0 0 8px;
+      font-size:0.85rem;
+    }
+    #msgEmailOverlay {
+      font-size:0.78rem;
+      color:var(--vermelho);
+      min-height:14px;
+      margin-bottom:4px;
+    }
 
-    /* HOMEPAGE (inicio do site) - visual mais atraente quando inscrições encerradas */
-    #secHome { display:none; padding:28px; background: linear-gradient(180deg,#ffffff 0%, #f4f7ff 100%); border-radius:12px; }
-    #homeContent { max-width:920px; margin:0 auto; text-align:center; }
-    #homeContent .home-top { display:flex; gap:12px; align-items:center; justify-content:center; margin-bottom:12px; }
-    #homeLogo { height:80px; width:auto; display:none; border-radius:8px; background:#fff; padding:8px; border:1px solid var(--borda); }
-    #homeTitle { margin:0; font-size:1.6rem; color:#09345a; }
-    #homeSubtitle { display:block; margin-top:6px; font-size:1rem; color:#33475b; }
-    #homeHeroHtml { margin-top:14px; font-size:1.02rem; color:#333; line-height:1.45; }
-    .home-actions { margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-    .home-actions .btn { padding:10px 16px; font-size:0.95rem; border-radius:10px; }
+    /* Cabeçalho do relatório (tela) */
+    #relatorioCabecalhoImpressao {
+      margin-top:4px;
+      margin-bottom:4px;
+    }
+    #relatorioCabecalhoImpressao h3 {
+      margin:0;
+      font-size:0.95rem;
+      color:var(--azul);
+    }
+    #relatorioCabecalhoImpressao small {
+      font-size:0.8rem;
+      color:#555;
+    }
+
+    /* PAINEL PROFESSORES (apenas para quem loga como prof/coord/gestor) */
+    #professoresSection {
+      display:none;
+    }
+    #profListaAlunos .jogo-bloco {
+      margin-top:8px;
+    }
 
     /* ESTILO DE IMPRESSÃO – mostrar SOMENTE a tabela do relatório */
     @media print {
-      body { background:#fff; margin:0; padding:0; }
-      header, #secInscricao, #secInscritos, #secJogos, #secPlacarAoVivo, #secClassificados, #emailOverlay, .admin-header, .admin-tabs, #tab-inscricoes, #tab-jogos, #tab-config, #btnFecharAdmin, #tab-relatorio .admin-bloco, #btnImprimirRelatorio, #btnImprimirTodaTurma { display: none !important; }
-      main { margin: 0; padding: 0; }
-      #adminSection { display:block !important; margin:0; padding:0; border:none; box-shadow:none; background:#fff; }
-      .card { border:none; box-shadow:none; margin:0; padding:0; background:#fff; }
-      #tab-relatorio { display:block !important; margin:0; padding:0; }
-      #tabelaRelatorio { display: table !important; width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 0; }
-      #tabelaRelatorio thead { display: table-header-group; }
-      #tabelaRelatorio tbody { display: table-row-group; }
-      #tabelaRelatorio th, #tabelaRelatorio td { border: 1px solid #000; padding: 4px 6px; }
+      body {
+        background:#fff;
+        margin:0;
+        padding:0;
+      }
+
+      /* Esconde tudo que não for a tabela do relatório */
+      header,
+      #secInscricao,
+      #secInscritos,
+      #secJogos,
+      #secPlacarAoVivo,
+      #secClassificados,
+      #emailOverlay,
+      .admin-header,
+      .admin-tabs,
+      #tab-inscricoes,
+      #tab-jogos,
+      #tab-config,
+      #btnFecharAdmin,
+      #tab-relatorio .admin-bloco,
+      #btnImprimirRelatorio,
+      #btnImprimirTodaTurma {
+        display: none !important;
+      }
+
+      main {
+        margin: 0;
+        padding: 0;
+      }
+      #adminSection {
+        display:block !important;
+        margin:0;
+        padding:0;
+        border:none;
+        box-shadow:none;
+        background:#fff;
+      }
+      .card {
+        border:none;
+        box-shadow:none;
+        margin:0;
+        padding:0;
+        background:#fff;
+      }
+      #tab-relatorio {
+        display:block !important;
+        margin:0;
+        padding:0;
+      }
+
+      #tabelaRelatorio {
+        display: table !important;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+        margin: 0;
+      }
+      #tabelaRelatorio thead {
+        display: table-header-group;
+      }
+      #tabelaRelatorio tbody {
+        display: table-row-group;
+      }
+      #tabelaRelatorio th,
+      #tabelaRelatorio td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+      }
     }
   </style>
 </head>
@@ -141,33 +494,6 @@
 </header>
 
 <main>
-
-  <!-- NOVA: PÁGINA INICIAL (quando inscrições ENCERRADAS) -->
-  <section class="card" id="secHome" style="display:none;">
-    <!-- Este bloco é totalmente editável via admin (salvo em config.geral.homepage) -->
-    <div id="homeContent">
-      <div class="home-top">
-        <img id="homeLogo" src="" alt="logo" />
-        <div>
-          <h2 id="homeTitle">Movimenta Odisseia</h2>
-          <small id="homeSubtitle">Inscrições encerradas — obrigado pelo interesse!</small>
-        </div>
-      </div>
-
-      <div id="homeHeroHtml">
-        <!-- conteúdo HTML livre (seguro: salvo pelo admin) -->
-        <p>As inscrições foram encerradas. Em breve publicaremos os jogos e classificados. Fique atento às próximas comunicações da escola.</p>
-      </div>
-
-      <div class="home-actions">
-        <button class="btn btn-primaria" onclick="mostrarSecao('inscritos')">👀 Ver inscritos</button>
-        <button class="btn btn-primaria" onclick="mostrarSecao('jogos')">🏆 Ver jogos</button>
-        <button class="btn btn-primaria" onclick="mostrarSecao('classificados')">✅ Classificados</button>
-        <button class="btn btn-primaria" onclick="mostrarSecao('placar')">⚡ Placar ao vivo</button>
-        <button class="btn btn-admin" onclick="abrirAdmin()">🔐 Área administrativa</button>
-      </div>
-    </div>
-  </section>
 
   <!-- INSCRIÇÃO -->
   <section class="card" id="secInscricao">
@@ -277,8 +603,6 @@
     </table>
   </section>
 
-  <!-- (o restante do documento - jogos, classificados, placar, admin etc. permanece inalterado em layout) -->
-
   <!-- JOGOS (ALUNO) -->
   <section class="card" id="secJogos">
     <h2>Jogos</h2>
@@ -382,12 +706,6 @@
           </select>
           <button class="btn btn-primaria" id="btnCancelarInscricao">Cancelar</button>
         </div>
-      </div>
-
-      <div class="admin-bloco">
-        <strong>Contagem geral (apenas admins)</strong>
-        <small style="display:block;margin-top:2px;">Aqui aparecem os números de inscritos por turma/modalidade.</small>
-        <div id="adminContagens" style="margin-top:6px; font-size:0.9rem;"></div>
       </div>
 
       <table id="tabelaAdmin">
@@ -646,34 +964,6 @@
       </div>
 
       <button class="btn btn-primaria" id="btnSalvarConfig">💾 Salvar configurações</button>
-
-      <!-- EDITOR DA PÁGINA INICIAL (ADMIN) -->
-      <div class="admin-bloco" style="margin-top:12px;">
-        <strong>Editor da página inicial (quando inscrições estiverem encerradas)</strong>
-        <small style="display:block;margin-top:2px;">Edite o conteúdo que será mostrado ao público quando as inscrições estiverem fechadas.</small>
-
-        <div style="margin-top:8px;">
-          <label for="homepageTitle">Título (h2)</label>
-          <input type="text" id="homepageTitle" placeholder="Ex: Movimenta Odisseia 2025">
-        </div>
-        <div style="margin-top:8px;">
-          <label for="homepageSubtitle">Subtítulo</label>
-          <input type="text" id="homepageSubtitle" placeholder="Ex: Obrigado pelo interesse — inscrições encerradas.">
-        </div>
-        <div style="margin-top:8px;">
-          <label for="homepageLogoUrl">URL do logo (opcional)</label>
-          <input type="text" id="homepageLogoUrl" placeholder="https://...">
-        </div>
-        <div style="margin-top:8px;">
-          <label for="homepageHeroHtml">HTML do bloco principal (pode conter <code>&lt;p&gt;</code>, <code>&lt;ul&gt;</code> etc.)</label>
-          <textarea id="homepageHeroHtml" placeholder="<p>Mensagem...</p>"></textarea>
-        </div>
-        <div style="margin-top:8px; display:flex; gap:8px;">
-          <button class="btn btn-primaria" id="btnSalvarHomepage">💾 Salvar página inicial</button>
-          <button class="btn btn-primaria" id="btnPreviewHomepage">👁️ Visualizar (local)</button>
-        </div>
-      </div>
-
     </div>
   </section>
 
@@ -768,6 +1058,7 @@ const TURMAS_NOTURNO = [
   "3ºA","3ºB","3ºC"
 ];
 
+/* TODAS AS TURMAS (para cadastro de jogos sem depender de turno/série) */
 const TODAS_TURMAS = [
   ...TURMAS_MATUTINO,
   ...TURMAS_VESPERTINO,
@@ -799,27 +1090,26 @@ let LIMITE_MODALIDADE_TURMA = {
 let LIMITE_QUEIMADA_TOTAL = 10;
 let LIMITE_QUEIMADA_POR_SEXO = 5;
 
-/* controle de inscrições por turma/mod queimada */
+/* controle de inscrições por turma/mod e queimada */
 let countsPorTurmaModalidade = {};
 let countsQueimadaGenero = {};
 let todasInscricoes = [];
 let todosJogos = [];
 
-/* professores e papéis */
+/* NOVO: professores e papéis */
 let todosProfessores = []; // {id, nome, tipo, senha}
 let currentRole = null;    // "ADMIN", "Professor", "Coordenador", "Gestor"
 let currentProfessor = null; // objeto do professor logado
 
 /* config evento */
 let configEvento = {
-  dataLimite: null,
+  dataLimite: null,           // yyyy-mm-dd
   msgEncerradas: "",
   bloquearAgora: false,
   nomeEvento: "Movimenta Odisseia",
   anoEvento: "",
   textoInicial: "",
-  autorizacoes: {},
-  homepage: { title: "", subtitle: "", logoUrl: "", heroHtml: "" }
+  autorizacoes: {} // estrutura: { turma: { "FUTSAL": true, "QUEIMADA MISTA": true, ... } }
 };
 
 let inscricoesEncerradas = false;
@@ -858,7 +1148,7 @@ function formatarDataBR(yyyyMMdd){
   return p[2] + "/" + p[1] + "/" + p[0];
 }
 
-/* ========== CONTROLE DE FECHAMENTO E TROCA PÁGINA INICIAL ========== */
+/* ========== CONTROLE DE FECHAMENTO ========== */
 
 function atualizarStatusInscricoes(){
   const hoje = new Date();
@@ -879,7 +1169,6 @@ function atualizarStatusInscricoes(){
 
   inscricoesEncerradas = fechado;
 
-  // habilita/desabilita campos do formulário (se aberto apenas)
   const form = document.getElementById("formInscricao");
   const adminStatus = document.getElementById("adminStatus");
   if (form){
@@ -899,28 +1188,9 @@ function atualizarStatusInscricoes(){
       adminStatus.classList.remove("fechado");
     }
   }
-
-  // Mostrar página inicial de boas-vindas se encerrado, caso contrário o formulário
-  const overlay = document.getElementById('emailOverlay');
-  if (inscricoesEncerradas){
-    mostrarSecao("home");
-    // esconder overlay quando encerrado (não precisa pedir e-mail se inscrições fechadas)
-    if (overlay) overlay.style.display = 'none';
-  } else {
-    // se admin estiver logado, não forçamos voltar ao formulário (admin vê admin)
-    if (!isAdmin && currentRole === null){
-      mostrarSecao("inscricao");
-      // mostrar overlay apenas se não houver email salvo
-      if (overlay) overlay.style.display = (emailAtual && validarEmail(emailAtual)) ? 'none' : 'flex';
-    } else if (!isAdmin && currentRole !== null && currentRole !== "ADMIN"){
-      // deixa a tela de professores se o usuário for professor
-      mostrarSecao("professores");
-      if (overlay) overlay.style.display = (emailAtual && validarEmail(emailAtual)) ? 'none' : 'flex';
-    }
-  }
 }
 
-/* ========== CARREGAR / SALVAR CONFIGS (inclui homepage) ========== */
+/* ========== CONFIG FIRESTORE ========== */
 
 async function carregarConfiguracoes(){
   try{
@@ -946,7 +1216,6 @@ async function carregarConfiguracoes(){
       if (d.anoEdicao) configEvento.anoEvento = d.anoEdicao;
       if (d.textoInicial) configEvento.textoInicial = d.textoInicial;
       if (d.autorizacoes) configEvento.autorizacoes = d.autorizacoes || {};
-      if (d.homepage) configEvento.homepage = Object.assign(configEvento.homepage || {}, d.homepage);
     }
   }catch(e){
     console.error("Erro ao carregar configurações:",e);
@@ -969,13 +1238,6 @@ async function carregarConfiguracoes(){
   document.getElementById("cfgAnoEvento").value = configEvento.anoEvento || "";
   document.getElementById("cfgTextoInicial").value = configEvento.textoInicial || "";
 
-  // homepage editor fields (admin)
-  document.getElementById("homepageTitle").value = configEvento.homepage.title || "";
-  document.getElementById("homepageSubtitle").value = configEvento.homepage.subtitle || "";
-  document.getElementById("homepageLogoUrl").value = configEvento.homepage.logoUrl || "";
-  document.getElementById("homepageHeroHtml").value = configEvento.homepage.heroHtml || "";
-
-  // Atualiza cabeçalho público com nome do evento/texto inicial
   document.getElementById("tituloEvento").textContent = "Inscrições " + (configEvento.nomeEvento || "Movimenta Odisseia");
   if (configEvento.textoInicial){
     document.getElementById("subEvento").textContent = configEvento.textoInicial;
@@ -983,15 +1245,15 @@ async function carregarConfiguracoes(){
     document.getElementById("subEvento").textContent = "Inscrições para o " + configEvento.nomeEvento + " " + configEvento.anoEvento;
   }
 
-  // Carregar homepage no DOM (público)
-  renderHomepage();
+  // carregar autorizações na UI (se houver)
+  atualizarAutorizacoesUI();
 
-  // atualizar status de encerramento e disponibilidade
   atualizarStatusInscricoes();
   atualizarDisponibilidadeModalidades();
 }
 
 /* SALVAR CONFIG */
+
 async function salvarConfiguracoes(){
   if (!isAdmin){
     alert("Apenas o administrador pode salvar as configurações.");
@@ -1025,6 +1287,14 @@ async function salvarConfiguracoes(){
     "VOLEI": limVolei
   };
 
+  // coletar autorizações (estado atual da UI)
+  const autorizacoes = {};
+  const selTurmaAut = document.getElementById("cfgAutTurma");
+  if (selTurmaAut){
+    // vamos usar configEvento.autorizacoes já mantida no código
+    // antes de salvar, atualizamos configEvento.autorizacoes a partir da UI geral
+    // para simplicidade, usamos configEvento.autorizacoes atual (a UI já sincroniza ao selecionar turma)
+  }
   try{
     await db.collection("config").doc("geral").set({
       dataLimiteInscricao: dataLimite || null,
@@ -1037,8 +1307,7 @@ async function salvarConfiguracoes(){
       nomeEvento: nomeEvento,
       anoEdicao: anoEvento,
       textoInicial: textoInicial,
-      autorizacoes: configEvento.autorizacoes || {},
-      // mantenha homepage intacta ao salvar configs (merge)
+      autorizacoes: configEvento.autorizacoes || {}
     }, { merge:true });
 
     configEvento.dataLimite = dataLimite || null;
@@ -1066,65 +1335,10 @@ async function salvarConfiguracoes(){
   }
 }
 
-/* SALVAR HOMEPAGE (ADMIN) */
-async function salvarHomepage(){
-  if (!isAdmin){
-    alert("Apenas o administrador pode salvar a página inicial.");
-    return;
-  }
-  const title = (document.getElementById("homepageTitle").value || "").trim();
-  const subtitle = (document.getElementById("homepageSubtitle").value || "").trim();
-  const logoUrl = (document.getElementById("homepageLogoUrl").value || "").trim();
-  const heroHtml = (document.getElementById("homepageHeroHtml").value || "").trim();
-
-  try{
-    await db.collection("config").doc("geral").set({
-      homepage: {
-        title: title,
-        subtitle: subtitle,
-        logoUrl: logoUrl || null,
-        heroHtml: heroHtml || null
-      }
-    }, { merge:true });
-
-    configEvento.homepage.title = title;
-    configEvento.homepage.subtitle = subtitle;
-    configEvento.homepage.logoUrl = logoUrl;
-    configEvento.homepage.heroHtml = heroHtml;
-
-    renderHomepage();
-    alert("Página inicial salva com sucesso.");
-  }catch(e){
-    console.error(e);
-    alert("Erro ao salvar a página inicial.");
-  }
-}
-
-/* Renderiza homepage no bloco público */
-function renderHomepage(){
-  const logo = document.getElementById("homeLogo");
-  const title = document.getElementById("homeTitle");
-  const subtitle = document.getElementById("homeSubtitle");
-  const hero = document.getElementById("homeHeroHtml");
-
-  if (!configEvento.homepage) return;
-
-  title.textContent = configEvento.homepage.title || configEvento.nomeEvento || "Movimenta Odisseia";
-  subtitle.textContent = configEvento.homepage.subtitle || configEvento.textoInicial || "";
-
-  if (configEvento.homepage.logoUrl){
-    logo.src = configEvento.homepage.logoUrl;
-    logo.style.display = "block";
-  } else {
-    logo.style.display = "none";
-  }
-
-  hero.innerHTML = configEvento.homepage.heroHtml || "<p>As inscrições foram encerradas. Em breve divulgaremos as próximas etapas.</p>";
-}
-
-/* ========== AUTORIZAÇÕES UI (mesma lógica) ========== */
+/* ========== AUTORIZAÇÕES UI (novidade) ========== */
 
 function atualizarAutorizacoesUI(){
+  // popula select de turmas no bloco de autorizações
   const sel = document.getElementById("cfgAutTurma");
   const cont = document.getElementById("cfgAutModalidadesContainer");
   if (!sel || !cont) return;
@@ -1135,6 +1349,7 @@ function atualizarAutorizacoesUI(){
     sel.appendChild(o);
   });
 
+  // construir checkboxes de modalidades (apenas uma vez)
   cont.innerHTML = "";
   MODALIDADES.forEach(m => {
     const id = "cfgAutChk_" + m.replace(/\s+/g,"_");
@@ -1156,6 +1371,7 @@ function atualizarAutorizacoesUI(){
     cont.appendChild(wrapper);
   });
 
+  // quando selecionar turma, preencher checkboxes com configEvento.autorizacoes[turma]
   sel.addEventListener("change", () => {
     const turma = sel.value;
     const autorz = (configEvento.autorizacoes && configEvento.autorizacoes[turma]) || {};
@@ -1163,6 +1379,7 @@ function atualizarAutorizacoesUI(){
     chks.forEach(chk => {
       const mod = chk.dataset.mod;
       chk.checked = !!autorz[mod];
+      // escuta alteração para atualizar configEvento em tempo real
       chk.onchange = () => {
         if (!configEvento.autorizacoes) configEvento.autorizacoes = {};
         if (!configEvento.autorizacoes[turma]) configEvento.autorizacoes[turma] = {};
@@ -1172,7 +1389,7 @@ function atualizarAutorizacoesUI(){
   });
 }
 
-/* ========== DISPONIBILIDADE MODALIDADES (AJUSTADO: sem números para público) ========== */
+/* ========== DISPONIBILIDADE MODALIDADES ========== */
 
 function atualizarDisponibilidadeModalidades(){
   const turma = document.getElementById("turma").value;
@@ -1180,47 +1397,30 @@ function atualizarDisponibilidadeModalidades(){
   const spans = document.querySelectorAll(".modalidade-vagas");
   const chks = document.querySelectorAll(".chkModalidade");
 
-  const publicoNaoVerNumeros = !isAdmin; // se não for admin, não mostramos números
-
   spans.forEach(span => {
     const mod = span.dataset.mod;
     if (!turma){
-      span.textContent = mod + (publicoNaoVerNumeros ? " (selecione turno e turma)" : " (selecione turno e turma)");
+      span.textContent = mod + " (selecione turno e turma)";
+
       span.classList.remove("modalidade-lotado");
       return;
     }
 
+    // se autorizado para essa turma/ modalidade -> mostrar "AUTORIZADO"
     const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
 
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
       const gen = countsQueimadaGenero[turma] || {Masculino:0, Feminino:0};
-      if (publicoNaoVerNumeros){
-        // público: sem números, exibe apenas estado (Disponível / Lotado)
-        if ((tot >= LIMITE_QUEIMADA_TOTAL) && !autorizada) {
-          span.textContent = mod + " — Lotado";
-          span.classList.add("modalidade-lotado");
-        } else {
-          span.textContent = mod + (autorizada ? " — AUTORIZADO" : " — Vagas disponíveis");
-          span.classList.remove("modalidade-lotado");
-        }
-      } else {
-        // admin: mostra números
-        span.textContent = mod + " ("+tot+"/"+LIMITE_QUEIMADA_TOTAL+" / Meninos: "+gen.Masculino+"/"+LIMITE_QUEIMADA_POR_SEXO+" / Meninas: "+gen.Feminino+"/"+LIMITE_QUEIMADA_POR_SEXO+")" + (autorizada ? " — AUTORIZADO" : "");
-        if (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada) span.classList.add("modalidade-lotado");
-        else span.classList.remove("modalidade-lotado");
-      }
+      span.textContent = mod + " ("+tot+"/"+LIMITE_QUEIMADA_TOTAL+" / Meninos: "+gen.Masculino+"/"+LIMITE_QUEIMADA_POR_SEXO+" / Meninas: "+gen.Feminino+"/"+LIMITE_QUEIMADA_POR_SEXO+")" + (autorizada ? " — AUTORIZADO" : "");
+      if (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada) span.classList.add("modalidade-lotado");
+      else span.classList.remove("modalidade-lotado");
     } else {
       const lim = LIMITE_MODALIDADE_TURMA[mod] || 0;
       const qtd = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      if (publicoNaoVerNumeros){
-        if (qtd >= lim && !autorizada) span.textContent = mod + " — Lotado";
-        else span.textContent = mod + (autorizada ? " — AUTORIZADO" : " — Vagas disponíveis");
-      } else {
-        span.textContent = mod + " ("+qtd+"/"+lim+" vagas)" + (autorizada ? " — AUTORIZADO" : "");
-        if (qtd >= lim && !autorizada) span.classList.add("modalidade-lotado");
-        else span.classList.remove("modalidade-lotado");
-      }
+      span.textContent = mod + " ("+qtd+"/"+lim+" vagas)" + (autorizada ? " — AUTORIZADO" : "");
+      if (qtd >= lim && !autorizada) span.classList.add("modalidade-lotado");
+      else span.classList.remove("modalidade-lotado");
     }
   });
 
@@ -1236,7 +1436,7 @@ function atualizarDisponibilidadeModalidades(){
 
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      const gen = countsQueimadaGenero[turma] || {Masculino:0,Feminino:0};
+      const gen = countsQueimadaGenero[turma] || {Masculino:0, Feminino:0};
       if (!sexo || (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada)){
         chk.disabled = true; chk.checked = false; return;
       }
@@ -1267,6 +1467,7 @@ async function handleSubmitInscricao(e){
     msgForm(configEvento.msgEncerradas || "As inscrições foram encerradas.", false);
     return;
   }
+  // primeiro tente emailAtual -> localStorage fallback
   if (!emailAtual){
     try{
       const fromStorage = localStorage.getItem('insc_email');
@@ -1310,7 +1511,9 @@ async function handleSubmitInscricao(e){
     }
   }
 
+  // verificação por modalidade com consideração de autorizações
   for (const mod of mods){
+    // se existe autorização para a turma/mod => pular validação
     const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
     if (autorizada) continue;
 
@@ -1346,7 +1549,7 @@ async function handleSubmitInscricao(e){
       camisaNumero: camisaNumero || null,
       modalidades: mods,
       observacoes: observacoes || null,
-      naoAutorizadoPor: [],
+      naoAutorizadoPor: [], // indicações de professores
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     msgForm("Inscrição realizada com sucesso! ✅", true);
@@ -1361,6 +1564,7 @@ async function handleSubmitInscricao(e){
 }
 
 /* CANCELAR INSCRIÇÃO (ADMIN) */
+
 async function cancelarInscricao(){
   if (!isAdmin){
     alert("Apenas o administrador pode cancelar inscrições.");
@@ -1523,31 +1727,9 @@ function renderAdmin(){
     tr.appendChild(tdD);
     corpo.appendChild(tr);
   });
-
-  // Render contagens administrativas (apenas admins veem)
-  const adminCont = document.getElementById("adminContagens");
-  adminCont.innerHTML = "";
-  const turmas = Object.keys(countsPorTurmaModalidade).sort();
-  if (!turmas.length){
-    adminCont.textContent = "Nenhuma inscrição ainda.";
-  } else {
-    turmas.forEach(t => {
-      const div = document.createElement("div");
-      div.style.marginBottom = "6px";
-      const linhas = [];
-      Object.keys(countsPorTurmaModalidade[t] || {}).forEach(mod => {
-        const qtd = countsPorTurmaModalidade[t][mod] || 0;
-        linhas.push(mod + ": " + qtd);
-      });
-      const queimada = countsQueimadaGenero[t] || {Masculino:0,Feminino:0};
-      const qLine = "QUEIMADA MISTA — total: " + ((countsPorTurmaModalidade[t] && countsPorTurmaModalidade[t]["QUEIMADA MISTA"]) || 0) + " (M: "+queimada.Masculino+", F: "+queimada.Feminino+")";
-      div.innerHTML = "<strong>"+t+"</strong><br>" + (linhas.join(" — ") + " — " + qLine);
-      adminCont.appendChild(div);
-    });
-  }
 }
 
-/* RELATÓRIO IMPRESSO (mesmas funções) */
+/* RELATÓRIO IMPRESSO */
 
 function renderRelatorio(){
   const tbody = document.querySelector("#tabelaRelatorio tbody");
@@ -1634,6 +1816,7 @@ function renderRelatorio(){
   });
 }
 
+/* NOVA FUNÇÃO: Relatório de TODA TURMA (todas as modalidades) */
 function renderRelatorioTodaTurma(){
   const tbody = document.querySelector("#tabelaRelatorio tbody");
   const turnoEl = document.getElementById("relatorioTurno");
@@ -2378,25 +2561,13 @@ async function indicarAlunoNaoParticipa(inscricaoId){
 /* ========== TROCA DE TELAS ========== */
 
 function mostrarSecao(sec){
-  // sec: 'inscricao','inscritos','jogos','classificados','placar','admin','professores','home'
-  // hide all
-  document.getElementById("secInscricao").style.display = "none";
-  document.getElementById("secInscritos").style.display = "none";
-  document.getElementById("secJogos").style.display = "none";
-  document.getElementById("secClassificados").style.display = "none";
-  document.getElementById("secPlacarAoVivo").style.display = "none";
-  document.getElementById("adminSection").style.display = "none";
-  document.getElementById("professoresSection").style.display = "none";
-  document.getElementById("secHome").style.display = "none";
-
-  if (sec === "inscricao") document.getElementById("secInscricao").style.display = "block";
-  if (sec === "inscritos") document.getElementById("secInscritos").style.display = "block";
-  if (sec === "jogos") document.getElementById("secJogos").style.display = "block";
-  if (sec === "classificados") document.getElementById("secClassificados").style.display = "block";
-  if (sec === "placar") document.getElementById("secPlacarAoVivo").style.display = "block";
-  if (sec === "admin") document.getElementById("adminSection").style.display = "block";
-  if (sec === "professores") document.getElementById("professoresSection").style.display = "block";
-  if (sec === "home") document.getElementById("secHome").style.display = "block";
+  document.getElementById("secInscricao").style.display = (sec==="inscricao"?"block":"none");
+  document.getElementById("secInscritos").style.display = (sec==="inscritos"?"block":"none");
+  document.getElementById("secJogos").style.display = (sec==="jogos"?"block":"none");
+  document.getElementById("secClassificados").style.display = (sec==="classificados"?"block":"none");
+  document.getElementById("secPlacarAoVivo").style.display = (sec==="placar"?"block":"none");
+  document.getElementById("adminSection").style.display = (sec==="admin"?"block":"none");
+  document.getElementById("professoresSection").style.display = (sec==="professores"?"block":"none");
 }
 
 function abrirAdmin(){
@@ -2477,7 +2648,7 @@ function configurarAbasAdmin(){
   });
 }
 
-/* ========== LISTENERS FIRESTORE (realtime listeners) ========== */
+/* ========== LISTENERS FIRESTORE ========== */
 
 function iniciarListeners(){
   // Professores (acesso)
@@ -2594,6 +2765,7 @@ function init(){
     }
     emailAtual = val;
     try { localStorage.setItem('insc_email', val); } catch(e){}
+    // definir fallback global também (caso outros scripts precisem)
     try { window._inscricao_email_fallback = val; } catch(e){}
     if (overlay) overlay.style.display = "none";
   }
@@ -2701,7 +2873,7 @@ function init(){
   filtroTurma.addEventListener("change", renderPublico);
   filtroModalidade.addEventListener("change", renderPublico);
 
-  /* JOGOS ADMIN SEM SÉRIE – TURMAS LIVRES (QUALQUER TURNO) */
+  /* NOVA LÓGICA: JOGOS ADMIN SEM SÉRIE – TURMAS LIVRES (QUALQUER TURNO) */
   const jogoTurma1 = document.getElementById("jogoTurma1");
   const jogoTurma2 = document.getElementById("jogoTurma2");
 
@@ -2777,6 +2949,7 @@ function init(){
   const btnImprimirRelatorio = document.getElementById("btnImprimirRelatorio");
   if (btnImprimirRelatorio){
     btnImprimirRelatorio.addEventListener("click", () => {
+      // renderRelatorio() já atualiza a tabela com base nos selects
       renderRelatorio();
       window.print();
     });
@@ -2785,6 +2958,7 @@ function init(){
   const btnImprimirTodaTurma = document.getElementById("btnImprimirTodaTurma");
   if (btnImprimirTodaTurma){
     btnImprimirTodaTurma.addEventListener("click", () => {
+      // renderiza relatório completo da turma (todas as modalidades)
       renderRelatorioTodaTurma();
       window.print();
     });
@@ -2855,6 +3029,7 @@ function init(){
   document.getElementById("adminFiltroModalidade").addEventListener("change", renderAdmin);
   document.getElementById("btnCancelarInscricao").addEventListener("click", cancelarInscricao);
 
+  // filtro modalidades para jogos (aluno)
   const filtroModalidadeJogo = document.getElementById("filtroModalidadeJogo");
   if (filtroModalidadeJogo){
     filtroModalidadeJogo.innerHTML = '<option value="">Selecione...</option>';
@@ -2867,9 +3042,11 @@ function init(){
     filtroModalidadeJogo.addEventListener("change", renderJogosAluno);
   }
 
+  // filtros jogos (aluno)
   document.getElementById("filtroSerieJogo").addEventListener("change", renderJogosAluno);
   document.getElementById("filtroDataJogo").addEventListener("change", renderJogosAluno);
 
+  // filtro de pesquisa para excluir jogo (admin)
   const filtroExcluirJogo = document.getElementById("filtroExcluirJogo");
   if (filtroExcluirJogo){
     filtroExcluirJogo.addEventListener("input", atualizarSelectExcluirJogo);
@@ -2881,21 +3058,6 @@ function init(){
   document.getElementById("btnSalvarConfig").addEventListener("click", e => {
     e.preventDefault();
     salvarConfiguracoes();
-  });
-
-  // SALVAR HOMEPAGE e visualizar localmente
-  document.getElementById("btnSalvarHomepage").addEventListener("click", e => {
-    e.preventDefault();
-    salvarHomepage();
-  });
-  document.getElementById("btnPreviewHomepage").addEventListener("click", () => {
-    // atualiza configEvento.homepage localmente e renderiza
-    configEvento.homepage.title = document.getElementById("homepageTitle").value || "";
-    configEvento.homepage.subtitle = document.getElementById("homepageSubtitle").value || "";
-    configEvento.homepage.logoUrl = document.getElementById("homepageLogoUrl").value || "";
-    configEvento.homepage.heroHtml = document.getElementById("homepageHeroHtml").value || "";
-    renderHomepage();
-    alert("Preview atualizado localmente. Salve para tornar público.");
   });
 
   // Botão de adicionar professor (admin)
@@ -2932,9 +3094,7 @@ function init(){
   iniciarListeners();
   carregarConfiguracoes();
 
-  // mostra home ou inscrição inicialmente dependendo do status
-  if (inscricoesEncerradas) mostrarSecao("home");
-  else mostrarSecao("inscricao");
+  mostrarSecao("inscricao");
 }
 
 /* DOM ready */
@@ -2947,3 +3107,4 @@ if (document.readyState === "loading"){
 
 </body>
 </html>
+
