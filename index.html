@@ -9,10 +9,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <!-- Bibliotecas para PDF / QR / captura DOM / scanner -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- Bibliotecas adicionais para PDF / QR / Scanner -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
 
   <style>
@@ -471,28 +470,57 @@
       }
     }
 
-    /* Credenciais overlay / scanner */
-    #credOverlay {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
+    /* Credenciais - estilos novos */
+    #credList .cred-card {
+      border-radius:8px;
+      border:1px solid #e1e4eb;
+      padding:10px;
+      margin-top:8px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      background:#fff;
+    }
+    #credList .cred-info {
+      font-size:0.92rem;
+    }
+    #credList .cred-info small {
+      display:block;
+      font-size:0.78rem;
+      color:#666;
+    }
+    #scannerOverlay {
+      position:fixed;
+      inset:0;
       background: rgba(0,0,0,0.6);
-      z-index: 12000;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:10000;
     }
-    #credOverlayCard {
-      background: #fff;
-      border-radius: 10px;
-      padding: 14px;
-      width: 420px;
-      max-width: 96%;
-      box-shadow: 0 12px 36px rgba(0,0,0,0.4);
-      text-align: center;
+    #scannerCard {
+      width: min(720px, 96%);
+      background:#fff;
+      border-radius:10px;
+      padding:12px;
     }
-    .badge-preview { width: 320px; margin: 8px auto; text-align:left; padding:10px; border:1px solid #e1e6f6; border-radius:8px; background:linear-gradient(180deg,#fff,#f7fbff); }
-    #invalidOverlay { position: fixed; inset: 0; display:none; align-items:center; justify-content:center; z-index:13000; }
-    #invalidOverlay .msg { background:#ffefef; color:#900; padding:16px; border-radius:8px; font-weight:700; border:1px solid #f2c0c0; }
+    #scannerResult {
+      margin-top:8px;
+      padding:8px;
+      border-radius:8px;
+      min-height:80px;
+    }
+    .result-valid { background:#e7ffef; color:#0b6a2a; }
+    .result-invalid { background:#ffe9e9; color:#9b1b1b; }
+    .cracha-preview {
+      border:1px dashed #cbd6e6;
+      padding:8px;
+      border-radius:6px;
+      display:inline-block;
+      margin-top:6px;
+      background:#fff;
+    }
   </style>
 </head>
 <body>
@@ -700,6 +728,7 @@
       <button class="admin-tab-btn" data-tab="relatorio">🖨️ Imprimir relatório</button>
       <button class="admin-tab-btn" data-tab="professores">👩‍🏫 Professores</button>
       <button class="admin-tab-btn" data-tab="config">⚙️ Configurações</button>
+      <!-- NOVA ABA: Credenciais -->
       <button class="admin-tab-btn" data-tab="credenciais">🎫 Credenciais</button>
     </div>
 
@@ -871,42 +900,6 @@
       </table>
     </div>
 
-    <!-- TAB CREDENCIAIS (novo) -->
-    <div class="admin-tab-content" id="tab-credenciais">
-      <div class="admin-bloco">
-        <strong>Credenciais</strong>
-        <small style="display:block;margin-top:4px;">Filtre por Turno, Turma e Modalidade. Para cada inscrição listada você pode gerar o crachá (PDF) com QR Code único.</small>
-        <div class="filtros" style="margin-top:8px;">
-          <div>
-            <label for="credFiltroTurno">Turno</label>
-            <select id="credFiltroTurno">
-              <option value="">Todos</option>
-              <option value="Matutino">Matutino</option>
-              <option value="Vespertino">Vespertino</option>
-              <option value="Noturno">Noturno</option>
-            </select>
-          </div>
-          <div>
-            <label for="credFiltroTurma">Turma</label>
-            <select id="credFiltroTurma"><option value="">Todos</option></select>
-          </div>
-          <div>
-            <label for="credFiltroModalidade">Modalidade</label>
-            <select id="credFiltroModalidade"><option value="">Todos</option></select>
-          </div>
-        </div>
-      </div>
-
-      <div id="credList">
-        <div id="credListEmpty">Selecione filtros e clique em aplicar para listar inscrições.</div>
-      </div>
-
-      <div style="margin-top:10px; display:flex; justify-content:flex-end; gap:8px;">
-        <button class="btn btn-primaria" id="btnAplicarFiltrosCred">Aplicar filtros</button>
-        <button class="btn btn-primaria" id="btnAbrirEscaneador">Escaneador</button>
-      </div>
-    </div>
-
     <!-- TAB PROFESSORES (ADMIN GERENCIA SENHAS) -->
     <div class="admin-tab-content" id="tab-professores">
       <div class="admin-bloco">
@@ -1031,6 +1024,44 @@
 
       <button class="btn btn-primaria" id="btnSalvarConfig">💾 Salvar configurações</button>
     </div>
+
+    <!-- TAB CREDENCIAIS (NOVO) -->
+    <div class="admin-tab-content" id="tab-credenciais">
+      <div class="admin-bloco">
+        <strong>Credenciais — gerar e escanear</strong>
+        <small style="display:block;margin-top:4px;">Filtre por Turno, Turma e Modalidade. Cada inscrição listada terá o botão <strong>Imprimir Credenciais</strong>.</small>
+
+        <div class="filtros" style="margin-top:8px;">
+          <div>
+            <label for="credFiltroTurno">Turno</label>
+            <select id="credFiltroTurno">
+              <option value="">Selecione...</option>
+              <option value="Matutino">Matutino</option>
+              <option value="Vespertino">Vespertino</option>
+              <option value="Noturno">Noturno</option>
+            </select>
+          </div>
+          <div>
+            <label for="credFiltroTurma">Turma</label>
+            <select id="credFiltroTurma">
+              <option value="">Selecione o turno primeiro...</option>
+            </select>
+          </div>
+          <div>
+            <label for="credFiltroModalidade">Modalidade</label>
+            <select id="credFiltroModalidade">
+              <option value="">Selecione a modalidade...</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="credList" style="margin-top:8px;"></div>
+
+      <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn btn-primaria" id="btnAbrirEscaneador">🔍 Escaneador</button>
+      </div>
+    </div>
   </section>
 
   <!-- PAINEL PARA PROFESSORES / COORDENADORES / GESTORES -->
@@ -1080,19 +1111,20 @@
 
 </main>
 
-<!-- OVERLAYS: Credenciais preview / scanner -->
-<div id="credOverlay">
-  <div id="credOverlayCard">
-    <div id="credOverlayBody"></div>
-    <div style="margin-top:10px; display:flex; gap:8px; justify-content:center;">
-      <button class="btn btn-primaria" id="btnFecharCredOverlay">Fechar</button>
-      <button class="btn btn-primaria" id="btnDownloadPreviewPdf">📥 Baixar PDF</button>
+<!-- SCANNER OVERLAY (esconde até autorizado) -->
+<div id="scannerOverlay">
+  <div id="scannerCard">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+      <h3 style="margin:0; color:var(--azul);">Escaneador de Credenciais</h3>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" id="btnStopScanner">✖ Fechar</button>
+      </div>
     </div>
-  </div>
-</div>
 
-<div id="invalidOverlay" style="display:none;">
-  <div class="msg" id="invalidOverlayMsg">Inscrição não encontrada / QR inválido</div>
+    <div id="reader" style="margin-top:10px;"></div>
+
+    <div id="scannerResult"></div>
+  </div>
 </div>
 
 <script>
@@ -1183,19 +1215,22 @@ let currentProfessor = null; // objeto do professor logado
 
 /* config evento */
 let configEvento = {
-  dataLimite: null,
+  dataLimite: null,           // yyyy-mm-dd
   msgEncerradas: "",
   bloquearAgora: false,
   nomeEvento: "Movimenta Odisseia",
   anoEvento: "",
   textoInicial: "",
-  autorizacoes: {}
+  autorizacoes: {} // estrutura: { turma: { "FUTSAL": true, "QUEIMADA MISTA": true, ... } }
 };
 
 let inscricoesEncerradas = false;
 let emailAtual = null;
 let isAdmin = false;
 const ADMIN_PASSWORD = "52090949";
+
+/* Scanner helper */
+let html5QrCodeInstance = null;
 
 /* ========== FUNÇÕES AUXILIARES ========== */
 
@@ -1214,7 +1249,6 @@ function validarEmail(email){
 
 function msgForm(texto, ok){
   const box = document.getElementById("msgForm");
-  if (!box) return;
   box.innerHTML = "";
   const div = document.createElement("div");
   div.className = ok ? "msg-sucesso" : "msg-erro";
@@ -1411,7 +1445,6 @@ async function salvarConfiguracoes(){
 /* ========== AUTORIZAÇÕES UI (novidade) ========== */
 
 function atualizarAutorizacoesUI(){
-  // popula select de turmas no bloco de autorizações
   const sel = document.getElementById("cfgAutTurma");
   const cont = document.getElementById("cfgAutModalidadesContainer");
   if (!sel || !cont) return;
@@ -1422,7 +1455,6 @@ function atualizarAutorizacoesUI(){
     sel.appendChild(o);
   });
 
-  // construir checkboxes de modalidades (apenas uma vez)
   cont.innerHTML = "";
   MODALIDADES.forEach(m => {
     const id = "cfgAutChk_" + m.replace(/\s+/g,"_");
@@ -1444,7 +1476,6 @@ function atualizarAutorizacoesUI(){
     cont.appendChild(wrapper);
   });
 
-  // quando selecionar turma, preencher checkboxes com configEvento.autorizacoes[turma]
   sel.addEventListener("change", () => {
     const turma = sel.value;
     const autorz = (configEvento.autorizacoes && configEvento.autorizacoes[turma]) || {};
@@ -1452,7 +1483,6 @@ function atualizarAutorizacoesUI(){
     chks.forEach(chk => {
       const mod = chk.dataset.mod;
       chk.checked = !!autorz[mod];
-      // escuta alteração para atualizar configEvento em tempo real
       chk.onchange = () => {
         if (!configEvento.autorizacoes) configEvento.autorizacoes = {};
         if (!configEvento.autorizacoes[turma]) configEvento.autorizacoes[turma] = {};
@@ -1465,8 +1495,8 @@ function atualizarAutorizacoesUI(){
 /* ========== DISPONIBILIDADE MODALIDADES ========== */
 
 function atualizarDisponibilidadeModalidades(){
-  const turma = document.getElementById("turma") ? document.getElementById("turma").value : "";
-  const sexo = document.getElementById("sexo") ? document.getElementById("sexo").value : "";
+  const turma = document.getElementById("turma").value;
+  const sexo = document.getElementById("sexo").value;
   const spans = document.querySelectorAll(".modalidade-vagas");
   const chks = document.querySelectorAll(".chkModalidade");
 
@@ -1479,7 +1509,6 @@ function atualizarDisponibilidadeModalidades(){
       return;
     }
 
-    // se autorizado para essa turma/ modalidade -> mostrar "AUTORIZADO"
     const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
 
     if (mod === "QUEIMADA MISTA"){
@@ -1509,7 +1538,7 @@ function atualizarDisponibilidadeModalidades(){
 
     if (mod === "QUEIMADA MISTA"){
       const tot = (countsPorTurmaModalidade[turma] && countsPorTurmaModalidade[turma][mod]) || 0;
-      const gen = countsQueimadaGenero[turma] || {Masculino:0, Feminino:0};
+      const gen = countsQueimadaGenero[turma] || {Masculino:0,Feminino:0};
       if (!sexo || (tot >= LIMITE_QUEIMADA_TOTAL && !autorizada)){
         chk.disabled = true; chk.checked = false; return;
       }
@@ -1540,7 +1569,6 @@ async function handleSubmitInscricao(e){
     msgForm(configEvento.msgEncerradas || "As inscrições foram encerradas.", false);
     return;
   }
-  // primeiro tente emailAtual -> localStorage fallback
   if (!emailAtual){
     try{
       const fromStorage = localStorage.getItem('insc_email');
@@ -1584,9 +1612,7 @@ async function handleSubmitInscricao(e){
     }
   }
 
-  // verificação por modalidade com consideração de autorizações
   for (const mod of mods){
-    // se existe autorização para a turma/mod => pular validação
     const autorizada = !!(configEvento.autorizacoes && configEvento.autorizacoes[turma] && configEvento.autorizacoes[turma][mod]);
     if (autorizada) continue;
 
@@ -1622,7 +1648,7 @@ async function handleSubmitInscricao(e){
       camisaNumero: camisaNumero || null,
       modalidades: mods,
       observacoes: observacoes || null,
-      naoAutorizadoPor: [], // indicações de professores
+      naoAutorizadoPor: [],
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     msgForm("Inscrição realizada com sucesso! ✅", true);
@@ -2644,7 +2670,6 @@ function mostrarSecao(sec){
 }
 
 function abrirAdmin(){
-  // Seleciona tipo de acesso primeiro
   const opcao = prompt(
     "Selecione o tipo de acesso:\n" +
     "1 - Administrador\n" +
@@ -2676,14 +2701,11 @@ function abrirAdmin(){
     currentRole = "ADMIN";
     currentProfessor = null;
     mostrarSecao("admin");
-    document.getElementById("adminSection").style.display = "block";
-    document.getElementById("secInscricao").style.display = "none";
     renderAdmin();
     renderAdminJogos();
     return;
   }
 
-  // Professor / Coordenador / Gestor
   const prof = todosProfessores.find(p => p.senha === senha && p.tipo === role);
   if (!prof){
     alert("Senha incorreta ou acesso não encontrado para este tipo.");
@@ -2692,4 +2714,823 @@ function abrirAdmin(){
 
   isAdmin = false;
   currentRole = role;
-  currentProfessor
+  currentProfessor = prof;
+  mostrarSecao("professores");
+  renderPainelProfessores();
+}
+
+function fecharAdmin(){
+  mostrarSecao("inscricao");
+  currentRole = null;
+  isAdmin = false;
+}
+
+function fecharProfessores(){
+  mostrarSecao("inscricao");
+  currentRole = null;
+  currentProfessor = null;
+}
+
+/* abas admin */
+function configurarAbasAdmin(){
+  const botoes = document.querySelectorAll(".admin-tab-btn");
+  botoes.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tab = btn.dataset.tab;
+      botoes.forEach(b => b.classList.remove("ativo"));
+      btn.classList.add("ativo");
+      document.querySelectorAll(".admin-tab-content").forEach(c => c.classList.remove("ativo"));
+      const target = document.getElementById("tab-"+tab);
+      if (target) target.classList.add("ativo");
+      // Se abriu a aba credenciais, renderiza lista
+      if (tab === "credenciais") renderCredenciais();
+    });
+  });
+}
+
+/* ========== LISTENERS FIRESTORE ========== */
+
+function iniciarListeners(){
+  db.collection("professoresAcesso").onSnapshot(snap => {
+    todosProfessores = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      todosProfessores.push({
+        id: doc.id,
+        nome: d.nome || "",
+        tipo: d.tipo || "Professor",
+        senha: d.senha || ""
+      });
+    });
+    renderProfessoresAdmin();
+  });
+
+  db.collection("inscricoes").orderBy("timestamp","asc").onSnapshot(snap => {
+    todasInscricoes = [];
+    countsPorTurmaModalidade = {};
+    countsQueimadaGenero = {};
+    snap.forEach(doc => {
+      const d = doc.data();
+      const ins = {
+        id: doc.id,
+        nome: d.nome || "",
+        nomeNormalizado: d.nomeNormalizado || normalizarNome(d.nome || ""),
+        email: d.email || "",
+        sexo: d.sexo || "",
+        turno: d.turno || "",
+        turma: d.turma || "",
+        camisaNumero: d.camisaNumero || "",
+        modalidades: d.modalidades || [],
+        observacoes: d.observacoes || "",
+        naoAutorizadoPor: d.naoAutorizadoPor || [],
+        timestamp: d.timestamp
+      };
+      todasInscricoes.push(ins);
+
+      if (!countsPorTurmaModalidade[ins.turma]) countsPorTurmaModalidade[ins.turma] = {};
+      ins.modalidades.forEach(m => {
+        if (!countsPorTurmaModalidade[ins.turma][m]) countsPorTurmaModalidade[ins.turma][m] = 0;
+        countsPorTurmaModalidade[ins.turma][m]++;
+        if (m === "QUEIMADA MISTA"){
+          if (!countsQueimadaGenero[ins.turma]) countsQueimadaGenero[ins.turma] = {Masculino:0, Feminino:0};
+          if (ins.sexo === "Masculino") countsQueimadaGenero[ins.turma].Masculino++;
+          if (ins.sexo === "Feminino") countsQueimadaGenero[ins.turma].Feminino++;
+        }
+      });
+    });
+    atualizarDisponibilidadeModalidades();
+    atualizarSelectsAdminPublico();
+    renderPublico();
+    renderAdmin();
+    renderRelatorio();
+    if (currentRole && currentRole !== "ADMIN"){
+      renderPainelProfessores();
+    }
+    // Se aba credenciais estiver ativa, atualiza
+    const credTab = document.getElementById("tab-credenciais");
+    if (credTab && credTab.classList.contains("ativo")) renderCredenciais();
+  });
+
+  db.collection("jogos").orderBy("dataJogo","asc").onSnapshot(snap => {
+    todosJogos = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      let p1 = d.placar1;
+      let p2 = d.placar2;
+      if (typeof p1 === "string") p1 = parseInt(p1,10);
+      if (typeof p2 === "string") p2 = parseInt(p2,10);
+      todosJogos.push({
+        id: doc.id,
+        turno: d.turno || "",
+        serie: d.serie || "",
+        turma1: d.turma1 || "",
+        turma2: d.turma2 || "",
+        dataJogo: d.dataJogo || "",
+        modalidade: d.modalidade || "",
+        horarioJogo: d.horarioJogo || "",
+        localJogo: d.localJogo || "",
+        status: d.status || "AGENDADO",
+        placar1: Number.isFinite(p1) ? p1 : 0,
+        placar2: Number.isFinite(p2) ? p2 : 0
+      });
+    });
+    atualizarSelectExcluirJogo();
+    renderJogosAluno();
+    renderPlacarAoVivo();
+    renderClassificacao();
+    renderAdminJogos();
+  });
+}
+
+/* ========== CREDENCIAIS: helpers e UI ========== */
+
+/**
+ * Retorna o "número da inscrição" (1-based) baseado na ordem de todasInscricoes (timestamp asc).
+ * Se inspecionar por id retorna -1 se não encontrado.
+ */
+function getNumeroInscricaoPorId(insId){
+  for (let i=0;i<todasInscricoes.length;i++){
+    if (todasInscricoes[i].id === insId) return i+1;
+  }
+  return -1;
+}
+
+/**
+ * Retorna inscrição pelo número (1-based) ou null
+ */
+function getInscricaoPorNumero(num){
+  if (!num || num <=0) return null;
+  if (num > todasInscricoes.length) return null;
+  return todasInscricoes[num-1] || null;
+}
+
+/**
+ * Cria dataURL de QR code usando QRious
+ */
+function gerarQRCodeDataURL(text, size){
+  try{
+    const qr = new QRious({
+      value: String(text),
+      size: size || 200,
+      level: 'M'
+    });
+    return qr.toDataURL();
+  }catch(e){
+    console.error("Erro ao gerar QR:", e);
+    return null;
+  }
+}
+
+/**
+ * Gera PDF em formato de crachá para impressão.
+ * - Usa jsPDF (window.jspdf.jsPDF)
+ * - Tamanho: 90mm x 120mm (ajustável)
+ * - QR codifica o número da inscrição (numérico)
+ */
+function gerarPDFCrachaParaInscricao(ins){
+  try{
+    const numero = getNumeroInscricaoPorId(ins.id);
+    const nome = ins.nome || "";
+    const turno = ins.turno || "";
+    const turma = ins.turma || "";
+    const modalidades = (ins.modalidades || []).join(", ");
+    const idTexto = String(numero); // QR deve conter o número da inscrição conforme pedido
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: [90, 120], compress: true });
+
+    // fundo simples
+    doc.setFillColor(255,255,255);
+    doc.rect(5,5,80,110,'F');
+
+    // Título evento
+    doc.setFontSize(10);
+    doc.setTextColor(0,70,150);
+    doc.setFont("helvetica","bold");
+    doc.text((configEvento.nomeEvento || "Movimenta Odisseia"), 10, 15);
+
+    // Nome
+    doc.setFontSize(16);
+    doc.setFont("helvetica","bold");
+    doc.setTextColor(0,0,0);
+    const nomeLines = doc.splitTextToSize(nome, 68);
+    doc.text(nomeLines, 10, 30);
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica","normal");
+    doc.text("Turno: " + turno, 10, 50);
+    doc.text("Turma: " + turma, 10, 57);
+    doc.text("Modalidade(s): " + modalidades, 10, 64);
+    doc.text("Nº inscrição: " + numero, 10, 71);
+
+    // QR
+    const qrData = gerarQRCodeDataURL(idTexto, 300);
+    if (qrData){
+      // addImage expects dataURL
+      // posiciona QR na direita
+      doc.addImage(qrData, 'PNG', 58, 25, 32, 32);
+    }
+
+    // rodapé / instrução
+    doc.setFontSize(8);
+    doc.setTextColor(90,90,90);
+    doc.text("Apresente este crachá para conferência. (Interclass)", 10, 106);
+
+    // salvar
+    const safeNome = nome.replace(/[^a-z0-9_\-]/gi,'_').substring(0,40) || "inscricao";
+    doc.save(`cracha_${numero}_${safeNome}.pdf`);
+  }catch(e){
+    console.error("Erro gerar PDF:", e);
+    alert("Erro ao gerar PDF do crachá.");
+  }
+}
+
+/* Render da aba Credenciais */
+function renderCredenciais(){
+  if (!isAdmin) return; // apenas admin
+  const filtroTurno = document.getElementById("credFiltroTurno");
+  const filtroTurma = document.getElementById("credFiltroTurma");
+  const filtroModalidade = document.getElementById("credFiltroModalidade");
+  const container = document.getElementById("credList");
+
+  if (!filtroTurno || !filtroTurma || !filtroModalidade || !container) return;
+
+  // preencher selects opcionais (somente na primeira vez)
+  if (filtroModalidade.options.length <= 1){
+    filtroModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
+    MODALIDADES.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m; opt.textContent = m;
+      filtroModalidade.appendChild(opt);
+    });
+  }
+
+  // preencher turma de acordo com turno
+  const turno = filtroTurno.value;
+  filtroTurma.innerHTML = "";
+  const optDefault = document.createElement("option");
+  if (!turno){
+    optDefault.value = "";
+    optDefault.textContent = "Selecione o turno primeiro...";
+    filtroTurma.appendChild(optDefault);
+  } else {
+    optDefault.value = "";
+    optDefault.textContent = "Selecione a turma...";
+    filtroTurma.appendChild(optDefault);
+    getTurmasPorTurno(turno).forEach(t => {
+      const opt = document.createElement("option");
+      opt.value = t; opt.textContent = t;
+      filtroTurma.appendChild(opt);
+    });
+  }
+
+  // construir lista usando filtros atuais
+  const turma = filtroTurma.value;
+  const modalidade = filtroModalidade.value;
+
+  container.innerHTML = "";
+
+  if (!turno || !turma || !modalidade){
+    const p = document.createElement("p");
+    p.textContent = "Selecione Turno, Turma e Modalidade para ver as inscrições individualmente.";
+    container.appendChild(p);
+    return;
+  }
+
+  const lista = todasInscricoes.filter(ins => {
+    if (ins.turno !== turno) return false;
+    if (ins.turma !== turma) return false;
+    if (!ins.modalidades || !ins.modalidades.includes(modalidade)) return false;
+    return true;
+  });
+
+  if (!lista.length){
+    const p = document.createElement("p");
+    p.textContent = "Nenhuma inscrição para esses filtros.";
+    container.appendChild(p);
+    return;
+  }
+
+  lista.forEach(ins => {
+    const numero = getNumeroInscricaoPorId(ins.id);
+    const card = document.createElement("div");
+    card.className = "cred-card";
+
+    const info = document.createElement("div");
+    info.className = "cred-info";
+    info.innerHTML = "<strong>"+(ins.nome||"-")+"</strong><small>Turma: "+(ins.turma||"-")+" — Turno: "+(ins.turno||"-")+" — Nº: "+numero+"</small><small>Modalidades: "+(ins.modalidades||[]).join(", ")+"</small>";
+
+    const actions = document.createElement("div");
+    actions.style.display = "flex";
+    actions.style.flexDirection = "column";
+    actions.style.gap = "6px";
+    const btnImprimir = document.createElement("button");
+    btnImprimir.className = "btn btn-primaria";
+    btnImprimir.textContent = "Imprimir Credenciais";
+    btnImprimir.addEventListener("click", () => {
+      gerarPDFCrachaParaInscricao(ins);
+    });
+
+    actions.appendChild(btnImprimir);
+
+    card.appendChild(info);
+    card.appendChild(actions);
+    container.appendChild(card);
+  });
+}
+
+/* ========== ESCANEADOR ========== */
+
+async function abrirEscaneadorComReautenticacao(){
+  // pede senha administrativa novamente
+  const senha = prompt("Digite a senha administrativa para acessar o escaneador:");
+  if (senha === null) return;
+  if (senha !== ADMIN_PASSWORD){
+    alert("Senha incorreta.");
+    return;
+  }
+  // abre overlay e inicia leitor
+  const overlay = document.getElementById("scannerOverlay");
+  const readerDiv = document.getElementById("reader");
+  const resultDiv = document.getElementById("scannerResult");
+  overlay.style.display = "flex";
+  resultDiv.innerHTML = "<em>Aguardando leitura do QR...</em>";
+  resultDiv.className = "";
+  // start html5-qrcode
+  try{
+    if (html5QrCodeInstance){
+      try { await html5QrCodeInstance.stop(); } catch(e){/* ignore */ }
+      html5QrCodeInstance.clear();
+      html5QrCodeInstance = null;
+    }
+    html5QrCodeInstance = new Html5Qrcode("reader");
+    const config = { fps: 10, qrbox: Math.min(250, Math.floor(window.innerWidth*0.6)) };
+    await html5QrCodeInstance.start({ facingMode: "environment" }, config, (decodedText, decodedResult) => {
+      // Successful scan - decodedText expected to be the numeric number of inscrição
+      try {
+        const txt = String(decodedText).trim();
+        // tentar extrair número (se veio como "NUM:123" ou só "123")
+        const m = txt.match(/(\d+)/);
+        const numero = m ? parseInt(m[1],10) : NaN;
+        if (!Number.isFinite(numero)){
+          showScannerResultInvalid("QR inválido ou formato não reconhecido: " + txt);
+          stopScanner();
+          return;
+        }
+        const inscr = getInscricaoPorNumero(numero);
+        if (!inscr){
+          showScannerResultInvalid("Inscrição não encontrada (nº "+numero+").");
+          stopScanner();
+          return;
+        }
+        showScannerResultValid(inscr, numero);
+        stopScanner();
+      } catch(e){
+        console.error("Erro no processamento do QR:", e);
+        showScannerResultInvalid("Erro ao processar QR.");
+        stopScanner();
+      }
+    }, (errorMessage) => {
+      // no-op for scan failures, don't flood UI
+      // console.debug("scan err", errorMessage);
+    });
+  }catch(e){
+    console.error("Erro iniciar leitor:", e);
+    resultDiv.innerHTML = "<div class='result-invalid'>Erro ao iniciar a câmera/ leitor: "+ (e.message||e) +"</div>";
+  }
+}
+
+function stopScanner(){
+  if (html5QrCodeInstance){
+    try {
+      html5QrCodeInstance.stop().then(() => {
+        try { html5QrCodeInstance.clear(); } catch(e){/*ignore*/ }
+        html5QrCodeInstance = null;
+      }).catch(e => {
+        try { html5QrCodeInstance.clear(); } catch(e){/*ignore*/ }
+        html5QrCodeInstance = null;
+      });
+    } catch(e){
+      html5QrCodeInstance = null;
+    }
+  }
+}
+
+/* Mostra resultado válido no overlay */
+function showScannerResultValid(inscr, numero){
+  const div = document.getElementById("scannerResult");
+  div.className = "result-valid";
+  div.innerHTML = `
+    <div><strong>Inscrição encontrada (Nº ${numero})</strong></div>
+    <div style="margin-top:6px;">
+      <strong>${inscr.nome}</strong><br>
+      ${inscr.turno} — ${inscr.turma}<br>
+      Modalidades: ${(inscr.modalidades||[]).join(", ")}<br>
+      ID doc: ${inscr.id}
+    </div>
+    <div class="cracha-preview">
+      <div style="font-weight:600; color: #07427a;">${configEvento.nomeEvento || 'Movimenta Odisseia'}</div>
+      <div style="margin-top:6px;"><strong>${inscr.nome}</strong></div>
+      <div style="font-size:0.85rem; color:#333;">${inscr.turno} — ${inscr.turma}</div>
+      <div style="margin-top:6px; font-size:0.85rem;">Nº: ${numero}</div>
+      <div style="margin-top:6px;">
+        <img src="${gerarQRCodeDataURL(String(numero),200)}" style="width:90px; height:90px;" />
+      </div>
+    </div>
+  `;
+}
+
+/* Mostra resultado inválido */
+function showScannerResultInvalid(msg){
+  const div = document.getElementById("scannerResult");
+  div.className = "result-invalid";
+  div.innerHTML = `<strong>Inscrição inválida / não encontrada</strong><div style="margin-top:6px;">${msg}</div>`;
+}
+
+/*  Ao fechar overlay */
+function fecharOverlayScanner(){
+  stopScanner();
+  const overlay = document.getElementById("scannerOverlay");
+  overlay.style.display = "none";
+  const readerDiv = document.getElementById("reader");
+  readerDiv.innerHTML = "";
+  document.getElementById("scannerResult").innerHTML = "";
+}
+
+/* ========== JOGOS ADMIN: CADASTRAR / EXCLUIR / EDITAR PLACAR ========== */
+
+/* ... (restante do código já existente, repetido para continuidade) ... */
+/* Para evitar duplicação, o resto do código segue abaixo (já presente no arquivo original): */
+
+/* ========== RESTANTE DAS FUNÇÕES E INIT ========== */
+
+/* preencher selects e iniciar UI (init) */
+function renderCredenciais(); // declaração para linter (já implementada acima)
+
+/* preencher selects (parte repetida do init) */
+
+function init(){
+  try {
+    const saved = localStorage.getItem('insc_email');
+    if (saved && saved.includes('@')){
+      emailAtual = saved;
+      const ov = document.getElementById('emailOverlay');
+      if (ov) ov.style.display = 'none';
+    }
+  } catch(e){ /* ignore */ }
+
+  const overlay = document.getElementById("emailOverlay");
+  const emailInput = document.getElementById("emailAluno");
+  const msgEmail = document.getElementById("msgEmailOverlay");
+
+  function liberarEmail(){
+    const val = (emailInput.value || '').trim();
+    if (!validarEmail(val)){
+      msgEmail.textContent = "Digite um e-mail válido.";
+      return;
+    }
+    emailAtual = val;
+    try { localStorage.setItem('insc_email', val); } catch(e){}
+    try { window._inscricao_email_fallback = val; } catch(e){}
+    if (overlay) overlay.style.display = "none";
+  }
+  const btnEntrar = document.getElementById("btnEntrarEmail");
+  if (btnEntrar) btnEntrar.addEventListener("click", liberarEmail);
+  if (emailInput){
+    emailInput.addEventListener("keydown", e => {
+      if (e.key === "Enter"){
+        e.preventDefault();
+        liberarEmail();
+      }
+    });
+  }
+
+  const contMods = document.getElementById("modalidadesContainer");
+  MODALIDADES.forEach(m => {
+    const item = document.createElement("div");
+    item.className = "modalidade-item";
+    const chk = document.createElement("input");
+    chk.type = "checkbox";
+    chk.className = "chkModalidade";
+    chk.value = m;
+    const info = document.createElement("div");
+    const lbl = document.createElement("span");
+    lbl.className = "modalidade-label";
+    lbl.textContent = m;
+    const vagas = document.createElement("span");
+    vagas.className = "modalidade-vagas";
+    vagas.dataset.mod = m;
+    vagas.textContent = "Selecione turno e turma para ver vagas.";
+    info.appendChild(lbl);
+    info.appendChild(vagas);
+    item.appendChild(chk);
+    item.appendChild(info);
+    contMods.appendChild(item);
+  });
+
+  contMods.addEventListener("change", e => {
+    if (e.target.classList.contains("chkModalidade")){
+      const marcados = contMods.querySelectorAll(".chkModalidade:checked");
+      if (marcados.length > LIMITE_MODALIDADES_POR_ALUNO){
+        e.target.checked = false;
+        alert("Máximo de "+LIMITE_MODALIDADES_POR_ALUNO+" modalidades por aluno.");
+      }
+    }
+  });
+
+  const turnoSel = document.getElementById("turno");
+  const turmaSel = document.getElementById("turma");
+  turmaSel.disabled = true;
+  turnoSel.addEventListener("change", () => {
+    const turno = turnoSel.value;
+    turmaSel.innerHTML = "";
+    if (!turno){
+      turmaSel.disabled = true;
+      turmaSel.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
+    } else {
+      turmaSel.disabled = false;
+      const turmasTurno = getTurmasPorTurno(turno);
+      const optDefault = document.createElement("option");
+      optDefault.value = "";
+      optDefault.textContent = "Selecione a turma...";
+      turmaSel.appendChild(optDefault);
+      turmasTurno.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t; opt.textContent = t;
+        turmaSel.appendChild(opt);
+      });
+    }
+    atualizarDisponibilidadeModalidades();
+  });
+  turmaSel.addEventListener("change", atualizarDisponibilidadeModalidades);
+  document.getElementById("sexo").addEventListener("change", atualizarDisponibilidadeModalidades);
+
+  const filtroTurno = document.getElementById("filtroTurno");
+  const filtroTurma = document.getElementById("filtroTurma");
+  const filtroModalidade = document.getElementById("filtroModalidade");
+
+  filtroTurma.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
+  filtroModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
+
+  filtroTurno.addEventListener("change", () => {
+    const turno = filtroTurno.value;
+    filtroTurma.innerHTML = "";
+    const optDefault = document.createElement("option");
+    if (!turno){
+      optDefault.value = "";
+      optDefault.textContent = "Selecione o turno primeiro...";
+      filtroTurma.appendChild(optDefault);
+    } else {
+      optDefault.value = "";
+      optDefault.textContent = "Selecione a turma...";
+      filtroTurma.appendChild(optDefault);
+      const turmasTurno = getTurmasPorTurno(turno);
+      turmasTurno.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        filtroTurma.appendChild(opt);
+      });
+    }
+    renderPublico();
+  });
+
+  filtroTurma.addEventListener("change", renderPublico);
+  filtroModalidade.addEventListener("change", renderPublico);
+
+  const jogoTurma1 = document.getElementById("jogoTurma1");
+  const jogoTurma2 = document.getElementById("jogoTurma2");
+
+  if (jogoTurma1 && jogoTurma2){
+    jogoTurma1.innerHTML = '<option value="">Selecione a turma 1...</option>';
+    jogoTurma2.innerHTML = '<option value="">Selecione a turma 2...</option>';
+
+    TODAS_TURMAS.forEach(t => {
+      const o1 = document.createElement("option");
+      o1.value = t;
+      o1.textContent = t;
+      jogoTurma1.appendChild(o1);
+
+      const o2 = document.createElement("option");
+      o2.value = t;
+      o2.textContent = t;
+      jogoTurma2.appendChild(o2);
+    });
+  }
+
+  const jogoModalidade = document.getElementById("jogoModalidade");
+  MODALIDADES.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m; opt.textContent = m;
+    jogoModalidade.appendChild(opt);
+  });
+
+  const relatorioTurno = document.getElementById("relatorioTurno");
+  const relatorioTurma = document.getElementById("relatorioTurma");
+  const relatorioModalidade = document.getElementById("relatorioModalidade");
+
+  if (relatorioModalidade){
+    relatorioModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
+    MODALIDADES.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = m;
+      relatorioModalidade.appendChild(opt);
+    });
+  }
+
+  if (relatorioTurno && relatorioTurma){
+    relatorioTurno.addEventListener("change", () => {
+      const turno = relatorioTurno.value;
+      relatorioTurma.innerHTML = "";
+      const optDefault = document.createElement("option");
+      if (!turno){
+        optDefault.value = "";
+        optDefault.textContent = "Selecione o turno primeiro...";
+        relatorioTurma.appendChild(optDefault);
+      } else {
+        optDefault.value = "";
+        optDefault.textContent = "Selecione a turma...";
+        relatorioTurma.appendChild(optDefault);
+        const turmasTurno = getTurmasPorTurno(turno);
+        turmasTurno.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t;
+          opt.textContent = t;
+          relatorioTurma.appendChild(opt);
+        });
+      }
+      renderRelatorio();
+    });
+
+    relatorioTurma.addEventListener("change", renderRelatorio);
+  }
+
+  if (relatorioModalidade){
+    relatorioModalidade.addEventListener("change", renderRelatorio);
+  }
+
+  const btnImprimirRelatorio = document.getElementById("btnImprimirRelatorio");
+  if (btnImprimirRelatorio){
+    btnImprimirRelatorio.addEventListener("click", () => {
+      renderRelatorio();
+      window.print();
+    });
+  }
+
+  const btnImprimirTodaTurma = document.getElementById("btnImprimirTodaTurma");
+  if (btnImprimirTodaTurma){
+    btnImprimirTodaTurma.addEventListener("click", () => {
+      renderRelatorioTodaTurma();
+      window.print();
+    });
+  }
+
+  document.getElementById("btnToggleInscritos").addEventListener("click", () => {
+    const sec = document.getElementById("secInscritos").style.display === "block";
+    const btn = document.getElementById("btnToggleInscritos");
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "👀 Ver inscritos";
+    } else {
+      mostrarSecao("inscritos");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
+  });
+
+  document.getElementById("btnVerJogos").addEventListener("click", () => {
+    const sec = document.getElementById("secJogos").style.display === "block";
+    const btn = document.getElementById("btnVerJogos");
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "🏆 Ver jogos";
+    } else {
+      mostrarSecao("jogos");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
+  });
+
+  document.getElementById("btnClassificados").addEventListener("click", () => {
+    const sec = document.getElementById("secClassificados").style.display === "block";
+    const btn = document.getElementById("btnClassificados");
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "✅ Classificados";
+    } else {
+      mostrarSecao("classificados");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
+  });
+
+  document.getElementById("btnPlacarAoVivo").addEventListener("click", () => {
+    const sec = document.getElementById("secPlacarAoVivo").style.display === "block";
+    const btn = document.getElementById("btnPlacarAoVivo");
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "⚡ Placar ao vivo";
+    } else {
+      mostrarSecao("placar");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
+  });
+
+  document.getElementById("btnAdminArea").addEventListener("click", abrirAdmin);
+  document.getElementById("btnFecharAdmin").addEventListener("click", fecharAdmin);
+  document.getElementById("btnFecharProfessores").addEventListener("click", fecharProfessores);
+
+  document.getElementById("formInscricao").addEventListener("submit", handleSubmitInscricao);
+
+  document.getElementById("adminFiltroNome").addEventListener("input", () => {
+    renderAdmin();
+    atualizarSelectsAdminPublico();
+  });
+  document.getElementById("adminFiltroTurma").addEventListener("change", () => {
+    renderAdmin();
+    atualizarSelectsAdminPublico();
+  });
+  document.getElementById("adminFiltroModalidade").addEventListener("change", renderAdmin);
+  document.getElementById("btnCancelarInscricao").addEventListener("click", cancelarInscricao);
+
+  const filtroModalidadeJogo = document.getElementById("filtroModalidadeJogo");
+  if (filtroModalidadeJogo){
+    filtroModalidadeJogo.innerHTML = '<option value="">Selecione...</option>';
+    MODALIDADES.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m; opt.textContent = m;
+      filtroModalidadeJogo.appendChild(opt);
+    });
+    filtroModalidadeJogo.addEventListener("change", renderJogosAluno);
+  }
+
+  document.getElementById("filtroSerieJogo").addEventListener("change", renderJogosAluno);
+  document.getElementById("filtroDataJogo").addEventListener("change", renderJogosAluno);
+
+  const filtroExcluirJogo = document.getElementById("filtroExcluirJogo");
+  if (filtroExcluirJogo){
+    filtroExcluirJogo.addEventListener("input", atualizarSelectExcluirJogo);
+  }
+
+  document.getElementById("btnCadastrarJogo").addEventListener("click", cadastrarJogo);
+  document.getElementById("btnExcluirJogo").addEventListener("click", excluirJogo);
+
+  document.getElementById("btnSalvarConfig").addEventListener("click", e => {
+    e.preventDefault();
+    salvarConfiguracoes();
+  });
+
+  document.getElementById("btnAdicionarProfessor").addEventListener("click", e => {
+    e.preventDefault();
+    adicionarProfessorAcesso();
+  });
+
+  const btnGerarSenha = document.getElementById("btnGerarSenhaProfessor");
+  if (btnGerarSenha){
+    btnGerarSenha.addEventListener("click", e => {
+      e.preventDefault();
+      let senha = "";
+      for (let i = 0; i < 5; i++) {
+        senha += Math.floor(Math.random() * 10);
+      }
+      document.getElementById("profSenhaCadastro").value = senha;
+    });
+  }
+
+  const profTurnoSelect = document.getElementById("profTurnoSelect");
+  const profTurmaSelect = document.getElementById("profTurmaSelect");
+  if (profTurnoSelect && profTurmaSelect){
+    profTurnoSelect.addEventListener("change", () => {
+      configurarSelectTurmaProfessor();
+      renderPainelProfessores();
+    });
+    profTurmaSelect.addEventListener("change", renderPainelProfessores);
+  }
+
+  configurarAbasAdmin();
+  iniciarListeners();
+  carregarConfiguracoes();
+
+  mostrarSecao("inscricao");
+
+  // Listeners específicos para Credenciais
+  document.getElementById("credFiltroTurno").addEventListener("change", renderCredenciais);
+  document.getElementById("credFiltroTurma").addEventListener("change", renderCredenciais);
+  document.getElementById("credFiltroModalidade").addEventListener("change", renderCredenciais);
+  document.getElementById("btnAbrirEscaneador").addEventListener("click", () => {
+    abrirEscaneadorComReautenticacao();
+  });
+
+  document.getElementById("btnStopScanner").addEventListener("click", () => {
+    fecharOverlayScanner();
+  });
+}
+
+/* DOM ready */
+if (document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
+</script>
+
+</body>
+</html>
