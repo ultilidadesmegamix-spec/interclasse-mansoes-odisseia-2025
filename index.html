@@ -521,7 +521,7 @@
       display:none;
     }
 
-    /* Tela vermelha para QR inválido */
+    /* Tela vermelha para QR inválido (legacy) */
     #scannerInvalid {
       position:fixed;
       inset:0;
@@ -1249,6 +1249,11 @@ let inscricoesEncerradas = false;
 let emailAtual = null;
 let isAdmin = false;
 const ADMIN_PASSWORD = "52090949";
+
+/* Scanner control */
+let scannerStream = null;
+let scannerAnimationFrame = null;
+let scannerPaused = false;
 
 /* ========== FUNÇÕES AUXILIARES ========== */
 
@@ -2856,14 +2861,6 @@ function iniciarListeners(){
 
 /* ========== CREDENCIAIS (NOVO) ========== */
 
-/**
- * renderCredenciaisLista:
- * - lê os filtros (turno, turma, modalidade)
- * - mostra cada inscrição (individualmente) que bater com filtros
- * - cada item tem botão "Imprimir Credenciais"
- *
- * Agora gera QR client-side com QRCode.toDataURL(...) (biblioteca qrcode)
- */
 async function renderCredenciaisLista(){
   const turno = document.getElementById("credFiltroTurno").value;
   const turma = document.getElementById("credFiltroTurma").value;
@@ -2934,10 +2931,7 @@ async function renderCredenciaisLista(){
   }
 }
 
-/**
- * imprimirCredencial(ins) - abre nova janela com layout de crachá e chama print()
- * - agora usa QR gerado localmente (data URL)
- */
+/* imprimirCredencial - abre nova janela com layout de crachá e chama print() */
 async function imprimirCredencial(ins){
   const nome = ins.nome || "";
   const turno = ins.turno || "";
@@ -2950,7 +2944,6 @@ async function imprimirCredencial(ins){
     dataUrl = await QRCode.toDataURL(id, { width: 300, margin: 1 });
   } catch(e){
     console.error("Erro ao gerar QR para impressão:", e);
-    // fallback simples: cria QR com biblioteca (se falhar, usar placeholder)
     dataUrl = "";
   }
 
@@ -3020,15 +3013,19 @@ async function imprimirCredencial(ins){
   w.document.close();
 }
 
-/* escape HTML simples para evitar injeção no badge */
+/* escape HTML simples */
 function escapeHtml(str){
   return (str || "").replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
 }
 
 /* ========== ESCANEADOR (QR via câmera) ========== */
 
-let scannerStream = null;
-let scannerAnimationFrame = null;
+/**
+ * Objetivo da atualização:
+ * - ao ler um QR, mostrar se o aluno está VALIDADO (verde) ou INVÁLIDO (vermelho)
+ * - após exibir a mensagem por um curto período, voltar automaticamente ao modo de escaneamento
+ * - não fechar/encerrar a câmera entre leituras (para validações em sequência)
+ */
 
 async function abrirEscaneadorComSenha(){
   const senha = prompt("Digite a senha da área administrativa para abrir o escaneador:");
@@ -3050,6 +3047,8 @@ function abrirEscaneador(){
   scannerResult.innerHTML = "";
   overlay.style.display = "flex";
 
+  scannerPaused = false;
+
   // iniciar câmera
   navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
     .then(stream => {
@@ -3065,7 +3064,13 @@ function abrirEscaneador(){
     });
 
   function scanLoop(){
-    if (!video || video.readyState !== video.HAVE_ENOUGH_DATA) {
+    if (!video) return;
+    if (scannerPaused) {
+      // aguardamos retomar
+      scannerAnimationFrame = requestAnimationFrame(scanLoop);
+      return;
+    }
+    if (video.readyState !== video.HAVE_ENOUGH_DATA) {
       scannerAnimationFrame = requestAnimationFrame(scanLoop);
       return;
     }
@@ -3077,9 +3082,15 @@ function abrirEscaneador(){
       const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
       const code = jsQR(imgData.data, imgData.width, imgData.height);
       if (code && code.data){
-        // encontrado QR - parar câmera e processar
-        stopScanner();
-        processarQR(code.data);
+        // PAUSAR leitura e processar o QR
+        scannerPaused = true;
+        processarQR(code.data).then(() => {
+          // só retoma se a stream ainda estiver ativa (usuário não clicou em Parar)
+          if (scannerStream){
+            scannerPaused = false;
+            scannerAnimationFrame = requestAnimationFrame(scanLoop);
+          }
+        });
         return;
       }
     } catch(e){ /* pode falhar em alguns navegadores se cross-origin */ }
@@ -3096,49 +3107,90 @@ function stopScanner(){
     scannerStream.getTracks().forEach(t => t.stop());
     scannerStream = null;
   }
+  scannerPaused = true;
 }
 
-/* processa o conteúdo lido do QR (esperamos ser o ID da inscrição) */
+/* processa o conteúdo lido do QR (esperamos ser o ID da inscrição)
+   agora: mostra status "VALIDADO" ou "INVÁLIDO" rapidamente e resolve para retomar scan */
 async function processarQR(qrData){
   const idLido = (qrData || "").trim();
   const ins = todasInscricoes.find(i => i.id === idLido);
-  if (!ins){
-    // mostrar tela vermelha com mensagem
-    document.getElementById("scannerInvalid").style.display = "flex";
-    return;
-  }
-  // mostrar crachá digital dentro do overlay (mesmo layout)
   const scannerResult = document.getElementById("scannerResult");
+  scannerResult.innerHTML = "";
+
+  // helper para exibir mensagem de status e aguardar
+  function mostrarStatusHTML(htmlContent, tempoMs){
+    scannerResult.innerHTML = htmlContent;
+    return new Promise(res => setTimeout(() => {
+      // limpa visual
+      if (document.getElementById("scannerResult")) document.getElementById("scannerResult").innerHTML = "";
+      res();
+    }, tempoMs || 1600));
+  }
+
+  if (!ins){
+    // INVÁLIDO: inscrição não encontrada
+    const html = `
+      <div style="display:flex; gap:12px; align-items:center;">
+        <div style="flex:1;">
+          <div style="font-weight:700; font-size:1.05rem; color:#fff; background:#c0392b; padding:8px; border-radius:6px; text-align:center;">INVÁLIDO</div>
+          <div style="margin-top:8px; font-size:0.95rem; color:#fff;">QR lido: <strong>${escapeHtml(idLido)}</strong></div>
+          <div style="margin-top:6px; color:#fff; opacity:0.95;">Inscrição não encontrada no banco de dados.</div>
+        </div>
+      </div>
+    `;
+    // mostrar por 1.6s e depois voltar
+    return mostrarStatusHTML(html, 1600);
+  }
+
+  // se o aluno existe, verificar se foi indicado por >=2 professores -> inválido
+  const bloqueios = Array.isArray(ins.naoAutorizadoPor) ? ins.naoAutorizadoPor.length : 0;
+  if (bloqueios >= 2){
+    const html = `
+      <div style="display:flex; gap:12px; align-items:center;">
+        <div style="flex:1;">
+          <div style="font-weight:700; font-size:1.05rem; color:#fff; background:#c0392b; padding:8px; border-radius:6px; text-align:center;">NÃO VALIDADO</div>
+          <div style="margin-top:8px; font-size:0.95rem; color:#222;">${escapeHtml(ins.nome)}</div>
+          <div style="font-size:0.9rem; color:#222; margin-top:4px;">Turma: <strong>${escapeHtml(ins.turma)}</strong> — Turno: <strong>${escapeHtml(ins.turno)}</strong></div>
+          <div style="margin-top:6px; color:#222; opacity:0.9;">Motivo: indicado por ${bloqueios} professor(es) (inscrição bloqueada).</div>
+        </div>
+        <div style="width:140px; text-align:center;">
+          <div style="width:120px;height:120px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #ccc;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13l-1.41 1.41L12 13.41 8.41 16.41 7 15l4-4 6 6z" fill="#c0392b"/></svg>
+          </div>
+        </div>
+      </div>
+    `;
+    return mostrarStatusHTML(html, 1700);
+  }
+
+  // CASO VALIDADO
   let dataUrl = "";
   try {
     dataUrl = await QRCode.toDataURL(idLido, { width: 240, margin: 1 });
   } catch(e){
     console.error("Erro ao gerar QR para visualização:", e);
+    dataUrl = "";
   }
 
-  scannerResult.innerHTML = `
+  const html = `
     <div style="display:flex; gap:12px; align-items:center;">
       <div style="flex:1;">
-        <strong style="font-size:1.05rem;">${escapeHtml(ins.nome)}</strong><br>
-        Turno: <strong>${escapeHtml(ins.turno)}</strong> — Turma: <strong>${escapeHtml(ins.turma)}</strong><br>
-        Modalidades: ${(ins.modalidades || []).map(m => escapeHtml(m)).join(", ")}<br>
-        ID: ${escapeHtml(ins.id)}
+        <div style="font-weight:700; font-size:1.05rem; color:#fff; background:#27ae60; padding:8px; border-radius:6px; text-align:center;">VALIDADO</div>
+        <div style="margin-top:8px; font-size:0.95rem; color:#222;">${escapeHtml(ins.nome)}</div>
+        <div style="font-size:0.9rem; color:#222; margin-top:4px;">Turma: <strong>${escapeHtml(ins.turma)}</strong> — Turno: <strong>${escapeHtml(ins.turno)}</strong></div>
+        <div style="margin-top:6px; color:#222; opacity:0.9;">Modalidades: ${((ins.modalidades||[]).map(m=>escapeHtml(m))).join(", ")}</div>
       </div>
       <div style="width:140px; text-align:center;">
-        ${dataUrl ? `<img src="${dataUrl}" style="width:120px; height:120px; border:1px solid #ccc; background:#fff;">` : `<div style="width:120px;height:120px;background:#fff;border:1px solid #ccc;"></div>`}
+        ${dataUrl ? `<img src="${dataUrl}" style="width:120px; height:120px; border:1px solid #ccc; background:#fff; border-radius:6px;">` : `<div style="width:120px;height:120px;background:#fff;border-radius:6px;border:1px solid #ccc;"></div>`}
       </div>
     </div>
-    <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end;">
-      <button class="btn btn-primaria" id="btnPrintScanned">Imprimir crachá</button>
-    </div>
   `;
-  // botao imprimir
-  document.getElementById("btnPrintScanned").addEventListener("click", () => {
-    imprimirCredencial(ins);
-  });
+  // mostrar por 1.6s e continuar leitura
+  return mostrarStatusHTML(html, 1600);
 }
 
-/* fechar tela vermelha invalid */
+/* fechar tela vermelha invalid (legacy) */
 document.getElementById("btnCloseInvalid").addEventListener("click", () => {
   document.getElementById("scannerInvalid").style.display = "none";
 });
