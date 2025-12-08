@@ -9,10 +9,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <!-- Bibliotecas adicionais para PDF / QR / Scanner -->
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+  <!-- jsQR (para leitura de QR via câmera) -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
   <style>
     :root {
@@ -470,57 +468,71 @@
       }
     }
 
-    /* Credenciais - estilos novos */
-    #credList .cred-card {
-      border-radius:8px;
-      border:1px solid #e1e4eb;
+    /* Estilos novos para Credenciais / Crachás */
+    .cred-lista { margin-top:8px; display:grid; gap:8px; }
+    .cred-card {
+      border:1px solid #e1e6f5;
       padding:10px;
-      margin-top:8px;
+      border-radius:8px;
       display:flex;
       justify-content:space-between;
       align-items:center;
-      gap:10px;
-      background:#fff;
+      gap:8px;
     }
-    #credList .cred-info {
-      font-size:0.92rem;
-    }
-    #credList .cred-info small {
-      display:block;
-      font-size:0.78rem;
-      color:#666;
-    }
+    .cred-dados { font-size:0.9rem; }
+    .cred-actions { display:flex; gap:8px; flex-wrap:wrap; }
+
+    /* Overlay do escaneador */
     #scannerOverlay {
       position:fixed;
       inset:0;
-      background: rgba(0,0,0,0.6);
+      background:rgba(0,0,0,0.85);
       display:none;
+      z-index:10000;
       align-items:center;
       justify-content:center;
-      z-index:10000;
+      flex-direction:column;
     }
     #scannerCard {
-      width: min(720px, 96%);
+      width:90%;
+      max-width:900px;
       background:#fff;
       border-radius:10px;
-      padding:12px;
+      padding:10px;
+    }
+    #scannerVideo {
+      width:100%;
+      max-height:420px;
+      background:#000;
     }
     #scannerResult {
       margin-top:8px;
-      padding:8px;
-      border-radius:8px;
-      min-height:80px;
+      min-height:120px;
     }
-    .result-valid { background:#e7ffef; color:#0b6a2a; }
-    .result-invalid { background:#ffe9e9; color:#9b1b1b; }
-    .cracha-preview {
-      border:1px dashed #cbd6e6;
+    #scannerError {
+      margin-top:8px;
+      color:#fff;
+      background:var(--vermelho);
       padding:8px;
       border-radius:6px;
-      display:inline-block;
-      margin-top:6px;
-      background:#fff;
+      display:none;
     }
+
+    /* Tela vermelha para QR inválido */
+    #scannerInvalid {
+      position:fixed;
+      inset:0;
+      background:var(--vermelho);
+      color:#fff;
+      display:none;
+      z-index:10001;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      font-size:1.1rem;
+      padding:20px;
+    }
+
   </style>
 </head>
 <body>
@@ -728,7 +740,7 @@
       <button class="admin-tab-btn" data-tab="relatorio">🖨️ Imprimir relatório</button>
       <button class="admin-tab-btn" data-tab="professores">👩‍🏫 Professores</button>
       <button class="admin-tab-btn" data-tab="config">⚙️ Configurações</button>
-      <!-- NOVA ABA: Credenciais -->
+      <!-- NOVO: aba de Credenciais -->
       <button class="admin-tab-btn" data-tab="credenciais">🎫 Credenciais</button>
     </div>
 
@@ -1025,11 +1037,11 @@
       <button class="btn btn-primaria" id="btnSalvarConfig">💾 Salvar configurações</button>
     </div>
 
-    <!-- TAB CREDENCIAIS (NOVO) -->
+    <!-- NOVO: TAB CREDENCIAIS -->
     <div class="admin-tab-content" id="tab-credenciais">
       <div class="admin-bloco">
-        <strong>Credenciais — gerar e escanear</strong>
-        <small style="display:block;margin-top:4px;">Filtre por Turno, Turma e Modalidade. Cada inscrição listada terá o botão <strong>Imprimir Credenciais</strong>.</small>
+        <strong>Gerar / Imprimir Credenciais</strong>
+        <small style="display:block;margin-top:4px;">Filtre por Turno, Turma e Modalidade. Cada inscrição aparece individualmente com opção de imprimir o crachá (PDF).</small>
 
         <div class="filtros" style="margin-top:8px;">
           <div>
@@ -1050,18 +1062,19 @@
           <div>
             <label for="credFiltroModalidade">Modalidade</label>
             <select id="credFiltroModalidade">
-              <option value="">Selecione a modalidade...</option>
+              <option value="">Todas</option>
             </select>
           </div>
         </div>
-      </div>
 
-      <div id="credList" style="margin-top:8px;"></div>
+        <div class="cred-lista" id="credLista"></div>
 
-      <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:8px;">
-        <button class="btn btn-primaria" id="btnAbrirEscaneador">🔍 Escaneador</button>
+        <div style="margin-top:12px; display:flex; justify-content:flex-end;">
+          <button class="btn btn-primaria" id="btnAbrirEscaneador">🔍 Escaneador</button>
+        </div>
       </div>
     </div>
+
   </section>
 
   <!-- PAINEL PARA PROFESSORES / COORDENADORES / GESTORES -->
@@ -1111,19 +1124,26 @@
 
 </main>
 
-<!-- SCANNER OVERLAY (esconde até autorizado) -->
+<!-- Scanner overlay (oculto) -->
 <div id="scannerOverlay">
   <div id="scannerCard">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-      <h3 style="margin:0; color:var(--azul);">Escaneador de Credenciais</h3>
-      <div style="display:flex; gap:8px;">
-        <button class="btn" id="btnStopScanner">✖ Fechar</button>
-      </div>
+    <h3 style="margin:0 0 8px 0;">Escaneador de Credenciais</h3>
+    <video id="scannerVideo" autoplay muted playsinline></video>
+    <canvas id="scannerCanvas" style="display:none;"></canvas>
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="btn btn-primaria" id="btnStopScanner">Parar</button>
+      <button class="btn" id="btnCloseScanner" style="background:#eee;">Fechar</button>
     </div>
-
-    <div id="reader" style="margin-top:10px;"></div>
-
     <div id="scannerResult"></div>
+    <div id="scannerError"></div>
+  </div>
+</div>
+
+<div id="scannerInvalid">
+  <div>
+    <h2>QR inválido / Inscrição não encontrada</h2>
+    <p>O QR Code lido não corresponde a nenhuma inscrição registrada.</p>
+    <button class="btn btn-primaria" id="btnCloseInvalid" style="margin-top:8px;">Fechar</button>
   </div>
 </div>
 
@@ -1208,29 +1228,24 @@ let countsQueimadaGenero = {};
 let todasInscricoes = [];
 let todosJogos = [];
 
-/* NOVO: professores e papéis */
 let todosProfessores = []; // {id, nome, tipo, senha}
-let currentRole = null;    // "ADMIN", "Professor", "Coordenador", "Gestor"
-let currentProfessor = null; // objeto do professor logado
+let currentRole = null;
+let currentProfessor = null;
 
-/* config evento */
 let configEvento = {
-  dataLimite: null,           // yyyy-mm-dd
+  dataLimite: null,
   msgEncerradas: "",
   bloquearAgora: false,
   nomeEvento: "Movimenta Odisseia",
   anoEvento: "",
   textoInicial: "",
-  autorizacoes: {} // estrutura: { turma: { "FUTSAL": true, "QUEIMADA MISTA": true, ... } }
+  autorizacoes: {}
 };
 
 let inscricoesEncerradas = false;
 let emailAtual = null;
 let isAdmin = false;
 const ADMIN_PASSWORD = "52090949";
-
-/* Scanner helper */
-let html5QrCodeInstance = null;
 
 /* ========== FUNÇÕES AUXILIARES ========== */
 
@@ -1244,7 +1259,7 @@ function normalizarNome(str){
 }
 
 function validarEmail(email){
-  return email && email.includes("@") && email.includes(".");
+  return typeof email === 'string' && email.includes("@") && email.includes(".");
 }
 
 function msgForm(texto, ok){
@@ -1367,8 +1382,6 @@ async function carregarConfiguracoes(){
   atualizarDisponibilidadeModalidades();
 }
 
-/* SALVAR CONFIG */
-
 async function salvarConfiguracoes(){
   if (!isAdmin){
     alert("Apenas o administrador pode salvar as configurações.");
@@ -1442,7 +1455,7 @@ async function salvarConfiguracoes(){
   }
 }
 
-/* ========== AUTORIZAÇÕES UI (novidade) ========== */
+/* ========== AUTORIZAÇÕES UI ========== */
 
 function atualizarAutorizacoesUI(){
   const sel = document.getElementById("cfgAutTurma");
@@ -1495,8 +1508,8 @@ function atualizarAutorizacoesUI(){
 /* ========== DISPONIBILIDADE MODALIDADES ========== */
 
 function atualizarDisponibilidadeModalidades(){
-  const turma = document.getElementById("turma").value;
-  const sexo = document.getElementById("sexo").value;
+  const turma = document.getElementById("turma") ? document.getElementById("turma").value : null;
+  const sexo = document.getElementById("sexo") ? document.getElementById("sexo").value : null;
   const spans = document.querySelectorAll(".modalidade-vagas");
   const chks = document.querySelectorAll(".chkModalidade");
 
@@ -1504,7 +1517,6 @@ function atualizarDisponibilidadeModalidades(){
     const mod = span.dataset.mod;
     if (!turma){
       span.textContent = mod + " (selecione turno e turma)";
-
       span.classList.remove("modalidade-lotado");
       return;
     }
@@ -1828,7 +1840,7 @@ function renderAdmin(){
   });
 }
 
-/* RELATÓRIO IMPRESSO */
+/* ========== RELATÓRIO / JOGOS / PLACAR (mantidos) ========== */
 
 function renderRelatorio(){
   const tbody = document.querySelector("#tabelaRelatorio tbody");
@@ -1915,7 +1927,6 @@ function renderRelatorio(){
   });
 }
 
-/* NOVA FUNÇÃO: Relatório de TODA TURMA (todas as modalidades) */
 function renderRelatorioTodaTurma(){
   const tbody = document.querySelector("#tabelaRelatorio tbody");
   const turnoEl = document.getElementById("relatorioTurno");
@@ -2740,10 +2751,7 @@ function configurarAbasAdmin(){
       botoes.forEach(b => b.classList.remove("ativo"));
       btn.classList.add("ativo");
       document.querySelectorAll(".admin-tab-content").forEach(c => c.classList.remove("ativo"));
-      const target = document.getElementById("tab-"+tab);
-      if (target) target.classList.add("ativo");
-      // Se abriu a aba credenciais, renderiza lista
-      if (tab === "credenciais") renderCredenciais();
+      document.getElementById("tab-"+tab).classList.add("ativo");
     });
   });
 }
@@ -2806,9 +2814,10 @@ function iniciarListeners(){
     if (currentRole && currentRole !== "ADMIN"){
       renderPainelProfessores();
     }
-    // Se aba credenciais estiver ativa, atualiza
-    const credTab = document.getElementById("tab-credenciais");
-    if (credTab && credTab.classList.contains("ativo")) renderCredenciais();
+    // atualizar lista de credenciais se estiver visível
+    if (document.getElementById("tab-credenciais").classList.contains("ativo")){
+      renderCredenciaisLista();
+    }
   });
 
   db.collection("jogos").orderBy("dataJogo","asc").onSnapshot(snap => {
@@ -2842,334 +2851,277 @@ function iniciarListeners(){
   });
 }
 
-/* ========== CREDENCIAIS: helpers e UI ========== */
+/* ========== CREDENCIAIS (NOVO) ========== */
 
 /**
- * Retorna o "número da inscrição" (1-based) baseado na ordem de todasInscricoes (timestamp asc).
- * Se inspecionar por id retorna -1 se não encontrado.
+ * renderCredenciaisLista:
+ * - lê os filtros (turno, turma, modalidade)
+ * - mostra cada inscrição (individualmente) que bater com filtros
+ * - cada item tem botão "Imprimir Credenciais"
  */
-function getNumeroInscricaoPorId(insId){
-  for (let i=0;i<todasInscricoes.length;i++){
-    if (todasInscricoes[i].id === insId) return i+1;
-  }
-  return -1;
-}
+function renderCredenciaisLista(){
+  const turno = document.getElementById("credFiltroTurno").value;
+  const turma = document.getElementById("credFiltroTurma").value;
+  const modalidade = document.getElementById("credFiltroModalidade").value;
+  const cont = document.getElementById("credLista");
+  cont.innerHTML = "";
 
-/**
- * Retorna inscrição pelo número (1-based) ou null
- */
-function getInscricaoPorNumero(num){
-  if (!num || num <=0) return null;
-  if (num > todasInscricoes.length) return null;
-  return todasInscricoes[num-1] || null;
-}
+  let lista = todasInscricoes.slice();
 
-/**
- * Cria dataURL de QR code usando QRious
- */
-function gerarQRCodeDataURL(text, size){
-  try{
-    const qr = new QRious({
-      value: String(text),
-      size: size || 200,
-      level: 'M'
-    });
-    return qr.toDataURL();
-  }catch(e){
-    console.error("Erro ao gerar QR:", e);
-    return null;
-  }
-}
-
-/**
- * Gera PDF em formato de crachá para impressão.
- * - Usa jsPDF (window.jspdf.jsPDF)
- * - Tamanho: 90mm x 120mm (ajustável)
- * - QR codifica o número da inscrição (numérico)
- */
-function gerarPDFCrachaParaInscricao(ins){
-  try{
-    const numero = getNumeroInscricaoPorId(ins.id);
-    const nome = ins.nome || "";
-    const turno = ins.turno || "";
-    const turma = ins.turma || "";
-    const modalidades = (ins.modalidades || []).join(", ");
-    const idTexto = String(numero); // QR deve conter o número da inscrição conforme pedido
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: [90, 120], compress: true });
-
-    // fundo simples
-    doc.setFillColor(255,255,255);
-    doc.rect(5,5,80,110,'F');
-
-    // Título evento
-    doc.setFontSize(10);
-    doc.setTextColor(0,70,150);
-    doc.setFont("helvetica","bold");
-    doc.text((configEvento.nomeEvento || "Movimenta Odisseia"), 10, 15);
-
-    // Nome
-    doc.setFontSize(16);
-    doc.setFont("helvetica","bold");
-    doc.setTextColor(0,0,0);
-    const nomeLines = doc.splitTextToSize(nome, 68);
-    doc.text(nomeLines, 10, 30);
-
-    doc.setFontSize(10);
-    doc.setFont("helvetica","normal");
-    doc.text("Turno: " + turno, 10, 50);
-    doc.text("Turma: " + turma, 10, 57);
-    doc.text("Modalidade(s): " + modalidades, 10, 64);
-    doc.text("Nº inscrição: " + numero, 10, 71);
-
-    // QR
-    const qrData = gerarQRCodeDataURL(idTexto, 300);
-    if (qrData){
-      // addImage expects dataURL
-      // posiciona QR na direita
-      doc.addImage(qrData, 'PNG', 58, 25, 32, 32);
-    }
-
-    // rodapé / instrução
-    doc.setFontSize(8);
-    doc.setTextColor(90,90,90);
-    doc.text("Apresente este crachá para conferência. (Interclass)", 10, 106);
-
-    // salvar
-    const safeNome = nome.replace(/[^a-z0-9_\-]/gi,'_').substring(0,40) || "inscricao";
-    doc.save(`cracha_${numero}_${safeNome}.pdf`);
-  }catch(e){
-    console.error("Erro gerar PDF:", e);
-    alert("Erro ao gerar PDF do crachá.");
-  }
-}
-
-/* Render da aba Credenciais */
-function renderCredenciais(){
-  if (!isAdmin) return; // apenas admin
-  const filtroTurno = document.getElementById("credFiltroTurno");
-  const filtroTurma = document.getElementById("credFiltroTurma");
-  const filtroModalidade = document.getElementById("credFiltroModalidade");
-  const container = document.getElementById("credList");
-
-  if (!filtroTurno || !filtroTurma || !filtroModalidade || !container) return;
-
-  // preencher selects opcionais (somente na primeira vez)
-  if (filtroModalidade.options.length <= 1){
-    filtroModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
-    MODALIDADES.forEach(m => {
-      const opt = document.createElement("option");
-      opt.value = m; opt.textContent = m;
-      filtroModalidade.appendChild(opt);
-    });
-  }
-
-  // preencher turma de acordo com turno
-  const turno = filtroTurno.value;
-  filtroTurma.innerHTML = "";
-  const optDefault = document.createElement("option");
-  if (!turno){
-    optDefault.value = "";
-    optDefault.textContent = "Selecione o turno primeiro...";
-    filtroTurma.appendChild(optDefault);
-  } else {
-    optDefault.value = "";
-    optDefault.textContent = "Selecione a turma...";
-    filtroTurma.appendChild(optDefault);
-    getTurmasPorTurno(turno).forEach(t => {
-      const opt = document.createElement("option");
-      opt.value = t; opt.textContent = t;
-      filtroTurma.appendChild(opt);
-    });
-  }
-
-  // construir lista usando filtros atuais
-  const turma = filtroTurma.value;
-  const modalidade = filtroModalidade.value;
-
-  container.innerHTML = "";
-
-  if (!turno || !turma || !modalidade){
-    const p = document.createElement("p");
-    p.textContent = "Selecione Turno, Turma e Modalidade para ver as inscrições individualmente.";
-    container.appendChild(p);
-    return;
-  }
-
-  const lista = todasInscricoes.filter(ins => {
-    if (ins.turno !== turno) return false;
-    if (ins.turma !== turma) return false;
-    if (!ins.modalidades || !ins.modalidades.includes(modalidade)) return false;
-    return true;
-  });
+  if (turno) lista = lista.filter(i => i.turno === turno);
+  if (turma) lista = lista.filter(i => i.turma === turma);
+  if (modalidade) lista = lista.filter(i => Array.isArray(i.modalidades) && i.modalidades.includes(modalidade));
 
   if (!lista.length){
-    const p = document.createElement("p");
-    p.textContent = "Nenhuma inscrição para esses filtros.";
-    container.appendChild(p);
+    const p = document.createElement("div");
+    p.textContent = "Nenhuma inscrição encontrada para esses filtros.";
+    cont.appendChild(p);
     return;
   }
 
+  // Exibir cada inscrição individual como card
   lista.forEach(ins => {
-    const numero = getNumeroInscricaoPorId(ins.id);
     const card = document.createElement("div");
     card.className = "cred-card";
 
-    const info = document.createElement("div");
-    info.className = "cred-info";
-    info.innerHTML = "<strong>"+(ins.nome||"-")+"</strong><small>Turma: "+(ins.turma||"-")+" — Turno: "+(ins.turno||"-")+" — Nº: "+numero+"</small><small>Modalidades: "+(ins.modalidades||[]).join(", ")+"</small>";
+    const dados = document.createElement("div");
+    dados.className = "cred-dados";
+    const modalidadesText = (ins.modalidades || []).join(", ");
+    dados.innerHTML =
+      "<strong>"+(ins.nome || "-")+"</strong><br>" +
+      "Turno: "+(ins.turno || "-")+" — Turma: "+(ins.turma || "-")+"<br>" +
+      "Modalidades: "+modalidadesText+"<br>" +
+      "ID: "+ins.id;
 
     const actions = document.createElement("div");
-    actions.style.display = "flex";
-    actions.style.flexDirection = "column";
-    actions.style.gap = "6px";
+    actions.className = "cred-actions";
+
     const btnImprimir = document.createElement("button");
     btnImprimir.className = "btn btn-primaria";
     btnImprimir.textContent = "Imprimir Credenciais";
     btnImprimir.addEventListener("click", () => {
-      gerarPDFCrachaParaInscricao(ins);
+      imprimirCredencial(ins);
     });
 
     actions.appendChild(btnImprimir);
 
-    card.appendChild(info);
+    card.appendChild(dados);
     card.appendChild(actions);
-    container.appendChild(card);
+    cont.appendChild(card);
   });
 }
 
-/* ========== ESCANEADOR ========== */
+/**
+ * imprimirCredencial(ins) - abre nova janela com layout de crachá e chama print()
+ * - usa Google Chart API para gerar QR com o ID (conteúdo do QR = ID da inscrição)
+ */
+function imprimirCredencial(ins){
+  const nome = ins.nome || "";
+  const turno = ins.turno || "";
+  const turma = ins.turma || "";
+  const modalidades = (ins.modalidades || []).join(", ");
+  const id = ins.id || "";
+  // gerar URL do QR (conteúdo: apenas o id)
+  const qrUrl = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=" + encodeURIComponent(id);
 
-async function abrirEscaneadorComReautenticacao(){
-  // pede senha administrativa novamente
-  const senha = prompt("Digite a senha administrativa para acessar o escaneador:");
+  // Layout do crachá (tamanho aproximado de um badge)
+  const badgeHtml = `
+  <!doctype html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <title>Crachá — ${nome}</title>
+    <style>
+      @media print {
+        @page { margin: 10mm; }
+        body { margin:0; }
+      }
+      body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial; padding:10px; }
+      .badge {
+        width: 320px;
+        height: 190px;
+        border: 2px solid #0056b3;
+        border-radius: 8px;
+        padding:12px;
+        display:flex;
+        gap:12px;
+        align-items:center;
+      }
+      .left {
+        flex:1;
+      }
+      .right {
+        width:120px;
+        text-align:center;
+      }
+      h1 { margin:0; font-size:20px; color:#0056b3; }
+      .meta { margin-top:6px; font-size:14px; color:#222; }
+      .small { font-size:12px; color:#333; margin-top:4px; }
+      .qr { width:100px; height:100px; border:1px solid #ccc; padding:4px; background:#fff; }
+      .id { font-size:12px; color:#444; margin-top:6px; }
+    </style>
+  </head>
+  <body>
+    <div class="badge">
+      <div class="left">
+        <h1>${escapeHtml(nome)}</h1>
+        <div class="meta">Turno: <strong>${escapeHtml(turno)}</strong></div>
+        <div class="meta">Turma: <strong>${escapeHtml(turma)}</strong></div>
+        <div class="small">Modalidades: ${escapeHtml(modalidades)}</div>
+        <div class="id">ID: ${escapeHtml(id)}</div>
+      </div>
+      <div class="right">
+        <img class="qr" src="${qrUrl}" alt="QR Code">
+        <div style="font-size:11px; margin-top:6px;">Apresente este crachá</div>
+      </div>
+    </div>
+    <script>
+      setTimeout(function(){ window.print(); }, 400);
+    </script>
+  </body>
+  </html>
+  `;
+  const w = window.open("", "_blank", "width=420,height=360");
+  if (!w) {
+    alert("Bloqueador de popups impediu abrir a janela de impressão. Permita popups e tente novamente.");
+    return;
+  }
+  w.document.open();
+  w.document.write(badgeHtml);
+  w.document.close();
+}
+
+/* escape HTML simples para evitar injeção no badge */
+function escapeHtml(str){
+  return (str || "").replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
+}
+
+/* ========== ESCANEADOR (QR via câmera) ========== */
+
+let scannerStream = null;
+let scannerAnimationFrame = null;
+
+async function abrirEscaneadorComSenha(){
+  const senha = prompt("Digite a senha da área administrativa para abrir o escaneador:");
   if (senha === null) return;
   if (senha !== ADMIN_PASSWORD){
     alert("Senha incorreta.");
     return;
   }
-  // abre overlay e inicia leitor
+  abrirEscaneador();
+}
+
+function abrirEscaneador(){
   const overlay = document.getElementById("scannerOverlay");
-  const readerDiv = document.getElementById("reader");
-  const resultDiv = document.getElementById("scannerResult");
+  const video = document.getElementById("scannerVideo");
+  const canvas = document.getElementById("scannerCanvas");
+  const scannerError = document.getElementById("scannerError");
+  const scannerResult = document.getElementById("scannerResult");
+  scannerError.style.display = "none";
+  scannerResult.innerHTML = "";
   overlay.style.display = "flex";
-  resultDiv.innerHTML = "<em>Aguardando leitura do QR...</em>";
-  resultDiv.className = "";
-  // start html5-qrcode
-  try{
-    if (html5QrCodeInstance){
-      try { await html5QrCodeInstance.stop(); } catch(e){/* ignore */ }
-      html5QrCodeInstance.clear();
-      html5QrCodeInstance = null;
-    }
-    html5QrCodeInstance = new Html5Qrcode("reader");
-    const config = { fps: 10, qrbox: Math.min(250, Math.floor(window.innerWidth*0.6)) };
-    await html5QrCodeInstance.start({ facingMode: "environment" }, config, (decodedText, decodedResult) => {
-      // Successful scan - decodedText expected to be the numeric number of inscrição
-      try {
-        const txt = String(decodedText).trim();
-        // tentar extrair número (se veio como "NUM:123" ou só "123")
-        const m = txt.match(/(\d+)/);
-        const numero = m ? parseInt(m[1],10) : NaN;
-        if (!Number.isFinite(numero)){
-          showScannerResultInvalid("QR inválido ou formato não reconhecido: " + txt);
-          stopScanner();
-          return;
-        }
-        const inscr = getInscricaoPorNumero(numero);
-        if (!inscr){
-          showScannerResultInvalid("Inscrição não encontrada (nº "+numero+").");
-          stopScanner();
-          return;
-        }
-        showScannerResultValid(inscr, numero);
-        stopScanner();
-      } catch(e){
-        console.error("Erro no processamento do QR:", e);
-        showScannerResultInvalid("Erro ao processar QR.");
-        stopScanner();
-      }
-    }, (errorMessage) => {
-      // no-op for scan failures, don't flood UI
-      // console.debug("scan err", errorMessage);
+
+  // iniciar câmera
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+    .then(stream => {
+      scannerStream = stream;
+      video.srcObject = stream;
+      video.play();
+      scanLoop();
+    })
+    .catch(err => {
+      console.error("Erro ao acessar câmera:", err);
+      scannerError.style.display = "block";
+      scannerError.textContent = "Erro ao acessar a câmera. Verifique permissões e se a página está em HTTPS.";
     });
-  }catch(e){
-    console.error("Erro iniciar leitor:", e);
-    resultDiv.innerHTML = "<div class='result-invalid'>Erro ao iniciar a câmera/ leitor: "+ (e.message||e) +"</div>";
+
+  function scanLoop(){
+    if (!video || video.readyState !== video.HAVE_ENOUGH_DATA) {
+      scannerAnimationFrame = requestAnimationFrame(scanLoop);
+      return;
+    }
+    const ctx = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    try {
+      const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+      const code = jsQR(imgData.data, imgData.width, imgData.height);
+      if (code && code.data){
+        // encontrado QR - parar câmera e processar
+        stopScanner();
+        processarQR(code.data);
+        return;
+      }
+    } catch(e){ /* pode falhar em alguns navegadores se cross-origin */ }
+    scannerAnimationFrame = requestAnimationFrame(scanLoop);
   }
 }
 
 function stopScanner(){
-  if (html5QrCodeInstance){
-    try {
-      html5QrCodeInstance.stop().then(() => {
-        try { html5QrCodeInstance.clear(); } catch(e){/*ignore*/ }
-        html5QrCodeInstance = null;
-      }).catch(e => {
-        try { html5QrCodeInstance.clear(); } catch(e){/*ignore*/ }
-        html5QrCodeInstance = null;
-      });
-    } catch(e){
-      html5QrCodeInstance = null;
-    }
+  if (scannerAnimationFrame) {
+    cancelAnimationFrame(scannerAnimationFrame);
+    scannerAnimationFrame = null;
+  }
+  if (scannerStream){
+    scannerStream.getTracks().forEach(t => t.stop());
+    scannerStream = null;
   }
 }
 
-/* Mostra resultado válido no overlay */
-function showScannerResultValid(inscr, numero){
-  const div = document.getElementById("scannerResult");
-  div.className = "result-valid";
-  div.innerHTML = `
-    <div><strong>Inscrição encontrada (Nº ${numero})</strong></div>
-    <div style="margin-top:6px;">
-      <strong>${inscr.nome}</strong><br>
-      ${inscr.turno} — ${inscr.turma}<br>
-      Modalidades: ${(inscr.modalidades||[]).join(", ")}<br>
-      ID doc: ${inscr.id}
-    </div>
-    <div class="cracha-preview">
-      <div style="font-weight:600; color: #07427a;">${configEvento.nomeEvento || 'Movimenta Odisseia'}</div>
-      <div style="margin-top:6px;"><strong>${inscr.nome}</strong></div>
-      <div style="font-size:0.85rem; color:#333;">${inscr.turno} — ${inscr.turma}</div>
-      <div style="margin-top:6px; font-size:0.85rem;">Nº: ${numero}</div>
-      <div style="margin-top:6px;">
-        <img src="${gerarQRCodeDataURL(String(numero),200)}" style="width:90px; height:90px;" />
+/* processa o conteúdo lido do QR (esperamos ser o ID da inscrição) */
+function processarQR(qrData){
+  const idLido = (qrData || "").trim();
+  const ins = todasInscricoes.find(i => i.id === idLido);
+  if (!ins){
+    // mostrar tela vermelha com mensagem
+    document.getElementById("scannerInvalid").style.display = "flex";
+    return;
+  }
+  // mostrar crachá digital dentro do overlay (mesmo layout)
+  const scannerResult = document.getElementById("scannerResult");
+  const qrUrl = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=" + encodeURIComponent(idLido);
+  scannerResult.innerHTML = `
+    <div style="display:flex; gap:12px; align-items:center;">
+      <div style="flex:1;">
+        <strong style="font-size:1.05rem;">${escapeHtml(ins.nome)}</strong><br>
+        Turno: <strong>${escapeHtml(ins.turno)}</strong> — Turma: <strong>${escapeHtml(ins.turma)}</strong><br>
+        Modalidades: ${(ins.modalidades || []).map(m => escapeHtml(m)).join(", ")}<br>
+        ID: ${escapeHtml(ins.id)}
+      </div>
+      <div style="width:140px; text-align:center;">
+        <img src="${qrUrl}" style="width:120px; height:120px; border:1px solid #ccc; background:#fff;">
       </div>
     </div>
+    <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end;">
+      <button class="btn btn-primaria" id="btnPrintScanned">Imprimir crachá</button>
+    </div>
   `;
+  // botao imprimir
+  document.getElementById("btnPrintScanned").addEventListener("click", () => {
+    imprimirCredencial(ins);
+  });
 }
 
-/* Mostra resultado inválido */
-function showScannerResultInvalid(msg){
-  const div = document.getElementById("scannerResult");
-  div.className = "result-invalid";
-  div.innerHTML = `<strong>Inscrição inválida / não encontrada</strong><div style="margin-top:6px;">${msg}</div>`;
-}
+/* fechar tela vermelha invalid */
+document.getElementById("btnCloseInvalid").addEventListener("click", () => {
+  document.getElementById("scannerInvalid").style.display = "none";
+});
 
-/*  Ao fechar overlay */
-function fecharOverlayScanner(){
+/* botoes parar/fechar scanner */
+document.getElementById("btnStopScanner").addEventListener("click", () => {
   stopScanner();
-  const overlay = document.getElementById("scannerOverlay");
-  overlay.style.display = "none";
-  const readerDiv = document.getElementById("reader");
-  readerDiv.innerHTML = "";
-  document.getElementById("scannerResult").innerHTML = "";
-}
+});
+document.getElementById("btnCloseScanner").addEventListener("click", () => {
+  stopScanner();
+  document.getElementById("scannerOverlay").style.display = "none";
+});
+document.getElementById("btnAbrirEscaneador").addEventListener("click", abrirEscaneadorComSenha);
 
-/* ========== JOGOS ADMIN: CADASTRAR / EXCLUIR / EDITAR PLACAR ========== */
-
-/* ... (restante do código já existente, repetido para continuidade) ... */
-/* Para evitar duplicação, o resto do código segue abaixo (já presente no arquivo original): */
-
-/* ========== RESTANTE DAS FUNÇÕES E INIT ========== */
-
-/* preencher selects e iniciar UI (init) */
-function renderCredenciais(); // declaração para linter (já implementada acima)
-
-/* preencher selects (parte repetida do init) */
+/* ========== INICIALIZAÇÃO E CONFIGURAÇÃO DE UI ========== */
 
 function init(){
+  // Overlay fallback: se já houver e-mail em localStorage, fecha imediatamente
   try {
     const saved = localStorage.getItem('insc_email');
     if (saved && saved.includes('@')){
@@ -3179,31 +3131,7 @@ function init(){
     }
   } catch(e){ /* ignore */ }
 
-  const overlay = document.getElementById("emailOverlay");
-  const emailInput = document.getElementById("emailAluno");
-  const msgEmail = document.getElementById("msgEmailOverlay");
-
-  function liberarEmail(){
-    const val = (emailInput.value || '').trim();
-    if (!validarEmail(val)){
-      msgEmail.textContent = "Digite um e-mail válido.";
-      return;
-    }
-    emailAtual = val;
-    try { localStorage.setItem('insc_email', val); } catch(e){}
-    try { window._inscricao_email_fallback = val; } catch(e){}
-    if (overlay) overlay.style.display = "none";
-  }
-  const btnEntrar = document.getElementById("btnEntrarEmail");
-  if (btnEntrar) btnEntrar.addEventListener("click", liberarEmail);
-  if (emailInput){
-    emailInput.addEventListener("keydown", e => {
-      if (e.key === "Enter"){
-        e.preventDefault();
-        liberarEmail();
-      }
-    });
-  }
+  configurarOverlayEmail();
 
   const contMods = document.getElementById("modalidadesContainer");
   MODALIDADES.forEach(m => {
@@ -3456,7 +3384,8 @@ function init(){
     filtroModalidadeJogo.innerHTML = '<option value="">Selecione...</option>';
     MODALIDADES.forEach(m => {
       const opt = document.createElement("option");
-      opt.value = m; opt.textContent = m;
+      opt.value = m;
+      opt.textContent = m;
       filtroModalidadeJogo.appendChild(opt);
     });
     filtroModalidadeJogo.addEventListener("change", renderJogosAluno);
@@ -3509,18 +3438,130 @@ function init(){
   iniciarListeners();
   carregarConfiguracoes();
 
-  mostrarSecao("inscricao");
+  // configurar credenciais selects
+  const credTurno = document.getElementById("credFiltroTurno");
+  const credTurma = document.getElementById("credFiltroTurma");
+  const credModal = document.getElementById("credFiltroModalidade");
 
-  // Listeners específicos para Credenciais
-  document.getElementById("credFiltroTurno").addEventListener("change", renderCredenciais);
-  document.getElementById("credFiltroTurma").addEventListener("change", renderCredenciais);
-  document.getElementById("credFiltroModalidade").addEventListener("change", renderCredenciais);
-  document.getElementById("btnAbrirEscaneador").addEventListener("click", () => {
-    abrirEscaneadorComReautenticacao();
+  credTurno.addEventListener("change", () => {
+    const turno = credTurno.value;
+    credTurma.innerHTML = "";
+    const optDefault = document.createElement("option");
+    if (!turno){
+      optDefault.value = "";
+      optDefault.textContent = "Selecione o turno primeiro...";
+      credTurma.appendChild(optDefault);
+    } else {
+      optDefault.value = "";
+      optDefault.textContent = "Selecione a turma...";
+      credTurma.appendChild(optDefault);
+      const turmasTurno = getTurmasPorTurno(turno);
+      turmasTurno.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        credTurma.appendChild(opt);
+      });
+    }
+    renderCredenciaisLista();
   });
 
-  document.getElementById("btnStopScanner").addEventListener("click", () => {
-    fecharOverlayScanner();
+  credTurma.addEventListener("change", renderCredenciaisLista);
+
+  credModal.innerHTML = '<option value="">Todas</option>';
+  MODALIDADES.forEach(m => {
+    const o = document.createElement("option");
+    o.value = m; o.textContent = m;
+    credModal.appendChild(o);
+  });
+  credModal.addEventListener("change", renderCredenciaisLista);
+
+  // ocultar scanner invalid overlay se estiver aberto
+  document.getElementById("scannerInvalid").style.display = "none";
+
+  mostrarSecao("inscricao");
+}
+
+/* ========== OVERLAY EMAIL: nova lógica robusta (substitui a anterior) ========== */
+
+function fecharOverlayEmail(){
+  const overlay = document.getElementById('emailOverlay');
+  if (overlay) overlay.style.display = 'none';
+}
+function abrirOverlayEmail(){
+  const overlay = document.getElementById('emailOverlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+function setEmailEFechar(email){
+  try { localStorage.setItem('insc_email', email); } catch(e){}
+  window._inscricao_email_fallback = email;
+  emailAtual = email;
+  fecharOverlayEmail();
+}
+
+function configurarOverlayEmail(){
+  const overlay = document.getElementById("emailOverlay");
+  const emailInput = document.getElementById("emailAluno");
+  const btnEntrar = document.getElementById("btnEntrarEmail");
+  const msgEmail = document.getElementById("msgEmailOverlay");
+
+  if (!overlay || !emailInput || !btnEntrar) return;
+
+  try {
+    const saved = localStorage.getItem('insc_email');
+    if (validarEmail(saved)) {
+      emailAtual = saved;
+      fecharOverlayEmail();
+      return;
+    }
+  } catch(e){}
+
+  // checa autofill após microtempo
+  setTimeout(() => {
+    const auto = (emailInput.value || '').trim();
+    if (validarEmail(auto)){
+      setEmailEFechar(auto);
+    }
+  }, 250);
+
+  function mostrarErro(msg){
+    if (msgEmail) msgEmail.textContent = msg;
+  }
+
+  function tentarEntrar(){
+    const val = (emailInput.value || '').trim();
+    if (!validarEmail(val)){
+      mostrarErro('Digite um e-mail válido (ex: nome@dominio.com)');
+      emailInput.focus();
+      return;
+    }
+    setEmailEFechar(val);
+  }
+
+  btnEntrar.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    tentarEntrar();
+  });
+
+  emailInput.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      tentarEntrar();
+    }
+  });
+
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') {
+      const saved = localStorage.getItem('insc_email');
+      if (validarEmail(saved)) fecharOverlayEmail();
+    }
+  });
+
+  overlay.addEventListener('click', (ev) => {
+    if (ev.target === overlay){
+      const saved = localStorage.getItem('insc_email');
+      if (validarEmail(saved)) fecharOverlayEmail();
+    }
   });
 }
 
