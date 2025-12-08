@@ -2930,7 +2930,7 @@ function imprimirCredencial(ins){
   <html>
   <head>
     <meta charset="utf-8">
-    <title>Crachá — ${nome}</title>
+    <title>Crachá — ${escapeHtml(nome)}</title>
     <style>
       @media print {
         @page { margin: 10mm; }
@@ -2977,7 +2977,7 @@ function imprimirCredencial(ins){
     </div>
     <script>
       setTimeout(function(){ window.print(); }, 400);
-    </script>
+    <\/script>
   </body>
   </html>
   `;
