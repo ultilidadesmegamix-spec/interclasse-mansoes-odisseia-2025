@@ -12,6 +12,9 @@
   <!-- jsQR (para leitura de QR via câmera) -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
+  <!-- Biblioteca para gerar QR client-side (gera data:URL) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
   <style>
     :root {
       --azul: #0056b3;
@@ -2858,8 +2861,10 @@ function iniciarListeners(){
  * - lê os filtros (turno, turma, modalidade)
  * - mostra cada inscrição (individualmente) que bater com filtros
  * - cada item tem botão "Imprimir Credenciais"
+ *
+ * Agora gera QR client-side com QRCode.toDataURL(...) (biblioteca qrcode)
  */
-function renderCredenciaisLista(){
+async function renderCredenciaisLista(){
   const turno = document.getElementById("credFiltroTurno").value;
   const turma = document.getElementById("credFiltroTurma").value;
   const modalidade = document.getElementById("credFiltroModalidade").value;
@@ -2880,7 +2885,7 @@ function renderCredenciaisLista(){
   }
 
   // Exibir cada inscrição individual como card
-  lista.forEach(ins => {
+  for (const ins of lista){
     const card = document.createElement("div");
     card.className = "cred-card";
 
@@ -2896,6 +2901,23 @@ function renderCredenciaisLista(){
     const actions = document.createElement("div");
     actions.className = "cred-actions";
 
+    // img QR (será preenchida via toDataURL)
+    const imgQR = document.createElement("img");
+    imgQR.style.width = "80px";
+    imgQR.style.height = "80px";
+    imgQR.style.border = "1px solid #ccc";
+    imgQR.style.background = "#fff";
+    imgQR.alt = "QR";
+
+    // gerar qr dataURL para a inscrição
+    try {
+      const smallDataUrl = await QRCode.toDataURL(ins.id, { width: 160, margin: 1 });
+      imgQR.src = smallDataUrl;
+    } catch(e){
+      console.error("Erro ao gerar QR (pequeno):", e);
+      imgQR.alt = "QR erro";
+    }
+
     const btnImprimir = document.createElement("button");
     btnImprimir.className = "btn btn-primaria";
     btnImprimir.textContent = "Imprimir Credenciais";
@@ -2903,28 +2925,35 @@ function renderCredenciaisLista(){
       imprimirCredencial(ins);
     });
 
+    actions.appendChild(imgQR);
     actions.appendChild(btnImprimir);
 
     card.appendChild(dados);
     card.appendChild(actions);
     cont.appendChild(card);
-  });
+  }
 }
 
 /**
  * imprimirCredencial(ins) - abre nova janela com layout de crachá e chama print()
- * - usa Google Chart API para gerar QR com o ID (conteúdo do QR = ID da inscrição)
+ * - agora usa QR gerado localmente (data URL)
  */
-function imprimirCredencial(ins){
+async function imprimirCredencial(ins){
   const nome = ins.nome || "";
   const turno = ins.turno || "";
   const turma = ins.turma || "";
   const modalidades = (ins.modalidades || []).join(", ");
   const id = ins.id || "";
-  // gerar URL do QR (conteúdo: apenas o id)
-  const qrUrl = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=" + encodeURIComponent(id);
 
-  // Layout do crachá (tamanho aproximado de um badge)
+  let dataUrl;
+  try {
+    dataUrl = await QRCode.toDataURL(id, { width: 300, margin: 1 });
+  } catch(e){
+    console.error("Erro ao gerar QR para impressão:", e);
+    // fallback simples: cria QR com biblioteca (se falhar, usar placeholder)
+    dataUrl = "";
+  }
+
   const badgeHtml = `
   <!doctype html>
   <html>
@@ -2971,7 +3000,7 @@ function imprimirCredencial(ins){
         <div class="id">ID: ${escapeHtml(id)}</div>
       </div>
       <div class="right">
-        <img class="qr" src="${qrUrl}" alt="QR Code">
+        ${dataUrl ? `<img class="qr" src="${dataUrl}" alt="QR Code">` : `<div class="qr"></div>`}
         <div style="font-size:11px; margin-top:6px;">Apresente este crachá</div>
       </div>
     </div>
@@ -3070,7 +3099,7 @@ function stopScanner(){
 }
 
 /* processa o conteúdo lido do QR (esperamos ser o ID da inscrição) */
-function processarQR(qrData){
+async function processarQR(qrData){
   const idLido = (qrData || "").trim();
   const ins = todasInscricoes.find(i => i.id === idLido);
   if (!ins){
@@ -3080,7 +3109,13 @@ function processarQR(qrData){
   }
   // mostrar crachá digital dentro do overlay (mesmo layout)
   const scannerResult = document.getElementById("scannerResult");
-  const qrUrl = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=" + encodeURIComponent(idLido);
+  let dataUrl = "";
+  try {
+    dataUrl = await QRCode.toDataURL(idLido, { width: 240, margin: 1 });
+  } catch(e){
+    console.error("Erro ao gerar QR para visualização:", e);
+  }
+
   scannerResult.innerHTML = `
     <div style="display:flex; gap:12px; align-items:center;">
       <div style="flex:1;">
@@ -3090,7 +3125,7 @@ function processarQR(qrData){
         ID: ${escapeHtml(ins.id)}
       </div>
       <div style="width:140px; text-align:center;">
-        <img src="${qrUrl}" style="width:120px; height:120px; border:1px solid #ccc; background:#fff;">
+        ${dataUrl ? `<img src="${dataUrl}" style="width:120px; height:120px; border:1px solid #ccc; background:#fff;">` : `<div style="width:120px;height:120px;background:#fff;border:1px solid #ccc;"></div>`}
       </div>
     </div>
     <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end;">
