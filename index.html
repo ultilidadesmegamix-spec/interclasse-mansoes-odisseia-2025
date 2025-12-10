@@ -464,6 +464,54 @@
         padding: 4px 6px;
       }
     }
+/* INÍCIO: Estilos para Crachás e Escaneador (adicionar dentro do <style>) */
+.badge-grid {
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:8px;
+}
+.badge-card {
+  width:260px;
+  border-radius:10px;
+  padding:10px;
+  background: linear-gradient(180deg,#fff,#f7fbff);
+  border:1px solid var(--borda);
+  box-shadow: 0 6px 18px rgba(3,63,142,0.06);
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.badge-left {
+  flex:1;
+}
+.badge-name {
+  font-weight:700;
+  font-size:0.98rem;
+  color:var(--azul);
+}
+.badge-meta {
+  font-size:0.82rem;
+  color:#333;
+}
+.badge-qr {
+  width:84px;
+  height:84px;
+  border-radius:8px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #e6eefb;
+}
+.cred-msg {
+  margin-top:6px;
+  font-size:0.9rem;
+}
+.scan-ok { background: linear-gradient(90deg, #e8ffef, #e5fff0); color:var(--verde); padding:8px; border-radius:8px; }
+.scan-fail { background: linear-gradient(90deg, #ffecec, #fff0f0); color:var(--vermelho); padding:8px; border-radius:8px; }
+/* FIM: Estilos para Crachás e Escaneador */
+
   </style>
 </head>
 <body>
@@ -489,7 +537,10 @@
     <button class="btn btn-primaria" id="btnVerJogos">🏆 Ver jogos</button>
     <button class="btn btn-primaria" id="btnClassificados">✅ Classificados</button>
     <button class="btn btn-primaria" id="btnPlacarAoVivo">⚡ Placar ao vivo</button>
-    <button class="btn btn-primaria" id="btnCredenciais">🎫 Credenciais</button>
+<!-- INÍCIO: botão Credenciais (adicionar logo após o botão #btnAdminArea) -->
+<button class="btn btn-primaria" id="btnCredenciais">🎫 Credenciais</button>
+<!-- FIM: botão Credenciais -->
+
     <button class="btn btn-admin" id="btnAdminArea">🔐 Área administrativa</button>
   </div>
 </header>
@@ -652,78 +703,6 @@
 
     <div id="placarAoVivoContainer"></div>
   </section>
-  <!-- CREDENCIAIS (NOVO) -->
-  <section class="card" id="secCredenciais" style="display:none;">
-    <h2>Credenciais &amp; Crachás</h2>
-    <small>Gerencie seu acesso e imprima seus crachás com QR Code.</small>
-
-    <div style="margin-top:10px;">
-      <label>Você já tem acesso?</label>
-      <div style="display:flex; gap:8px; margin-top:6px;">
-        <button class="btn btn-primaria" id="credBtnSim">Sim</button>
-        <button class="btn btn-primaria" id="credBtnNao">Não</button>
-      </div>
-    </div>
-
-    <!-- Form: criar acesso -->
-    <div id="credCriar" style="margin-top:12px; display:none;">
-      <h3 style="margin:6px 0;">Criar acesso</h3>
-      <div class="grid-2">
-        <div>
-          <label for="credTurno">Turno</label>
-          <select id="credTurno"><option value="">Selecione...</option>
-            <option value="Matutino">Matutino</option>
-            <option value="Vespertino">Vespertino</option>
-            <option value="Noturno">Noturno</option>
-          </select>
-        </div>
-        <div>
-          <label for="credTurma">Turma</label>
-          <select id="credTurma"><option value="">Selecione o turno primeiro...</option></select>
-        </div>
-      </div>
-
-      <div style="margin-top:8px;">
-        <label for="credNome">Nome</label>
-        <select id="credNome"><option value="">Selecione turno e turma...</option></select>
-      </div>
-
-      <div style="margin-top:8px;">
-        <label for="credSenha">Senha (crie uma)</label>
-        <input type="text" id="credSenha" placeholder="Senha para acessar seus crachás" />
-      </div>
-
-      <div style="margin-top:10px; display:flex; gap:8px;">
-        <button class="btn btn-primaria" id="btnCriarAcesso">➕ Criar acesso agora</button>
-      </div>
-
-      <div id="credCriarMsg" style="margin-top:8px;"></div>
-    </div>
-
-    <!-- Form: entrar -->
-    <div id="credEntrar" style="margin-top:12px; display:none;">
-      <h3 style="margin:6px 0;">Entrar com nome e senha</h3>
-      <div style="margin-top:8px;">
-        <label for="credEntrarNome">Nome</label>
-        <select id="credEntrarNome"><option value="">Selecione seu nome...</option></select>
-      </div>
-      <div style="margin-top:8px;">
-        <label for="credEntrarSenha">Senha</label>
-        <input type="text" id="credEntrarSenha" placeholder="Senha" />
-      </div>
-      <div style="margin-top:10px; display:flex; gap:8px;">
-        <button class="btn btn-primaria" id="btnEntrarCred">Entrar</button>
-      </div>
-      <div id="credEntrarMsg" style="margin-top:8px;"></div>
-    </div>
-
-    <!-- Painel do aluno com Crachás -->
-    <div id="credPainelAluno" style="margin-top:12px; display:none;">
-      <h3 style="margin:6px 0;">Seus crachás</h3>
-      <div id="credBadgesContainer" style="display:grid; grid-template-columns: repeat(auto-fit,minmax(320px,1fr)); gap:12px;"></div>
-    </div>
-
-  </section>
 
   <!-- ADMIN -->
   <section class="card" id="adminSection">
@@ -743,8 +722,11 @@
       <button class="admin-tab-btn" data-tab="jogos">🏆 Jogos</button>
       <button class="admin-tab-btn" data-tab="relatorio">🖨️ Imprimir relatório</button>
       <button class="admin-tab-btn" data-tab="professores">👩‍🏫 Professores</button>
-      <button class="admin-tab-btn" data-tab="escaneador">📷 Escaneador</button>
       <button class="admin-tab-btn" data-tab="config">⚙️ Configurações</button>
+<!-- INÍCIO: botão Escaneador (adicionar dentro de .admin-tabs, após os botões existentes) -->
+<button class="admin-tab-btn" data-tab="escaneador">📷 Escaneador</button>
+<!-- FIM: botão Escaneador -->
+
     </div>
 
     <!-- TAB INSCRIÇÕES -->
@@ -913,39 +895,6 @@
         </thead>
         <tbody></tbody>
       </table>
-    </div>
-    <!-- TAB ESCANEADOR (NOVO) -->
-    <div class="admin-tab-content" id="tab-escaneador">
-      <div class="admin-bloco">
-        <strong>Escaneador por jogo</strong>
-        <small style="display:block;margin-top:2px;">Selecione o jogo do momento antes de ativar a câmera.</small>
-
-        <div style="margin-top:6px;">
-          <label for="escJogoSelect">Selecionar jogo</label>
-          <select id="escJogoSelect" style="width:100%;">
-            <option value="">Selecione o jogo do dia/rodada...</option>
-          </select>
-        </div>
-
-        <div id="escStatus" style="margin-top:8px; font-size:0.9rem;"></div>
-
-        <div id="escCameraArea" style="margin-top:8px; display:none;">
-          <video id="escVideo" autoplay playsinline style="width:100%; max-height:360px; border-radius:8px; background:#000;"></video>
-          <canvas id="escCanvas" style="display:none;"></canvas>
-
-          <div id="escResult" style="margin-top:8px; font-weight:600;"></div>
-          <div id="escIndicator" style="margin-top:8px; height:40px;"></div>
-          <div style="margin-top:8px;">
-            <button class="btn btn-primaria" id="btnPararEscaneador">Parar leitor</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="admin-bloco">
-        <strong>Status das turmas</strong>
-        <small style="display:block;margin-top:2px;">Tabela dos Times e lista de inscritos (marcadas automaticamente pelo escaneador).</small>
-        <div id="escResumoJogos"></div>
-      </div>
     </div>
 
     <!-- TAB PROFESSORES (ADMIN GERENCIA SENHAS) -->
@@ -1118,6 +1067,113 @@
       <div id="profListaAlunos" style="margin-top:6px;"></div>
     </div>
   </section>
+<!-- INÍCIO: Overlays do sistema de credenciais e escaneador -->
+<!-- 1) Overlay Credenciais (criar / entrar + crachás) -->
+<div id="credenciaisOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center;">
+  <div style="width:96%; max-width:760px; background:#fff; border-radius:12px; padding:16px; box-shadow:0 12px 30px rgba(0,0,0,0.25);">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+      <h2 style="margin:0; color:var(--azul);">Credenciais do aluno</h2>
+      <button class="btn" id="btnFecharCredenciais" title="Fechar">✖</button>
+    </div>
+
+    <div id="credStatusMsg" style="margin-bottom:8px;"></div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:260px;">
+        <h3 style="margin:6px 0 8px 0; font-size:0.95rem;">Entrar</h3>
+        <label for="credNomeLogin">Nome</label>
+        <input type="text" id="credNomeLogin" placeholder="Seu nome completo" />
+        <label for="credTurmaLogin" style="margin-top:6px;">Turma</label>
+        <select id="credTurmaLogin">
+          <option value="">Selecione...</option>
+        </select>
+        <label for="credSenhaLogin" style="margin-top:6px;">Senha</label>
+        <input type="password" id="credSenhaLogin" placeholder="Senha" />
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button class="btn btn-primaria" id="btnEntrarCred">Entrar</button>
+          <button class="btn" id="btnMostrarCriar">Criar acesso</button>
+        </div>
+      </div>
+
+      <div style="flex:1; min-width:260px;">
+        <h3 style="margin:6px 0 8px 0; font-size:0.95rem;">Criar acesso</h3>
+        <label for="credTurnoCrear">Turno</label>
+        <select id="credTurnoCrear">
+          <option value="">Selecione...</option>
+          <option value="Matutino">Matutino</option>
+          <option value="Vespertino">Vespertino</option>
+          <option value="Noturno">Noturno</option>
+        </select>
+        <label for="credTurmaCrear" style="margin-top:6px;">Turma</label>
+        <select id="credTurmaCrear">
+          <option value="">Selecione o turno primeiro...</option>
+        </select>
+        <label for="credAlunoSelect" style="margin-top:6px;">Escolha seu nome</label>
+        <select id="credAlunoSelect">
+          <option value="">Selecione turma primeiro...</option>
+        </select>
+        <label for="credSenhaCrear" style="margin-top:6px;">Criar senha</label>
+        <input type="password" id="credSenhaCrear" placeholder="Senha (4-8 caracteres)" />
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button class="btn btn-primaria" id="btnCriarCred">Criar acesso</button>
+        </div>
+      </div>
+    </div>
+
+    <hr style="margin:12px 0;" />
+
+    <div id="credCrachasArea">
+      <!-- crachás gerados aparecerão aqui -->
+    </div>
+  </div>
+</div>
+
+<!-- 2) Overlay Escaneador (admin) -->
+<div id="escaneadorOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:10001; align-items:center; justify-content:center;">
+  <div style="width:96%; max-width:820px; background:#fff; border-radius:12px; padding:12px; box-shadow:0 12px 30px rgba(0,0,0,0.3);">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="margin:0; color:var(--azul);">Escaneador — selecione o jogo</h2>
+      <button class="btn" id="btnFecharEscaneador">✖</button>
+    </div>
+
+    <div style="margin-top:8px;">
+      <label for="selectJogoParaEscanear">Jogos cadastrados</label>
+      <select id="selectJogoParaEscanear" style="width:100%; padding:8px; border-radius:8px; border:1px solid var(--borda);">
+        <option value="">Selecione um jogo...</option>
+      </select>
+      <div style="margin-top:8px; display:flex; gap:8px;">
+        <button class="btn btn-primaria" id="btnIniciarEscaneamento">Iniciar escaneamento</button>
+        <button class="btn" id="btnPararEscaneamento" disabled>Parar câmera</button>
+      </div>
+    </div>
+
+    <div id="escaneadorArea" style="margin-top:10px; display:none;">
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <video id="escaneadorVideo" autoplay playsinline style="width:320px; height:240px; background:#000; border-radius:8px;"></video>
+        <div style="flex:1;">
+          <div id="escaneResultado" style="height:240px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1.1rem;">
+            Aguardando escaneamento...
+          </div>
+          <div style="margin-top:8px; font-size:0.9rem; color:#444;">
+            Instruções: escolha o jogo acima. O sistema aceitará apenas QRs de alunos das turmas deste jogo e da modalidade deste jogo. Cada QR só é válido **uma vez por jogo**.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3) Modal lista de inscritos de um jogo (usado em Ver jogos) -->
+<div id="modalInscritosJogo" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:10002; align-items:center; justify-content:center;">
+  <div style="width:95%; max-width:720px; background:#fff; border-radius:10px; padding:12px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="margin:0; color:var(--azul);">Inscritos no jogo</h3>
+      <button class="btn" id="btnFecharModalInscritos">✖</button>
+    </div>
+    <div id="listaInscritosDoJogo" style="margin-top:10px; max-height:420px; overflow:auto;"></div>
+  </div>
+</div>
+<!-- FIM: Overlays do sistema de credenciais e escaneador -->
 
 </main>
 
@@ -3203,555 +3259,504 @@ function init(){
 
   mostrarSecao("inscricao");
 }
-/* ================= CREDENCIAIS / CRACHÁS / ESCANEADOR ================= */
+/* INÍCIO: Código adicional - Credenciais, Crachás, QR e Escaneador (cole ANTES do bloco "/* DOM ready */") */
 
-/* helper: cria ID simples único */
-function gerarIdCurto(){
-  return 'c' + Math.random().toString(36).slice(2,10);
+/* ---------- Helpers para QR e UI ---------- */
+function gerarQRCodeUrl(text, size = 200){
+  // usa Google Chart API para gerar imagem do QR (simples e sem bibliotecas)
+  return "https://chart.googleapis.com/chart?cht=qr&chs=" + size + "x" + size + "&chl=" + encodeURIComponent(text);
 }
 
-/* --- Credenciais: UI wiring --- */
+function showCredAlert(msg, ok = true){
+  const el = document.getElementById("credStatusMsg");
+  if (!el) return;
+  el.innerHTML = '<div class="' + (ok ? 'msg-sucesso' : 'msg-erro') + '">' + msg + '</div>';
+}
+
+/* ---------- Abrir / preencher selects do overlay de credenciais ---------- */
+
 document.getElementById("btnCredenciais").addEventListener("click", () => {
-  // alterna para a seção credenciais
-  mostrarSecao("credenciais");
-  // esconder os outros painéis
-  document.getElementById("secCredenciais").style.display = "block";
-  // atualiza selects
-  atualizarCredSelectsInit();
+  // abre overlay
+  const ov = document.getElementById("credenciaisOverlay");
+  if (!ov) return;
+  // preencher selects de turma (mesmos arrays já definidos no código)
+  const selTLogin = document.getElementById("credTurmaLogin");
+  const selTCrear = document.getElementById("credTurmaCrear");
+  const selTurnoCrear = document.getElementById("credTurnoCrear");
+  const selAluno = document.getElementById("credAlunoSelect");
+
+  selTLogin.innerHTML = '<option value="">Selecione...</option>';
+  TODAS_TURMAS.forEach(t => { const o = document.createElement("option"); o.value = t; o.textContent = t; selTLogin.appendChild(o); });
+
+  selTCrear.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
+  selAluno.innerHTML = '<option value="">Selecione turma primeiro...</option>';
+  // reset mensagens
+  showCredAlert("", true);
+  document.getElementById("credCrachasArea").innerHTML = "";
+  ov.style.display = "flex";
 });
 
-/* fazer o "mostrarSecao" reconhecer a nova opção (não modifica a função original) */
-function mostrarSecao(sec){
-  // manter comportamento anterior
-  document.getElementById("secInscricao").style.display = (sec==="inscricao"?"block":"none");
-  document.getElementById("secInscritos").style.display = (sec==="inscritos"?"block":"none");
-  document.getElementById("secJogos").style.display = (sec==="jogos"?"block":"none");
-  document.getElementById("secClassificados").style.display = (sec==="classificados"?"block":"none");
-  document.getElementById("secPlacarAoVivo").style.display = (sec==="placar"?"block":"none");
-  document.getElementById("adminSection").style.display = (sec==="admin"?"block":"none");
-  document.getElementById("professoresSection").style.display = (sec==="professores"?"block":"none");
-  // nova seção credenciais
-  const credSec = document.getElementById("secCredenciais");
-  if (credSec) credSec.style.display = (sec==="credenciais"?"block":"none");
-}
-
-/* UI toggles do credenciais */
-document.getElementById("credBtnNao").addEventListener("click", () => {
-  document.getElementById("credCriar").style.display = "block";
-  document.getElementById("credEntrar").style.display = "none";
-  document.getElementById("credPainelAluno").style.display = "none";
-});
-document.getElementById("credBtnSim").addEventListener("click", () => {
-  document.getElementById("credCriar").style.display = "none";
-  document.getElementById("credEntrar").style.display = "block";
-  document.getElementById("credPainelAluno").style.display = "none";
+document.getElementById("btnFecharCredenciais").addEventListener("click", () => {
+  document.getElementById("credenciaisOverlay").style.display = "none";
 });
 
-/* preencher turmas/nome no criar acesso (usa mesmas turmas do site) */
-function atualizarCredSelectsInit(){
-  // credTurno -> credTurma
-  const selTurno = document.getElementById("credTurno");
-  const selTurma = document.getElementById("credTurma");
-  const selNome = document.getElementById("credNome");
-  selTurma.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
-  selNome.innerHTML = '<option value="">Selecione turno e turma...</option>';
-  if (selTurno.value){
-    const turmas = getTurmasPorTurno(selTurno.value);
-    selTurma.innerHTML = '<option value="">Selecione a turma...</option>';
-    turmas.forEach(t => {
-      const o = document.createElement("option"); o.value = t; o.textContent = t;
-      selTurma.appendChild(o);
-    });
+/* Atualiza turmas no bloco criar (dependente do turno) */
+document.getElementById("credTurnoCrear").addEventListener("change", () => {
+  const turno = document.getElementById("credTurnoCrear").value;
+  const sel = document.getElementById("credTurmaCrear");
+  sel.innerHTML = "";
+  if (!turno){
+    sel.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
+    return;
   }
-
-  // preencher lista de nomes para entrar (com todos os alunos cadastrados)
-  const entrarNome = document.getElementById("credEntrarNome");
-  entrarNome.innerHTML = '<option value="">Selecione seu nome...</option>';
-  // usa todasInscricoes para popular
-  const nomes = {};
-  todasInscricoes.forEach(i => { nomes[i.nome] = true; });
-  Object.keys(nomes).sort().forEach(n => {
-    const o = document.createElement("option"); o.value = n; o.textContent = n;
-    entrarNome.appendChild(o);
-  });
-}
-
-/* atualiza lista de nomes no select de criar com filtro turno/turma */
-document.getElementById("credTurno").addEventListener("change", atualizarCredSelectsInit);
-document.getElementById("credTurma").addEventListener("change", () => {
-  const turno = document.getElementById("credTurno").value;
-  const turma = document.getElementById("credTurma").value;
-  const selNome = document.getElementById("credNome");
-  selNome.innerHTML = '<option value="">Selecione...</option>';
-  if (!turno || !turma) return;
-  const lista = todasInscricoes.filter(ins => ins.turno === turno && ins.turma === turma);
-  const nomesSet = {};
-  lista.forEach(i => { if (i.nome) nomesSet[i.nome] = true; });
-  Object.keys(nomesSet).sort().forEach(n => {
-    const o = document.createElement("option"); o.value = n; o.textContent = n;
-    selNome.appendChild(o);
-  });
+  const turmas = getTurmasPorTurno(turno);
+  sel.appendChild(new Option("Selecione a turma...",""));
+  turmas.forEach(t => sel.appendChild(new Option(t,t)));
 });
 
-/* Criar acesso: cria credenciais no Firestore (uma por modalidade inscrita) */
-document.getElementById("btnCriarAcesso").addEventListener("click", async () => {
-  const nome = document.getElementById("credNome").value;
-  const turno = document.getElementById("credTurno").value;
-  const turma = document.getElementById("credTurma").value;
-  const senha = (document.getElementById("credSenha").value || "").trim();
-  const msgDiv = document.getElementById("credCriarMsg");
-  msgDiv.innerHTML = "";
-
-  if (!nome || !turno || !turma || !senha){
-    msgDiv.innerHTML = '<div class="msg-erro">Preencha turno, turma, nome e senha.</div>'; return;
-  }
-
-  // encontrar inscrição do aluno
-  const inscr = todasInscricoes.find(i => i.nome === nome && i.turno === turno && i.turma === turma);
-  if (!inscr){
-    msgDiv.innerHTML = '<div class="msg-erro">Inscrição não encontrada para este aluno (verifique nome/turno/turma).</div>'; return;
-  }
-  if (!inscr.modalidades || !inscr.modalidades.length){
-    msgDiv.innerHTML = '<div class="msg-erro">Aluno sem modalidades inscritas.</div>'; return;
-  }
-
-  try{
-    // cria credenciais por modalidade (se já não existir)
-    const created = [];
-    for (const mod of inscr.modalidades){
-      // buscar se já existe credencial para este aluno+modalidade
-      const q = await db.collection("credenciais")
-        .where("inscricaoId","==",inscr.id)
-        .where("modalidade","==",mod)
-        .get();
-
-      if (!q.empty) continue; // já tem credencial para essa modalidade
-
-      const credId = gerarIdCurto();
-      const docRef = await db.collection("credenciais").add({
-        inscricaoId: inscr.id,
-        nome: inscr.nome,
-        turno: inscr.turno,
-        turma: inscr.turma,
-        modalidade: mod,
-        senha: senha,
-        credId: credId,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      created.push({id: docRef.id, credId: credId, modalidade: mod});
-    }
-
-    if (!created.length){
-      msgDiv.innerHTML = '<div class="msg-sucesso">Já existem credenciais para as modalidades deste aluno. Tente entrar com o nome e senha.</div>';
-    } else {
-      msgDiv.innerHTML = '<div class="msg-sucesso">Credenciais criadas com sucesso para: '+created.map(c=>c.modalidade).join(", ")+'</div>';
-    }
-
-    // abrir painel do aluno automaticamente (mostra crachás)
-    await carregarPainelAlunoPorNomeESenha(nome, senha);
-  }catch(e){
-    console.error(e);
-    msgDiv.innerHTML = '<div class="msg-erro">Erro ao criar credenciais.</div>';
-  }
-});
-
-/* Entrar (aluno) com nome + senha */
-document.getElementById("btnEntrarCred").addEventListener("click", async () => {
-  const nome = document.getElementById("credEntrarNome").value;
-  const senha = (document.getElementById("credEntrarSenha").value || "").trim();
-  const msgDiv = document.getElementById("credEntrarMsg");
-  msgDiv.innerHTML = "";
-  if (!nome || !senha){ msgDiv.innerHTML = '<div class="msg-erro">Preencha nome e senha.</div>'; return; }
-
-  await carregarPainelAlunoPorNomeESenha(nome, senha);
-});
-
-/* carregar painel do aluno: buscar credenciais no Firestore e renderizar crachás */
-async function carregarPainelAlunoPorNomeESenha(nome, senha){
-  const q = await db.collection("credenciais").where("nome","==",nome).where("senha","==",senha).get();
-  const painel = document.getElementById("credPainelAluno");
-  const badgCont = document.getElementById("credBadgesContainer");
-  const entrarMsg = document.getElementById("credEntrarMsg");
-  const criarMsg = document.getElementById("credCriarMsg");
-  entrarMsg.innerHTML = ""; if (criarMsg) criarMsg.innerHTML = "";
-
-  if (q.empty){
-    entrarMsg.innerHTML = '<div class="msg-erro">Nenhuma credencial encontrada para este nome/senha.</div>'; return;
-  }
-
-  painel.style.display = "block";
-  badgCont.innerHTML = "";
-
-  // para cada credencial do aluno, montar um crachá
-  q.forEach(doc => {
-    const d = doc.data();
-    const credDocId = doc.id;
-    // QR payload: JSON simplificado com credId e modalidade
-    const payload = JSON.stringify({ tipo: "cracha", credId: d.credId, modalidade: d.modalidade, inscricaoId: d.inscricaoId });
-    const qrUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=220x220&chl=' + encodeURIComponent(payload);
-
-    // layout do crachá (segue a referência visual: nome, turno, turma, modalidade, QR)
-    const card = document.createElement("div");
-    card.style.border = "2px solid #2f86d6";
-    card.style.borderRadius = "12px";
-    card.style.padding = "12px";
-    card.style.display = "flex";
-    card.style.justifyContent = "space-between";
-    card.style.alignItems = "center";
-    card.style.background = "#fff";
-    card.style.boxShadow = "0 2px 6px rgba(0,0,0,0.06)";
-
-    const left = document.createElement("div");
-    left.style.flex = "1";
-    left.style.paddingRight = "8px";
-
-    const nomeEl = document.createElement("div");
-    nomeEl.innerHTML = "<div style='font-weight:800; font-size:1.05rem; color:var(--azul);'>"+ (d.nome || "") +"</div>";
-    left.appendChild(nomeEl);
-
-    const infoList = document.createElement("div");
-    infoList.style.marginTop = "8px";
-    infoList.innerHTML =
-      "<div>Turno: <strong>"+(d.turno || "-")+"</strong></div>" +
-      "<div>Turma: <strong>"+(d.turma || "-")+"</strong></div>" +
-      "<div>Modalidade: <strong>"+(d.modalidade || "-")+"</strong></div>" +
-      "<div style='font-size:0.75rem; color:#666;'>ID: "+(d.credId || "")+"</div>";
-    left.appendChild(infoList);
-
-    const right = document.createElement("div");
-    right.style.width = "220px";
-    right.style.flex = "0 0 220px";
-    right.style.display = "flex";
-    right.style.justifyContent = "center";
-    right.style.alignItems = "center";
-    const img = document.createElement("img");
-    img.src = qrUrl;
-    img.style.maxWidth = "100%";
-    img.style.height = "auto";
-    img.alt = "QR Code";
-    right.appendChild(img);
-
-    card.appendChild(left);
-    card.appendChild(right);
-
-    // botão para imprimir/baixar (gera janela com apenas o crachá)
-    const btnRow = document.createElement("div");
-    btnRow.style.marginTop = "8px";
-    const btnImp = document.createElement("button");
-    btnImp.className = "btn btn-primaria";
-    btnImp.textContent = "Imprimir / Abrir crachá";
-    btnImp.addEventListener("click", () => {
-      const w = window.open("");
-      w.document.write("<html><head><title>Crachá</title></head><body style='font-family:Arial,Helvetica,sans-serif;margin:20px;'>");
-      w.document.write(card.outerHTML);
-      w.document.write("</body></html>");
-      w.document.close();
-      w.print();
-    });
-    btnRow.appendChild(btnImp);
-
-    const wrap = document.createElement("div");
-    wrap.appendChild(card);
-    wrap.appendChild(btnRow);
-    badgCont.appendChild(wrap);
-  });
-}
-
-/* ========== ESCANEADOR (ADMIN) ========== */
-
-let escVideoStream = null;
-let escScanning = false;
-
-function popularSelectJogosParaEscaneador(){
-  const sel = document.getElementById("escJogoSelect");
-  sel.innerHTML = '<option value="">Selecione o jogo do momento...</option>';
-  // listar jogos do array todosJogos
-  todosJogos.forEach(j => {
-    const label = (j.modalidade || "")+" — "+formatarDataBR(j.dataJogo)+" "+(j.horarioJogo||"")+" — "+(j.turma1||"")+" x "+(j.turma2||"");
+/* Quando escolhe turma no criar -> lista alunos dessa turma (da coleção inscricoes já carregada em todasInscricoes) */
+document.getElementById("credTurmaCrear").addEventListener("change", () => {
+  const turma = document.getElementById("credTurmaCrear").value;
+  const selAluno = document.getElementById("credAlunoSelect");
+  selAluno.innerHTML = '<option value="">Selecione...</option>';
+  const lista = todasInscricoes.filter(i => i.turma === turma);
+  lista.sort((a,b)=> (a.nome||"").localeCompare(b.nome||"","pt-BR"));
+  lista.forEach(i => {
     const opt = document.createElement("option");
-    opt.value = j.id;
-    opt.textContent = label;
-    sel.appendChild(opt);
+    opt.value = i.id; // vamos salvar referência à inscrição
+    opt.textContent = i.nome;
+    selAluno.appendChild(opt);
   });
-}
-document.addEventListener("click", (e) => {
-  if (e.target && e.target.matches('[data-tab="escaneador"], .admin-tab-btn')) {
-    // when admin opens tab, populate select — but safer to call when tab shown
-  }
 });
 
-// quando o usuário muda o jogo selecionado
-document.addEventListener("change", (e) => {
-  if (e.target && e.target.id === 'escJogoSelect'){
-    const id = e.target.value;
-    const area = document.getElementById("escCameraArea");
-    const status = document.getElementById("escStatus");
-    document.getElementById("escResult").textContent = "";
-    document.getElementById("escIndicator").innerHTML = "";
-    if (!id){
-      area.style.display = "none";
-      stopEscaneador();
-      status.textContent = "Selecione um jogo para ativar o leitor.";
-      renderResumoEsc(id);
+/* ---------- Criar credencial (aluno) ---------- */
+document.getElementById("btnCriarCred").addEventListener("click", async (e) => {
+  e.preventDefault();
+  const inscId = document.getElementById("credAlunoSelect").value;
+  const senha = (document.getElementById("credSenhaCrear").value || "").trim();
+  const turma = document.getElementById("credTurmaCrear").value;
+  const turno = document.getElementById("credTurnoCrear").value;
+
+  if (!inscId || !senha || senha.length < 4){
+    showCredAlert("Selecione seu nome e crie uma senha (mínimo 4 caracteres).", false);
+    return;
+  }
+
+  // verifica se já existe credencial para esta inscrição
+  try{
+    const q = await db.collection("credenciais").where("inscricaoId","==",inscId).get();
+    if (!q.empty){
+      showCredAlert("Já existe um acesso criado para esse aluno. Faça login.", false);
       return;
     }
-    // habilitar área e iniciar câmera
-    area.style.display = "block";
-    status.textContent = "Leitor pronto. Ative a câmera — o navegador pode pedir permissão.";
-    startEscaneador(id);
-    renderResumoEsc(id);
-  }
-});
-
-async function startEscaneador(jogoId){
-  stopEscaneador();
-  const video = document.getElementById("escVideo");
-  if (!video) return;
-  // pedir câmera
-  try{
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio:false });
-    escVideoStream = stream;
-    video.srcObject = stream;
-    await video.play();
-    escScanning = true;
-    scanLoopForQR(jogoId);
-  }catch(e){
-    console.error(e);
-    document.getElementById("escStatus").textContent = "Erro ao ativar câmera. Verifique permissões e dispositivo.";
-  }
-}
-
-function stopEscaneador(){
-  escScanning = false;
-  if (escVideoStream){
-    escVideoStream.getTracks().forEach(t => t.stop());
-    escVideoStream = null;
-  }
-  const v = document.getElementById("escVideo");
-  if (v) { try{ v.pause(); v.srcObject = null; }catch(e){} }
-}
-
-/* botão parar */
-document.getElementById("btnPararEscaneador").addEventListener("click", () => {
-  stopEscaneador();
-  document.getElementById("escCameraArea").style.display = "none";
-  document.getElementById("escStatus").textContent = "Leitor parado.";
-});
-
-/* loop de captura e detecção (usa BarcodeDetector quando disponível; fallback: tentar ler via canvas + BarcodeDetector se suportado) */
-async function scanLoopForQR(jogoId){
-  const video = document.getElementById("escVideo");
-  const canvas = document.getElementById("escCanvas");
-  const ctx = canvas.getContext ? canvas.getContext('2d') : null;
-  const status = document.getElementById("escStatus");
-  const resultDiv = document.getElementById("escResult");
-  const indicator = document.getElementById("escIndicator");
-
-  // preparar detector se disponível
-  let detector = null;
-  if (window.BarcodeDetector){
-    try { detector = new BarcodeDetector({formats: ['qr_code']}); }
-    catch(e){ detector = null; }
-  }
-
-  while(escScanning){
-    try{
-      if (video.readyState >= 2 && ctx){
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        if (detector){
-          try {
-            const barcodes = await detector.detect(canvas);
-            if (barcodes && barcodes.length){
-              const payload = barcodes[0].rawValue || barcodes[0].rawData || "";
-              await processarPayloadQRCode(payload, jogoId);
-            }
-          } catch(e){
-            // detector falhou em frame específico
-          }
-        } else {
-          // sem BarcodeDetector: tentar ler via canvas -> usar leitura por URL não é trivial aqui
-          // indicar que navegador talvez não suporte detecção automática
-          indicator.innerHTML = '<div class="msg-erro">Leitura automática indisponível neste navegador. Use um navegador com BarcodeDetector (Chrome/Edge recentes).</div>';
-          // para evitar CPU alta, pausa loop
-          await new Promise(res => setTimeout(res, 1200));
-        }
-      }
-    }catch(e){}
-    await new Promise(res => setTimeout(res, 250));
-  }
-}
-
-/* Processa o conteúdo do QR Code lido */
-async function processarPayloadQRCode(payload, jogoId){
-  const resultDiv = document.getElementById("escResult");
-  const indicator = document.getElementById("escIndicator");
-  try{
-    // alguns QR podem vir percent-encoded se gerados externamente; tentar decodificar
-    let texto = payload;
-    try { texto = decodeURIComponent(payload); } catch(e){ texto = payload; }
-
-    let obj = null;
-    try { obj = JSON.parse(texto); } catch(e){ obj = null; }
-
-    if (!obj || obj.tipo !== 'cracha' || !obj.credId){
-      // QR inválido
-      indicator.innerHTML = '<div style="background:#ffdede; padding:8px; border-radius:6px; color:#b30000;">Entrada não autorizada — QR inválido</div>';
-      resultDiv.textContent = 'Entrada não autorizada';
+    // buscar inscrição para obter nome/modalidades
+    const insDoc = todasInscricoes.find(x => x.id === inscId);
+    if (!insDoc){
+      showCredAlert("Inscrição não encontrada.", false);
       return;
     }
 
-    // buscar credencial pelo credId
-    const q = await db.collection("credenciais").where("credId","==",obj.credId).limit(1).get();
+    // cria credencial: campos básicos + lista de modalidades do aluno
+    const nova = {
+      inscricaoId: inscId,
+      nome: insDoc.nome || "",
+      nomeNormalizado: insDoc.nomeNormalizado || normalizarNome(insDoc.nome || ""),
+      email: insDoc.email || "",
+      turno: insDoc.turno || turno,
+      turma: insDoc.turma || turma,
+      modalidades: insDoc.modalidades || [],
+      senha: senha, // OBS: senha em texto simples (para simplicidade). Pode trocar por hash se desejar.
+      criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    const ref = await db.collection("credenciais").add(nova);
+
+    showCredAlert("Acesso criado com sucesso! Seus crachás foram gerados abaixo.", true);
+
+    // gerar crachás na UI local (não precisa recarregar)
+    gerarCrachasParaCredencial(ref.id, nova);
+
+  }catch(err){
+    console.error(err);
+    showCredAlert("Erro ao criar credencial. Tente novamente.", false);
+  }
+});
+
+/* ---------- Login do aluno por nome+senha ---------- */
+document.getElementById("btnEntrarCred").addEventListener("click", async (e) => {
+  e.preventDefault();
+  const nome = (document.getElementById("credNomeLogin").value || "").trim();
+  const turma = document.getElementById("credTurmaLogin").value;
+  const senha = (document.getElementById("credSenhaLogin").value || "").trim();
+  if (!nome || !turma || !senha){
+    showCredAlert("Preencha nome, turma e senha para entrar.", false);
+    return;
+  }
+  try{
+    const nomeNorm = normalizarNome(nome);
+    const q = await db.collection("credenciais")
+      .where("nomeNormalizado","==",nomeNorm)
+      .where("turma","==",turma)
+      .where("senha","==",senha)
+      .limit(1)
+      .get();
     if (q.empty){
-      indicator.innerHTML = '<div style="background:#ffdede; padding:8px; border-radius:6px; color:#b30000;">Entrada não autorizada — credencial não encontrada</div>';
-      resultDiv.textContent = 'Entrada não autorizada';
+      showCredAlert("Credenciais não encontradas. Verifique os dados.", false);
       return;
     }
     const doc = q.docs[0];
-    const d = doc.data();
+    const data = doc.data();
+    showCredAlert("Login bem-sucedido. Seus crachás:", true);
+    gerarCrachasParaCredencial(doc.id, data);
+  }catch(err){
+    console.error(err);
+    showCredAlert("Erro ao tentar entrar. Tente novamente.", false);
+  }
+});
 
-    // buscar o jogo
-    const jogo = todosJogos.find(j => j.id === jogoId);
-    if (!jogo){
-      indicator.innerHTML = '<div class="msg-erro">Jogo não encontrado.</div>'; return;
+/* ---------- Geração de crachás (um por modalidade) ---------- */
+function gerarCrachasParaCredencial(credId, credData){
+  const area = document.getElementById("credCrachasArea");
+  area.innerHTML = "";
+  const titulo = document.createElement("div");
+  titulo.style.fontSize = "0.95rem";
+  titulo.style.fontWeight = "600";
+  titulo.style.marginBottom = "8px";
+  titulo.textContent = "Crachás — " + (credData.nome || "");
+  area.appendChild(titulo);
+
+  const grid = document.createElement("div");
+  grid.className = "badge-grid";
+  (credData.modalidades || []).forEach(mod => {
+    const card = document.createElement("div");
+    card.className = "badge-card";
+    const left = document.createElement("div");
+    left.className = "badge-left";
+    const nm = document.createElement("div"); nm.className = "badge-name"; nm.textContent = credData.nome || "";
+    const meta = document.createElement("div"); meta.className = "badge-meta";
+    meta.textContent = (credData.turma || "") + " • " + (credData.turno || "") + " • " + mod;
+    left.appendChild(nm); left.appendChild(meta);
+    const qrWrap = document.createElement("div"); qrWrap.className = "badge-qr";
+    // QR payload: credId|modalidade|turma (admin valida contra jogo selecionado)
+    const payload = JSON.stringify({credId:credId, modalidade:mod, turma: credData.turma || ""});
+    const img = document.createElement("img");
+    img.alt = "QR " + mod;
+    img.style.width = "76px"; img.style.height = "76px"; img.loading = "lazy";
+    img.src = gerarQRCodeUrl(payload, 300);
+    qrWrap.appendChild(img);
+
+    card.appendChild(left);
+    card.appendChild(qrWrap);
+    grid.appendChild(card);
+  });
+  area.appendChild(grid);
+
+  // instrução: QR precisa ser escaneado para cada jogo ativo (de acordo com regra)
+  const aviso = document.createElement("div");
+  aviso.className = "cred-msg";
+  aviso.textContent = "Observação: cada QR deve ser escaneado pelo administrador **para cada jogo** (cada escaneamento é registrado por jogo).";
+  area.appendChild(aviso);
+}
+
+/* ---------- Botão 'Mostrar Criar' alterna para painel de criação ---------- */
+document.getElementById("btnMostrarCriar").addEventListener("click", () => {
+  // desliza / foca no painel criar — comportamento simples:
+  document.getElementById("credTurnoCrear").focus();
+});
+
+/* ---------- ESCANEADOR (admin) ---------- */
+let escaneadorStream = null;
+let escaneando = false;
+let barcodeDetector = null;
+let jogoSelecionadoParaEscanear = null;
+
+async function popularSelectJogosParaEscaneador(){
+  const sel = document.getElementById("selectJogoParaEscanear");
+  sel.innerHTML = '<option value="">Selecione um jogo...</option>';
+  // usa todosJogos já sincronizado pelo listener
+  todosJogos.forEach(j => {
+    const opt = document.createElement("option");
+    opt.value = j.id;
+    opt.textContent = `${j.modalidade} — ${formatarDataBR(j.dataJogo)} ${j.horarioJogo || ''} — ${j.turma1 || ''} x ${j.turma2 || ''}`;
+    sel.appendChild(opt);
+  });
+}
+
+/* abrir overlay escaneador */
+document.querySelectorAll(".admin-tab-btn").forEach(b => {
+  // adiciona listener para ativar a tab quando clicar (já existe lógica de abas), mas vamos interceptar escolha de tab "escaneador"
+  b.addEventListener("click", (ev) => {
+    if (b.dataset.tab === "escaneador"){
+      // abre overlay em vez de apenas trocar aba
+      document.getElementById("escaneadorOverlay").style.display = "flex";
+      popularSelectJogosParaEscaneador();
     }
+  });
+});
+document.getElementById("btnFecharEscaneador").addEventListener("click", () => {
+  pararCameraEscaneador();
+  document.getElementById("escaneadorOverlay").style.display = "none";
+});
 
-    // verificar turma/modalidade
-    const alunoTurma = d.turma;
-    const modCred = d.modalidade;
-    const modalidadeJogo = jogo.modalidade;
-    const turmaValida = (alunoTurma === jogo.turma1) || (alunoTurma === jogo.turma2);
-
-    // verificar se já foi escaneado para este jogo (coleção jogos/{jogoId}/presencas com campo credId)
-    const presRef = db.collection("jogos").doc(jogoId).collection("presencas");
-    const presQuery = await presRef.where("credId","==",d.credId).limit(1).get();
-    if (!turmaValida){
-      indicator.innerHTML = '<div style="background:#ffdede; padding:8px; border-radius:6px; color:#b30000;">Entrada não autorizada — aluno não pertence às turmas do jogo</div>';
-      resultDiv.textContent = 'Entrada não autorizada';
-      return;
+/* iniciar / parar escaneamento */
+document.getElementById("btnIniciarEscaneamento").addEventListener("click", async () => {
+  const sel = document.getElementById("selectJogoParaEscanear");
+  const jogoId = sel.value;
+  if (!jogoId){
+    alert("Selecione um jogo antes de iniciar o escaneamento.");
+    return;
+  }
+  jogoSelecionadoParaEscanear = todosJogos.find(j => j.id === jogoId);
+  if (!jogoSelecionadoParaEscanear){
+    alert("Jogo não encontrado.");
+    return;
+  }
+  // mostrar área de vídeo
+  document.getElementById("escaneadorArea").style.display = "block";
+  // habilitar botão parar
+  document.getElementById("btnPararEscaneamento").disabled = false;
+  // inicializar BarcodeDetector quando disponível
+  try {
+    if ('BarcodeDetector' in window){
+      barcodeDetector = new BarcodeDetector({formats: ['qr_code']});
+    } else {
+      barcodeDetector = null;
     }
-    if (modCred !== modalidadeJogo){
-      indicator.innerHTML = '<div style="background:#ffdede; padding:8px; border-radius:6px; color:#b30000;">Entrada não autorizada — crachá de outra modalidade</div>';
-      resultDiv.textContent = 'Entrada não autorizada';
-      return;
-    }
-    if (!presQuery.empty){
-      indicator.innerHTML = '<div style="background:#ffdede; padding:8px; border-radius:6px; color:#b30000;">Entrada não autorizada — crachá já escaneado para este jogo</div>';
-      resultDiv.textContent = 'Entrada não autorizada';
-      return;
-    }
+  } catch(e){
+    barcodeDetector = null;
+  }
+  await iniciarCameraEscaneador();
+});
 
-    // tudo ok -> registrar presença
-    await presRef.add({
-      credId: d.credId,
-      inscricaoId: d.inscricaoId || null,
-      nome: d.nome || null,
-      turma: d.turma || null,
-      modalidade: d.modalidade || null,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
+document.getElementById("btnPararEscaneamento").addEventListener("click", () => {
+  pararCameraEscaneador();
+});
 
-    indicator.innerHTML = '<div style="background:#e7ffea; padding:8px; border-radius:6px; color:#0c7a2a;">Entrada autorizada — '+(d.nome || '')+'</div>';
-    resultDiv.textContent = 'Entrada autorizada';
-    // atualizar resumo
-    renderResumoEsc(jogoId);
+/* iniciar câmera e loop de leitura */
+async function iniciarCameraEscaneador(){
+  const video = document.getElementById("escaneadorVideo");
+  if (!video) return;
+  try{
+    escaneadorStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio:false });
+    video.srcObject = escaneadorStream;
+    await video.play();
+    escaneando = true;
+    requestAnimationFrame(loopLeituraQR);
   }catch(e){
     console.error(e);
-    document.getElementById("escIndicator").innerHTML = '<div class="msg-erro">Erro ao processar QR.</div>';
+    alert("Não foi possível acessar a câmera. Use um navegador compatível e permita o acesso à câmera.");
   }
 }
 
-/* renderizar resumo das turmas / jogadores com status de presença para o jogo selecionado */
-async function renderResumoEsc(jogoId){
-  const cont = document.getElementById("escResumoJogos") || document.getElementById("escResumoJogos");
-  if (!cont) return;
-  cont.innerHTML = "";
-  if (!jogoId) { cont.textContent = "Selecione um jogo para ver o resumo."; return; }
+function pararCameraEscaneador(){
+  escaneando = false;
+  const video = document.getElementById("escaneadorVideo");
+  if (video) { video.pause(); video.srcObject = null; }
+  if (escaneadorStream){
+    escaneadorStream.getTracks().forEach(t => t.stop());
+    escaneadorStream = null;
+  }
+  document.getElementById("escaneResultado").textContent = "Aguardando escaneamento...";
+  document.getElementById("btnPararEscaneamento").disabled = true;
+}
 
-  const jogo = todosJogos.find(j => j.id === jogoId);
-  if (!jogo){ cont.textContent = "Jogo não encontrado."; return; }
+/* loop que captura frame e tenta detectar QR */
+async function loopLeituraQR(){
+  if (!escaneando) return;
+  const video = document.getElementById("escaneadorVideo");
+  const resultEl = document.getElementById("escaneResultado");
+  if (!video || video.readyState < 2){
+    requestAnimationFrame(loopLeituraQR);
+    return;
+  }
 
-  // buscar presencas
-  const pres = [];
-  const presSnap = await db.collection("jogos").doc(jogoId).collection("presencas").get();
-  presSnap.forEach(d => pres.push(d.data()));
-
-  // Time A (turma1) e Time B (turma2)
-  const turmas = [jogo.turma1, jogo.turma2];
-  turmas.forEach(t => {
-    const bloco = document.createElement("div");
-    bloco.style.marginTop = "8px";
-    bloco.innerHTML = "<strong>Time: "+(t||"-")+"</strong>";
-    const tabela = document.createElement("table");
-    tabela.style.marginTop = "6px";
-    tabela.innerHTML = "<thead><tr><th>Nome</th><th>Status</th></tr></thead>";
-    const tbody = document.createElement("tbody");
-
-    // lista de inscritos na modalidade para esta turma
-    const inscritos = todasInscricoes.filter(ins => ins.turma === t && (ins.modalidades || []).includes(jogo.modalidade));
-    if (!inscritos.length){
-      const tr = document.createElement("tr");
-      const td = document.createElement("td"); td.colSpan=2; td.textContent = "Nenhum inscrito nesta turma para a modalidade.";
-      tr.appendChild(td); tbody.appendChild(tr);
+  try {
+    if (barcodeDetector){
+      const barcodes = await barcodeDetector.detect(video);
+      if (barcodes && barcodes.length){
+        const payload = barcodes[0].rawValue || barcodes[0].rawData;
+        await processarPayloadQR(payload, resultEl);
+        // pausa breve para evitar múltiplas leituras rápidas do mesmo QR
+        await new Promise(r => setTimeout(r, 800));
+      }
     } else {
-      inscritos.forEach(ins => {
-        const ja = pres.some(p => p.inscricaoId === ins.id || p.credId && p.credId === ins.id);
-        const tr = document.createElement("tr");
-        const tdN = document.createElement("td"); tdN.textContent = ins.nome || "-";
-        const tdS = document.createElement("td");
-        tdS.innerHTML = ja ? '<span style="color:var(--verde); font-weight:600;">● escaneado</span>' : '<span style="color:var(--vermelho); font-weight:600;">● não escaneado</span>';
-        tr.appendChild(tdN); tr.appendChild(tdS); tbody.appendChild(tr);
-      });
+      // Fallback simples: desenhar frame em canvas e usar decode via ImageBitmap + BarcodeDetector tentativa (browsers modernos).
+      // Se BarcodeDetector não existir não é trivial decodificar sem biblioteca externa. Mostramos mensagem ao admin.
+      resultEl.textContent = "Seu navegador não suporta leitura automática de QR. Use Chrome/Edge recente.";
+      escaneando = false;
+      pararCameraEscaneador();
+      return;
     }
-    tabela.appendChild(tbody);
-    bloco.appendChild(tabela);
-    cont.appendChild(bloco);
+  } catch(err){
+    console.error("Erro na leitura do QR:", err);
+  } finally {
+    if (escaneando) requestAnimationFrame(loopLeituraQR);
+  }
+}
+
+/* Processa conteúdo do QR e valida contra o jogo selecionado */
+async function processarPayloadQR(payload, resultEl){
+  // Esperamos payload JSON com campos {credId, modalidade, turma}
+  let data = null;
+  try{
+    data = JSON.parse(payload);
+  }catch(e){
+    // payload inválido
+    resultEl.innerHTML = '<div class="scan-fail">QR inválido</div>';
+    return;
+  }
+  if (!data.credId || !data.modalidade){
+    resultEl.innerHTML = '<div class="scan-fail">QR inválido</div>';
+    return;
+  }
+  if (!jogoSelecionadoParaEscanear){
+    resultEl.innerHTML = '<div class="scan-fail">Nenhum jogo selecionado</div>';
+    return;
+  }
+
+  // valida turma/ modalidade do jogo
+  const jogo = jogoSelecionadoParaEscanear;
+  const turmaValida = (data.turma === jogo.turma1) || (data.turma === jogo.turma2);
+  const modalidadeValida = (data.modalidade === jogo.modalidade);
+
+  if (!turmaValida || !modalidadeValida){
+    resultEl.innerHTML = '<div class="scan-fail">Não autorizado (turma/ modalidade diferente)</div>';
+    return;
+  }
+
+  // verifica se este credId já foi escaneado para esse jogo (coleção 'scans' com doc id jogoId_credId_modalidade)
+  const scanDocId = `${jogo.id}__${data.credId}__${data.modalidade.replace(/\s+/g,'_')}`;
+  try{
+    const scanRef = db.collection("scans").doc(scanDocId);
+    const doc = await scanRef.get();
+    if (doc.exists){
+      resultEl.innerHTML = '<div class="scan-fail">QR já utilizado para este jogo</div>';
+      return;
+    }
+    // grava o registro de uso
+    await scanRef.set({
+      jogoId: jogo.id,
+      credId: data.credId,
+      modalidade: data.modalidade,
+      turma: data.turma,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      admin: currentRole === "ADMIN" ? "ADMIN" : currentProfessor ? currentProfessor.id : "?" 
+    });
+    resultEl.innerHTML = '<div class="scan-ok">AUTORIZADO ✅</div>';
+    // atualiza bolinhas na UI de 'Ver jogos' se estiver aberta
+    atualizarModalBolinhasSeAberto(jogo.id);
+  }catch(err){
+    console.error(err);
+    resultEl.innerHTML = '<div class="scan-fail">Erro ao registrar escaneamento</div>';
+  }
+}
+
+/* ---------- Modal que mostra inscritos do jogo com bolinhas vermelho/verde ---------- */
+function abrirModalInscritosDoJogo(jogo){
+  const modal = document.getElementById("modalInscritosJogo");
+  const lista = document.getElementById("listaInscritosDoJogo");
+  lista.innerHTML = "";
+  if (!jogo){
+    lista.textContent = "Jogo inválido.";
+    modal.style.display = "flex";
+    return;
+  }
+
+  // busca inscritos que tenham a modalidade e estejam em turma1 OU turma2
+  const inscritos = todasInscricoes.filter(ins => {
+    if (!ins.modalidades || !Array.isArray(ins.modalidades)) return false;
+    if (!ins.modalidades.includes(jogo.modalidade)) return false;
+    if (ins.turma !== jogo.turma1 && ins.turma !== jogo.turma2) return false;
+    return true;
   });
 
-  // lista geral de inscritos na modalidade (ambas turmas)
-  const listBlock = document.createElement("div");
-  listBlock.style.marginTop = "10px";
-  listBlock.innerHTML = "<strong>Lista geral de inscritos na modalidade "+(jogo.modalidade||"-")+"</strong>";
-  const tbl = document.createElement("table");
-  tbl.style.marginTop = "6px";
-  tbl.innerHTML = "<thead><tr><th>Nome</th><th>Turma</th><th>Status</th></tr></thead>";
-  const tb = document.createElement("tbody");
-  const inscritosGeral = todasInscricoes.filter(ins => (ins.modalidades || []).includes(jogo.modalidade) && (ins.turma === jogo.turma1 || ins.turma === jogo.turma2));
-  if (!inscritosGeral.length){
-    const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan=3; td.textContent = "Nenhum inscrito."; tr.appendChild(td); tb.appendChild(tr);
-  } else {
-    inscritosGeral.forEach(ins => {
-      const ja = pres.some(p => p.inscricaoId === ins.id || p.credId && p.credId === ins.id);
-      const tr = document.createElement("tr");
-      const td1 = document.createElement("td"); td1.textContent = ins.nome || "-";
-      const td2 = document.createElement("td"); td2.textContent = ins.turma || "-";
-      const td3 = document.createElement("td"); td3.innerHTML = ja ? '<span style="color:var(--verde); font-weight:600;">● escaneado</span>' : '<span style="color:var(--vermelho); font-weight:600;">● não escaneado</span>';
-      tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
-      tb.appendChild(tr);
+  // busca scans do jogo para marcar quem foi escaneado
+  db.collection("scans").where("jogoId","==",jogo.id).get().then(snap => {
+    const escaneados = new Set();
+    snap.forEach(d => {
+      const dt = d.data();
+      if (dt && dt.credId) escaneados.add(dt.credId);
     });
+
+    if (!inscritos.length){
+      lista.textContent = "Nenhum inscrito para esse jogo.";
+    } else {
+      inscritos.sort((a,b) => (a.nome||"").localeCompare(b.nome||"","pt-BR"));
+      inscritos.forEach(ins => {
+        const div = document.createElement("div");
+        div.style.display = "flex";
+        div.style.justifyContent = "space-between";
+        div.style.alignItems = "center";
+        div.style.padding = "6px 8px";
+        div.style.borderBottom = "1px solid #f1f4fb";
+
+        const left = document.createElement("div");
+        left.textContent = ins.nome + " — " + ins.turma;
+
+        const right = document.createElement("div");
+        const bola = document.createElement("span");
+        bola.className = "bolinha-resultado";
+        if (escaneados.has(ins.id) || escaneados.has(ins.id.toString())){
+          bola.classList.add("bolinha-verde");
+        } else {
+          bola.classList.add("bolinha-vermelha");
+        }
+        right.appendChild(bola);
+        div.appendChild(left);
+        div.appendChild(right);
+        lista.appendChild(div);
+      });
+    }
+
+    modal.style.display = "flex";
+  }).catch(err => {
+    console.error(err);
+    lista.textContent = "Erro ao carregar inscritos.";
+    modal.style.display = "flex";
+  });
+}
+
+document.getElementById("btnFecharModalInscritos").addEventListener("click", () => {
+  document.getElementById("modalInscritosJogo").style.display = "none";
+});
+
+/* Helper para atualizar bolinhas se modal estiver aberto e quando um novo scan ocorre */
+function atualizarModalBolinhasSeAberto(jogoId){
+  const modal = document.getElementById("modalInscritosJogo");
+  if (!modal || modal.style.display !== "flex") return;
+  // reabrir modal para atualizar lista
+  const jogo = todosJogos.find(j => j.id === jogoId);
+  if (jogo) abrirModalInscritosDoJogo(jogo);
+}
+
+/* ---------- Integração UI: botão para ver inscritos dentro de renderJogosAluno ---------- */
+/* Observação: não modifica telas existentes — adiciona um botão "Ver inscritos" em cada jogo listado. 
+   Para isso precisamos **complementar** a função renderJogosAluno existente. 
+   Abaixo expõe uma função auxiliar que você deve chamar no final de cada bloco de jogo (quando montar os cards).
+   Como você pediu apenas trechos para inserir, adicionamos o listener global que intercepta cliques em elementos com data-jogo-id. */
+
+document.addEventListener("click", (ev) => {
+  const btn = ev.target.closest("[data-action='ver-inscritos-jogo']");
+  if (btn){
+    const jogoId = btn.dataset.jogoId;
+    const jogo = todosJogos.find(j => j.id === jogoId);
+    if (jogo) abrirModalInscritosDoJogo(jogo);
   }
-  tbl.appendChild(tb);
-  listBlock.appendChild(tbl);
-  cont.appendChild(listBlock);
-}
+});
 
-/* Quando os listeners de jogos/incrições atualizarem os arrays, manter escaneador e selects sincronizados */
-function sincronizarEscaneadorECreds(){
-  popularSelectJogosParaEscaneador();
-  atualizarCredSelectsInit();
-}
-window.sincronizarEscaneadorECreds = sincronizarEscaneadorECreds;
+/* Para que o botão "Ver inscritos" apareça, altere (apenas) a função renderJogosAluno quando montar cada 'jogo-bloco' 
+   adicionando dentro do bloco (onde o jogo é mostrado) o botão abaixo:
 
-/* Adiciona hook após listeners carregarem dados: */
-const origIniciarListeners = iniciarListeners;
-iniciarListeners = function(){
-  origIniciarListeners();
-  // garantir selects e escaneador sincronizados
-  setTimeout(sincronizarEscaneadorECreds, 600);
-};
+   <button class="btn" data-action="ver-inscritos-jogo" data-jogo-id="ID_DO_JOGO">Ver inscritos</button>
+
+   --- instrução precisa do seu lado na função renderJogosAluno: para cada jogo que você cria, anexe o botão acima.
+   (Se preferir, eu posso fornecer o trecho exato para colar dentro da sua função renderJogosAluno — quer que eu escreva esse trecho e indique o ponto exato dentro da função?) 
+*/
+
+/* ---------- Popula selects iniciais no overlay Credenciais e Escaneador quando o listener do Firestore atualizar dados ---------- */
+db.collection("credenciais").onSnapshot(()=>{ /* só para forçar reatividade se necessário */ });
+db.collection("jogos").onSnapshot(()=>{ popularSelectJogosParaEscaneador(); });
+
+/* FIM: Código adicional - Credenciais, Crachás, QR e Escaneador */
 
 /* DOM ready */
 if (document.readyState === "loading"){
