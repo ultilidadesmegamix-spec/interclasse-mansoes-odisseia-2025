@@ -9,11 +9,11 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <!-- QR code generator (QRCode.toDataURL) -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+<!-- QR code generator -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 
-  <!-- HTML5 QR scanner (camera) -->
-  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+<!-- HTML5 QR scanner (camera) -->
+<script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
 
   <style>
     :root {
@@ -925,29 +925,34 @@
         <div id="listaAdminJogos" style="margin-top:6px;"></div>
       </div>
     </div>
-    <!-- TAB ESCANEADOR (NOVO) -->
-    <div class="admin-tab-content" id="tab-escaneador">
-      <div class="admin-bloco">
-        <strong>Escaneador de credenciais</strong>
-        <small style="display:block;margin-top:4px;">Selecione o jogo que deseja iniciar para liberar a câmera. Somente serão aceitos alunos das turmas e modalidade daquele jogo.</small>
+<!-- TAB ESCANEADOR (NOVO) -->
+<div class="admin-tab-content" id="tab-escaneador">
+  <div class="admin-bloco">
+    <strong>Escaneador de credenciais</strong>
+    <small style="display:block;margin-top:4px;">Selecione o jogo e a câmera. Somente serão aceitos alunos das turmas e modalidade daquele jogo.</small>
 
-        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-          <select id="selectJogoEscaneador" style="min-width:280px;">
-            <option value="">Selecione um jogo...</option>
-          </select>
-          <button class="btn btn-primaria" id="btnIniciarEscaneador">▶ Iniciar escaneador</button>
-          <button class="btn" id="btnPararEscaneador" style="display:none;">■ Parar</button>
-        </div>
+    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <select id="selectJogoEscaneador" style="min-width:280px;">
+        <option value="">Selecione um jogo...</option>
+      </select>
 
-        <div id="escaneadorStatus" style="margin-top:8px; font-size:0.9rem;"></div>
+      <select id="selectCameraDevice" style="min-width:220px;">
+        <option value="">Câmera: (carregar ao abrir)</option>
+      </select>
 
-        <div id="escaneadorArea" style="margin-top:10px; display:none;">
-          <div id="qrReader" style="width:100%; max-width:640px; margin:0 auto;"></div>
-          <div id="escaneadorResultado" style="margin-top:8px; font-weight:600;"></div>
-          <div id="escaneadorFeedback" style="height:120px; display:flex; align-items:center; justify-content:center; border-radius:8px; margin-top:8px;"></div>
-        </div>
-      </div>
+      <button class="btn btn-primaria" id="btnIniciarEscaneador">▶ Iniciar escaneador</button>
+      <button class="btn" id="btnPararEscaneador" style="display:none;">■ Parar</button>
     </div>
+
+    <div id="escaneadorStatus" style="margin-top:8px; font-size:0.9rem;"></div>
+
+    <div id="escaneadorArea" style="margin-top:10px; display:none;">
+      <div id="qrReader" style="width:100%; max-width:640px; margin:0 auto;"></div>
+      <div id="escaneadorResultado" style="margin-top:8px; font-weight:600;"></div>
+      <div id="escaneadorFeedback" style="height:120px; display:flex; align-items:center; justify-content:center; border-radius:8px; margin-top:8px;"></div>
+    </div>
+  </div>
+</div>
 
     <!-- TAB RELATÓRIO -->
     <div class="admin-tab-content" id="tab-relatorio">
@@ -3258,13 +3263,12 @@ function init(){
 
   mostrarSecao("inscricao");
 }
+/* =================== CREDENCIAIS + ESCANEADOR (VERSÃO FINAL) =================== */
 
-/* =================== CREDENCIAIS + ESCANEADOR (ADICIONADO) =================== */
+/* Cache local para scans */
+let scansCache = [];
 
-/* Cache local para scans: usado para bolinhas e evitar leituras repetidas */
-let scansCache = []; // cada item: { jogoId, inscricaoId, modalidade, timestamp }
-
-/* ---------- Listener para manter scansCache sincronizado ---------- */
+/* Sincroniza scansCache com Firestore (coleção 'scans') */
 db.collection("scans").onSnapshot(snap => {
   scansCache = [];
   snap.forEach(doc => {
@@ -3277,16 +3281,13 @@ db.collection("scans").onSnapshot(snap => {
       timestamp: d.timestamp
     });
   });
-  // atualiza bolinhas quando scans mudam
   try { atualizarBolinhasEmJogos(); } catch(e){ /* ignore */ }
 });
 
-/* ---------- Helpers ---------- */
+/* ---------- Helpers e payload QR ---------- */
 function gerarPayloadQR(inscricaoId, modalidade){
-  // payload simples e decodificável: MOVIMENTA|inscricaoId|modalidade
   return `MOVIMENTA|${inscricaoId}|${modalidade}`;
 }
-
 function mostrarMensagemEscaneador(texto, ok){
   const el = document.getElementById("escaneadorResultado");
   const feedback = document.getElementById("escaneadorFeedback");
@@ -3305,7 +3306,7 @@ function mostrarMensagemEscaneador(texto, ok){
   }
 }
 
-/* ---------- Credenciais: UI e lógica ---------- */
+/* ---------- Overlay Credenciais (UI) ---------- */
 document.getElementById("btnCredenciais").addEventListener("click", () => {
   document.getElementById("credenciaisOverlay").style.display = "flex";
   document.getElementById("credMsg").textContent = "";
@@ -3314,13 +3315,11 @@ document.getElementById("btnCredenciais").addEventListener("click", () => {
   document.getElementById("credLoginContainer").style.display = "none";
   document.getElementById("credEscolhaAlunoContainer").style.display = "none";
 });
-
-// fechar
 document.getElementById("btnFecharCred").addEventListener("click", () => {
   document.getElementById("credenciaisOverlay").style.display = "none";
 });
 
-/* popular selects turno/turma na overlay de credenciais */
+/* Preenche turmas ao escolher turno na overlay */
 const credTurno = document.getElementById("credTurno");
 const credTurma = document.getElementById("credTurma");
 credTurno.addEventListener("change", () => {
@@ -3343,17 +3342,13 @@ credTurma.addEventListener("change", () => {
   const sel = document.getElementById("credSelectAluno");
   sel.innerHTML = "";
   if (!t){ document.getElementById("credEscolhaAlunoContainer").style.display = "none"; return; }
-  // preencher com inscritos daquela turma (usar cache todasInscricoes)
   const lista = todasInscricoes.filter(i => i.turma === t);
   if (!lista.length){
     sel.innerHTML = '<option value="">Nenhum inscrito nesta turma</option>';
   } else {
     sel.innerHTML = '<option value="">Selecione seu nome...</option>';
     lista.forEach(i => {
-      const o = document.createElement("option");
-      o.value = i.id;
-      o.textContent = i.nome;
-      sel.appendChild(o);
+      const o = document.createElement("option"); o.value = i.id; o.textContent = i.nome; sel.appendChild(o);
     });
   }
   document.getElementById("credEscolhaAlunoContainer").style.display = "block";
@@ -3361,7 +3356,7 @@ credTurma.addEventListener("change", () => {
   document.getElementById("credLoginContainer").style.display = "none";
 });
 
-/* quando aluno é escolhido, mostrar opções criar / entrar */
+/* Quando aluno escolhido, verifica se já tem credencial */
 document.getElementById("credSelectAluno").addEventListener("change", () => {
   const id = document.getElementById("credSelectAluno").value;
   if (!id){
@@ -3369,14 +3364,11 @@ document.getElementById("credSelectAluno").addEventListener("change", () => {
     document.getElementById("credLoginContainer").style.display = "none";
     return;
   }
-  // verificar se já existe credencial
   db.collection("credenciais").where("inscricaoId","==", id).get().then(snap => {
     if (!snap.empty){
-      // credencial existe -> mostrar apenas login
       document.getElementById("credCadastrarContainer").style.display = "none";
       document.getElementById("credLoginContainer").style.display = "block";
     } else {
-      // criar nova
       document.getElementById("credCadastrarContainer").style.display = "block";
       document.getElementById("credLoginContainer").style.display = "none";
     }
@@ -3386,13 +3378,12 @@ document.getElementById("credSelectAluno").addEventListener("change", () => {
   });
 });
 
-/* criar acesso */
+/* Criar acesso (salva em collection 'credenciais') */
 document.getElementById("btnCriarAcesso").addEventListener("click", async () => {
   const inscrId = document.getElementById("credSelectAluno").value;
   const senha = (document.getElementById("credNovaSenha").value || "").trim();
   if (!inscrId || !senha){ document.getElementById("credMsg").textContent = "Escolha seu nome e crie uma senha."; return; }
   try{
-    // salvar credencial simples
     await db.collection("credenciais").add({
       inscricaoId: inscrId,
       senha: senha,
@@ -3408,7 +3399,7 @@ document.getElementById("btnCriarAcesso").addEventListener("click", async () => 
   }
 });
 
-/* login e exibir crachás */
+/* Login credencial e mostrar crachás */
 document.getElementById("btnLoginCred").addEventListener("click", async () => {
   const inscrId = document.getElementById("credSelectAluno").value;
   const senha = (document.getElementById("credSenhaLogin").value || "").trim();
@@ -3420,13 +3411,11 @@ document.getElementById("btnLoginCred").addEventListener("click", async () => {
       document.getElementById("credMsg").textContent = "Senha incorreta ou credencial não encontrada.";
       return;
     }
-    // carregar inscrição correspondente a partir de todasInscricoes
     const inscr = todasInscricoes.find(i => i.id === inscrId);
     if (!inscr){
       document.getElementById("credMsg").textContent = "Inscrição não encontrada (contate administração).";
       return;
     }
-    // exibir crachás
     mostrarCrachasDoAluno(inscr);
     document.getElementById("credMsg").textContent = "";
     document.getElementById("credCrachasArea").style.display = "block";
@@ -3438,7 +3427,7 @@ document.getElementById("btnLoginCred").addEventListener("click", async () => {
   }
 });
 
-/* geração de crachás (HTML + QR) */
+/* Gera crachás com QR (usa qrcode lib) */
 async function mostrarCrachasDoAluno(inscricao){
   const cont = document.getElementById("credCrachasContainer");
   cont.innerHTML = "";
@@ -3447,27 +3436,16 @@ async function mostrarCrachasDoAluno(inscricao){
     cont.innerHTML = "<div style='color:#555'>Nenhuma modalidade inscrita.</div>";
     return;
   }
-
   for (const mod of mods){
-    const card = document.createElement("div");
-    card.className = "cracha-card";
-
-    const top = document.createElement("div");
-    top.className = "cracha-top";
+    const card = document.createElement("div"); card.className = "cracha-card";
+    const top = document.createElement("div"); top.className = "cracha-top";
     const nomeEl = document.createElement("div"); nomeEl.className = "cracha-nome"; nomeEl.textContent = inscricao.nome || "-";
     const turmaEl = document.createElement("div"); turmaEl.className = "cracha-info"; turmaEl.textContent = inscricao.turma || "-";
     top.appendChild(nomeEl); top.appendChild(turmaEl);
-
-    const info = document.createElement("div");
-    info.className = "cracha-info";
+    const info = document.createElement("div"); info.className = "cracha-info";
     info.innerHTML = `<div>${inscricao.turno || "-"} — ${mod}</div>`;
-
-    const qrWrap = document.createElement("div");
-    qrWrap.className = "cracha-qr";
-    const qrImg = document.createElement("img");
-    qrImg.alt = "QR";
-
-    // gerar payload e put image
+    const qrWrap = document.createElement("div"); qrWrap.className = "cracha-qr";
+    const qrImg = document.createElement("img"); qrImg.alt = "QR";
     const payload = gerarPayloadQR(inscricao.id, mod);
     try{
       const url = await QRCode.toDataURL(payload, { margin:1, width:160 });
@@ -3477,23 +3455,22 @@ async function mostrarCrachasDoAluno(inscricao){
       qrImg.alt = "QR erro";
     }
     qrWrap.appendChild(qrImg);
-
     card.appendChild(top);
     card.appendChild(info);
     card.appendChild(qrWrap);
-
     cont.appendChild(card);
   }
 }
 
-/* ---------- Escaneador admin (fluxo) ---------- */
+/* ========== Escaneador Admin ========== */
 let activeHtml5Qr = null;
 let jogoEscaneadorAtivo = null;
 
+/* Popular select de jogos usando todosJogos (array que já é mantido pelo listener) */
 function popularSelectJogosEscaneador(){
   const sel = document.getElementById("selectJogoEscaneador");
   sel.innerHTML = '<option value="">Selecione um jogo...</option>';
-  // lista todosJogos (cache já mantida)
+  if (!todosJogos || !todosJogos.length) return;
   todosJogos.forEach(j => {
     const opt = document.createElement("option");
     opt.value = j.id;
@@ -3501,15 +3478,42 @@ function popularSelectJogosEscaneador(){
     sel.appendChild(opt);
   });
 }
+
+/* Popular select de câmeras com Html5Qrcode.getCameras() */
+async function popularSelectCameras(){
+  const selCam = document.getElementById("selectCameraDevice");
+  selCam.innerHTML = '<option value="">Câmera: (carregar)</option>';
+  try{
+    const cameras = await Html5Qrcode.getCameras();
+    if (Array.isArray(cameras) && cameras.length){
+      cameras.forEach(c => {
+        const o = document.createElement("option"); o.value = c.id; o.textContent = c.label || c.id; selCam.appendChild(o);
+      });
+    } else {
+      const o = document.createElement("option"); o.value = ""; o.textContent = "Nenhuma câmera listada"; selCam.appendChild(o);
+    }
+  }catch(e){
+    console.warn("Erro ao listar câmeras:", e);
+    const o = document.createElement("option"); o.value = ""; o.textContent = "Erro ao listar câmeras"; selCam.appendChild(o);
+  }
+}
+
+/* Abrir aba escaneador (popula selects) */
 document.getElementById("btnEscaneador").addEventListener("click", () => {
-  // abrir aba escaneador (visual) e popular select
   document.querySelectorAll(".admin-tab-btn").forEach(b => b.classList.remove("ativo"));
   document.getElementById("btnEscaneador").classList.add("ativo");
   document.querySelectorAll(".admin-tab-content").forEach(c => c.classList.remove("ativo"));
   document.getElementById("tab-escaneador").classList.add("ativo");
   popularSelectJogosEscaneador();
+  popularSelectCameras();
 });
 
+/* Listener: quando os jogos do Firestore são atualizados, garante que o select do escaneador também atualize */
+db.collection("jogos").onSnapshot(() => {
+  try{ popularSelectJogosEscaneador(); } catch(e){ /* ignore */ }
+});
+
+/* ---------- Iniciar Escaneador (permissão + deviceId robusto) ---------- */
 document.getElementById("btnIniciarEscaneador").addEventListener("click", async () => {
   if (!isAdmin){
     alert("Apenas administrador pode usar o escaneador.");
@@ -3520,91 +3524,136 @@ document.getElementById("btnIniciarEscaneador").addEventListener("click", async 
   if (!jogoId){ alert("Selecione um jogo para iniciar."); return; }
   const jogo = todosJogos.find(j => j.id === jogoId);
   if (!jogo){ alert("Jogo não encontrado."); return; }
+  const selCam = document.getElementById("selectCameraDevice");
+  const cameraDeviceIdSelecionado = selCam.value || null;
 
-  // mostra area e esconde botões
   document.getElementById("escaneadorArea").style.display = "block";
   document.getElementById("btnPararEscaneador").style.display = "inline-block";
   document.getElementById("btnIniciarEscaneador").style.display = "none";
-  document.getElementById("escaneadorStatus").textContent = `Escaneando para: ${jogo.modalidade} — ${jogo.turma1} x ${jogo.turma2}`;
+  document.getElementById("escaneadorStatus").textContent = `Preparando câmera para: ${jogo.modalidade} — ${jogo.turma1} x ${jogo.turma2}`;
 
   jogoEscaneadorAtivo = jogo;
 
-  // iniciar Html5Qrcode
+  // Primeiro passo: pedir permissão (getUserMedia) — gesto do usuário já foi dado (clicou)
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    stream.getTracks().forEach(t => t.stop());
+  } catch (permErr) {
+    console.error("Permissão de câmera negada ou erro:", permErr);
+    alert("Permissão de câmera negada. Verifique as permissões do site e se está em HTTPS.");
+    document.getElementById("btnPararEscaneador").click();
+    return;
+  }
+
+  // Inicializa Html5Qrcode
   const qrReaderId = "qrReader";
   if (activeHtml5Qr) {
-    try{ activeHtml5Qr.stop(); }catch(e){/*ignore*/ }
+    try{ await activeHtml5Qr.stop(); }catch(e){/*ignore*/ }
+    try{ activeHtml5Qr.clear(); }catch(e){/*ignore*/ }
     activeHtml5Qr = null;
   }
-  activeHtml5Qr = new Html5Qrcode(qrReaderId, /* verbose= */ false);
+  activeHtml5Qr = new Html5Qrcode(qrReaderId, { verbose: false });
 
   const config = { fps: 10, qrbox: { width: 320, height: 320 } };
 
-  try{
-    await activeHtml5Qr.start(
-      { facingMode: "environment" },
-      config,
-      async (decodedText, decodedResult) => {
-        // parse decodedText (esperamos padrão MOVIMENTA|inscricaoId|modalidade)
-        if (!decodedText || !decodedText.startsWith("MOVIMENTA|")){
-          mostrarMensagemEscaneador("QR inválido", false);
-          return;
+  const onDecode = async (decodedText, decodedResult) => {
+    if (!decodedText || !decodedText.startsWith("MOVIMENTA|")){
+      mostrarMensagemEscaneador("QR inválido", false);
+      return;
+    }
+    const parts = decodedText.split("|");
+    const inscrId = parts[1];
+    const modalidade = parts.slice(2).join("|");
+    const inscr = todasInscricoes.find(i => i.id === inscrId);
+    if (!inscr){
+      mostrarMensagemEscaneador("Inscrição não encontrada", false);
+      return;
+    }
+    if (inscr.turma !== jogoEscaneadorAtivo.turma1 && inscr.turma !== jogoEscaneadorAtivo.turma2){
+      mostrarMensagemEscaneador("Turma não pertence a este jogo", false);
+      return;
+    }
+    if (modalidade !== jogoEscaneadorAtivo.modalidade){
+      mostrarMensagemEscaneador("Modalidade não corresponde ao jogo", false);
+      return;
+    }
+    const ja = scansCache.find(s => s.jogoId === jogoEscaneadorAtivo.id && s.inscricaoId === inscrId && s.modalidade === modalidade);
+    if (ja){
+      mostrarMensagemEscaneador("Já escaneado para este jogo", false);
+      return;
+    }
+    try{
+      await db.collection("scans").add({
+        jogoId: jogoEscaneadorAtivo.id,
+        inscricaoId: inscrId,
+        modalidade: modalidade,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      mostrarMensagemEscaneador(`Autorizado: ${inscr.nome}`, true);
+      atualizarBolinhasEmJogos();
+    }catch(e){
+      console.error(e);
+      mostrarMensagemEscaneador("Erro ao registrar scan", false);
+    }
+  };
+  const onError = (err) => { console.debug("Decode error:", err); };
+
+  // Tenta iniciar com deviceId selecionado -> tenta traseira via getCameras -> facingMode fallback
+  try {
+    if (cameraDeviceIdSelecionado) {
+      await activeHtml5Qr.start(
+        { deviceId: { exact: cameraDeviceIdSelecionado } },
+        config,
+        onDecode,
+        onError
+      );
+    } else {
+      let iniciou = false;
+      try {
+        const cams = await Html5Qrcode.getCameras();
+        if (Array.isArray(cams) && cams.length) {
+          const back = cams.find(c => /back|rear|traseira|environment/i.test(c.label || "")) || cams[0];
+          if (back && back.id) {
+            await activeHtml5Qr.start(
+              { deviceId: { exact: back.id } },
+              config,
+              onDecode,
+              onError
+            );
+            iniciou = true;
+          }
         }
-        const parts = decodedText.split("|");
-        const inscrId = parts[1];
-        const modalidade = parts.slice(2).join("|"); // caso modalidade contenha '|'
-        // validar inscrição
-        const inscr = todasInscricoes.find(i => i.id === inscrId);
-        if (!inscr){
-          mostrarMensagemEscaneador("Inscrição não encontrada", false);
-          return;
-        }
-        // verificar turma: apenas turmas do jogo (turma1 ou turma2)
-        if (inscr.turma !== jogo.turma1 && inscr.turma !== jogo.turma2){
-          mostrarMensagemEscaneador("Turma não pertence a este jogo", false);
-          return;
-        }
-        // verificar modalidade bate com jogo
-        if (modalidade !== jogo.modalidade){
-          mostrarMensagemEscaneador("Modalidade não corresponde ao jogo", false);
-          return;
-        }
-        // verificar se já foi escaneado (collection 'scans' com campos jogoId+inscricaoId+modalidade)
-        const ja = scansCache.find(s => s.jogoId === jogo.id && s.inscricaoId === inscrId && s.modalidade === modalidade);
-        if (ja){
-          mostrarMensagemEscaneador("Já escaneado para este jogo", false);
-          return;
-        }
-        // tudo ok: registrar scan
-        try{
-          await db.collection("scans").add({
-            jogoId: jogo.id,
-            inscricaoId: inscrId,
-            modalidade: modalidade,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-          });
-          mostrarMensagemEscaneador(`Autorizado: ${inscr.nome}`, true);
-          // atualiza bolinhas
-          atualizarBolinhasEmJogos();
-        }catch(e){
-          console.error(e);
-          mostrarMensagemEscaneador("Erro ao registrar scan", false);
-        }
-      },
-      (errorMessage) => {
-        // console.debug("Decode error", errorMessage);
+      } catch(camListErr) {
+        console.warn("getCameras falhou:", camListErr);
       }
-    );
-  }catch(e){
-    console.error("Erro ao iniciar câmera:", e);
-    alert("Não foi possível iniciar a câmera. Verifique permissão de acesso.");
+      if (!iniciou) {
+        await activeHtml5Qr.start(
+          { facingMode: "environment" },
+          config,
+          onDecode,
+          onError
+        );
+      }
+    }
+    document.getElementById("escaneadorStatus").textContent = "Câmera ativa — aponte para o QR Code.";
+  } catch (e) {
+    console.error("Erro ao iniciar câmera (detalhe):", e);
+    let mensagem = "Não foi possível acessar/iniciar a câmera.";
+    if (location.protocol !== "https:" && location.hostname !== "localhost") {
+      mensagem += " (HTTPS é exigido por muitos navegadores.)";
+    }
+    mensagem += " Verifique permissões/HTTPS e tente novamente.";
+    alert(mensagem);
+    document.getElementById("escaneadorStatus").textContent = mensagem;
     document.getElementById("btnPararEscaneador").click();
   }
 });
 
+/* Parar escaneador */
 document.getElementById("btnPararEscaneador").addEventListener("click", async () => {
   if (activeHtml5Qr){
     try{ await activeHtml5Qr.stop(); }catch(e){/*ignore*/ }
-    activeHtml5Qr.clear();
+    try{ activeHtml5Qr.clear(); }catch(e){/*ignore*/ }
     activeHtml5Qr = null;
   }
   jogoEscaneadorAtivo = null;
@@ -3615,112 +3664,66 @@ document.getElementById("btnPararEscaneador").addEventListener("click", async ()
   mostrarMensagemEscaneador("", null);
 });
 
-/* ---------- BOLINHAS EM 'Ver jogos' ---------- */
-/* Esta função recria a lista de jogos (com base nos filtros já existentes) e adiciona, sob cada jogo, a lista de jogadores inscritos com bolinha (vermelha/verde). */
+/* Atualiza bolinhas na tela de jogos (conforme scansCache) */
 function atualizarBolinhasEmJogos(){
-  const serieEl = document.getElementById("filtroSerieJogo");
-  const modalidadeEl = document.getElementById("filtroModalidadeJogo");
-  const dataEl = document.getElementById("filtroDataJogo");
-  const container = document.getElementById("listaJogosContainer");
-  if (!container) return;
-
-  // manter mesma validação que renderJogosAluno: se série ou modalidade não selecionados, mostra aviso
-  const serie = serieEl.value;
-  const modalidade = modalidadeEl.value;
-  const dataFiltro = dataEl.value;
-
-  if (!serie || !modalidade){
-    container.textContent = "Selecione a série e a modalidade para ver os jogos.";
-    return;
-  }
-
-  let lista = todosJogos.filter(j => {
-    const s1 = getSerieFromTurma(j.turma1);
-    const s2 = getSerieFromTurma(j.turma2);
-    if (s1 !== serie && s2 !== serie) return false;
-    if (j.modalidade !== modalidade) return false;
-    if (dataFiltro && j.dataJogo !== dataFiltro) return false;
-    return true;
-  });
-
-  if (!lista.length){
-    container.textContent = "Nenhum jogo para esses filtros.";
-    return;
-  }
-
-  // ordenar por data/hora
-  lista = lista.slice().sort((a,b) => {
-    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
-    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
-    return da.localeCompare(db);
-  });
-
-  // reconstruir markup com bolinhas
-  container.innerHTML = "";
-  lista.forEach(j => {
-    const div = document.createElement("div");
-    div.className = "jogo-bloco";
-
-    const headerHtml =
-      "<strong>"+(j.modalidade || "-")+"</strong><br>"+
-      "Data: "+formatarDataBR(j.dataJogo)+" — Horário: "+(j.horarioJogo || "-")+"<br>"+
-      "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+"<br>"+
-      "Local: "+(j.localJogo || "-");
-    div.innerHTML = headerHtml;
-
-    // montar lista de jogadores (inscritos na modalidade daquele jogo e nas turmas deste jogo)
-    const jogadores = todasInscricoes.filter(ins => {
-      if (!ins.modalidades || !ins.modalidades.includes(j.modalidade)) return false;
-      if (ins.turma !== j.turma1 && ins.turma !== j.turma2) return false;
-      return true;
-    }).slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
-
-    const ul = document.createElement("ul");
-    ul.className = "jogadores-lista";
-
-    if (!jogadores.length){
-      const p = document.createElement("div");
-      p.style.marginTop = "6px";
-      p.textContent = "Nenhum inscrito nesta modalidade para as turmas deste jogo.";
-      div.appendChild(p);
-    } else {
-      jogadores.forEach(ins => {
-        const li = document.createElement("li");
-        const bol = document.createElement("span");
-        bol.className = "jogador-bolinha jogador-neutra";
-        // verificar se já foi escaneado neste jogo
-        const sc = scansCache.find(s => s.jogoId === j.id && s.inscricaoId === ins.id && s.modalidade === j.modalidade);
-        if (sc) bol.className = "jogador-bolinha jogador-verde";
-        else bol.className = "jogador-bolinha jogador-vermelha";
-
-        const nomeSpan = document.createElement("span");
-        nomeSpan.textContent = ins.nome || "-";
-        li.appendChild(bol);
-        li.appendChild(nomeSpan);
-        ul.appendChild(li);
-      });
-      div.appendChild(ul);
+  try {
+    const container = document.getElementById("listaJogosContainer");
+    if (!container) return;
+    const serie = document.getElementById("filtroSerieJogo").value;
+    const modalidade = document.getElementById("filtroModalidadeJogo").value;
+    const dataFiltro = document.getElementById("filtroDataJogo").value;
+    if (!serie || !modalidade){
+      container.textContent = "Selecione a série e a modalidade para ver os jogos.";
+      return;
     }
-
-    container.appendChild(div);
-  });
+    let lista = todosJogos.filter(j => {
+      const s1 = getSerieFromTurma(j.turma1);
+      const s2 = getSerieFromTurma(j.turma2);
+      if (s1 !== serie && s2 !== serie) return false;
+      if (j.modalidade !== modalidade) return false;
+      if (dataFiltro && j.dataJogo !== dataFiltro) return false;
+      return true;
+    });
+    if (!lista.length){
+      container.textContent = "Nenhum jogo para esses filtros.";
+      return;
+    }
+    lista = lista.slice().sort((a,b) => ((a.dataJogo||"") + " " + (a.horarioJogo||"")).localeCompare((b.dataJogo||"") + " " + (b.horarioJogo||"")));
+    container.innerHTML = "";
+    lista.forEach(j => {
+      const div = document.createElement("div"); div.className = "jogo-bloco";
+      const headerHtml = "<strong>"+(j.modalidade || "-")+"</strong><br>"+ "Data: "+formatarDataBR(j.dataJogo)+" — Horário: "+(j.horarioJogo || "-")+"<br>"+ "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+"<br>"+ "Local: "+(j.localJogo || "-");
+      div.innerHTML = headerHtml;
+      const jogadores = todasInscricoes.filter(ins => {
+        if (!ins.modalidades || !ins.modalidades.includes(j.modalidade)) return false;
+        if (ins.turma !== j.turma1 && ins.turma !== j.turma2) return false;
+        return true;
+      }).slice().sort((a,b) => (a.nome||"").localeCompare(b.nome||"","pt-BR"));
+      const ul = document.createElement("ul"); ul.className = "jogadores-lista";
+      if (!jogadores.length){
+        const p = document.createElement("div"); p.style.marginTop = "6px"; p.textContent = "Nenhum inscrito nesta modalidade para as turmas deste jogo."; div.appendChild(p);
+      } else {
+        jogadores.forEach(ins => {
+          const li = document.createElement("li");
+          const bol = document.createElement("span"); bol.className = "jogador-bolinha jogador-neutra";
+          const sc = scansCache.find(s => s.jogoId === j.id && s.inscricaoId === ins.id && s.modalidade === j.modalidade);
+          if (sc) bol.className = "jogador-bolinha jogador-verde"; else bol.className = "jogador-bolinha jogador-vermelha";
+          const nomeSpan = document.createElement("span"); nomeSpan.textContent = ins.nome || "-";
+          li.appendChild(bol); li.appendChild(nomeSpan); ul.appendChild(li);
+        });
+        div.appendChild(ul);
+      }
+      container.appendChild(div);
+    });
+  } catch(e){ console.error("Erro atualizarBolinhasEmJogos:", e); }
 }
 
-/* Atualiza bolinhas sempre que a lista de jogos ou inscrições mudar */
-const hookAtualizarBolinhas = () => {
-  try { atualizarBolinhasEmJogos(); } catch(e){ /* ignore */ }
-};
-// ligar aos listeners já existentes: chamar após listeners de jogos/inscricoes terminarem de popular
-// Apenas garantir chamada inicial:
-setTimeout(hookAtualizarBolinhas, 1200);
+/* Inicial: popula selects quando os dados forem carregados */
+setTimeout(() => { try{ popularSelectJogosEscaneador(); popularSelectCameras(); atualizarBolinhasEmJogos(); } catch(e){} }, 1200);
 
-/* Também chamar após cada renderJogosAluno ou quando filtros mudarem */
-document.getElementById("filtroSerieJogo").addEventListener("change", atualizarBolinhasEmJogos);
-document.getElementById("filtroModalidadeJogo").addEventListener("change", atualizarBolinhasEmJogos);
-document.getElementById("filtroDataJogo").addEventListener("change", atualizarBolinhasEmJogos);
+/* =================== FIM DO BLOCO CREDENCIAIS / ESCANEADOR =================== */
 
-/* ================ fim das adições ================ */
-
+/* DOM ready */
 if (document.readyState === "loading"){
   document.addEventListener("DOMContentLoaded", init);
 } else {
