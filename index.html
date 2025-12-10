@@ -9,6 +9,10 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+  <!-- QR Code generator & QR scanner -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+
   <style>
     :root {
       --azul: #0056b3;
@@ -465,136 +469,80 @@
       }
     }
 
-    /* --- Estilos novos para credenciais / crachá / escaneador --- */
-    .credenciais-card {
-      display:flex;
-      gap:14px;
-      align-items:flex-start;
-      flex-wrap:wrap;
-    }
-    .crachas-lista {
-      display:grid;
-      gap:10px;
-      grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
-      width:100%;
-    }
-    .crachao {
-      border:3px solid #8fb7f6;
-      border-radius:10px;
-      padding:12px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      background:#fff;
-    }
-    .crachao .info {
-      flex:1 1 auto;
-    }
-    .crachao h3 {
-      margin:0;
-      color:var(--azul);
-      font-size:1.05rem;
-    }
-    .crachao .meta {
-      font-size:0.85rem;
-      color:#333;
-      margin-top:6px;
-    }
-    .qr-img {
-      width:120px;
-      height:120px;
-      object-fit:contain;
-      background:#fff;
-      border-radius:4px;
-      border:1px solid #e1e4eb;
-    }
-
-    /* escaneador */
-    #scannerContainer {
+    /* ----------- ADIÇÕES VISUAIS: CREDENCIAL E ESCANEADOR ----------- */
+    /* credencial card (visual similar à referência) */
+    .cred-card {
       display:flex;
       gap:12px;
-      flex-wrap:wrap;
-      align-items:flex-start;
-    }
-    #scannerPreview {
-      width:360px;
-      height:270px;
-      background:#000;
-      border-radius:8px;
-      overflow:hidden;
-      position:relative;
-    }
-    #scannerPreview video {
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-    #scannerControls {
-      flex:1 1 240px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-    .statusBox {
-      padding:8px;
-      border-radius:8px;
-      color:#fff;
-      font-weight:600;
-      text-align:center;
-    }
-    .statusBox.ok { background:var(--verde); }
-    .statusBox.err { background:var(--vermelho); }
-    .presencas-lista {
-      max-height:300px;
-      overflow:auto;
-      border:1px solid #e1e4eb;
-      padding:8px;
-      border-radius:8px;
+      align-items:center;
+      padding:12px;
+      border-radius:12px;
+      border:3px solid #2f8bd1;
       background:#fff;
+      width:100%;
+      max-width:800px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.06);
+      margin-bottom:12px;
     }
-
-    /* modal lista de presença (pública) */
-    #modalPresenca {
-      position:fixed;
-      inset:0;
-      display:none;
+    .cred-left {
+      flex:1;
+    }
+    .cred-nome {
+      color: #0b66b3;
+      font-weight:700;
+      font-size:1.25rem;
+      margin-bottom:6px;
+    }
+    .cred-info { font-size:0.92rem; color:#333; margin-bottom:4px; }
+    .cred-id { font-size:0.75rem; color:#666; margin-top:6px; word-break:break-all; }
+    .cred-qr {
+      width:150px;
+      height:150px;
+      display:flex;
       align-items:center;
       justify-content:center;
-      background:rgba(0,0,0,0.4);
-      z-index:99999;
-    }
-    #modalPresencaCard {
       background:#fff;
-      padding:12px;
-      border-radius:10px;
-      width:90%;
-      max-width:780px;
-      max-height:80%;
-      overflow:auto;
-      box-shadow:0 8px 30px rgba(0,0,0,0.25);
     }
-    .pres-table {
+    .cred-actions { margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; }
+
+    /* página credenciais */
+    #secCredenciais { display:none; }
+    .cred-form { display:grid; gap:8px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
+
+    /* scanner UI */
+    #scannerArea { display:none; }
+    #scannerPreview {
+      width:100%;
+      max-width:720px;
+      height:420px;
+      background:#000;
       display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    .pres-col {
-      flex:1 1 320px;
-      border:1px solid #e8eefb;
-      padding:8px;
-      border-radius:8px;
-      background:#fbfeff;
-    }
-    .pres-row {
-      display:flex;
-      justify-content:space-between;
       align-items:center;
-      padding:6px 4px;
-      border-bottom:1px dashed #eef4ff;
+      justify-content:center;
+      border-radius:8px;
+      overflow:hidden;
     }
-    .dot-green { width:12px; height:12px; background:var(--verde); border-radius:50%; display:inline-block; margin-right:8px; }
-    .dot-red { width:12px; height:12px; background:var(--vermelho); border-radius:50%; display:inline-block; margin-right:8px; }
+    #scannerResult {
+      margin-top:10px;
+      padding:10px;
+      border-radius:8px;
+      font-weight:700;
+      color:#fff;
+      display:inline-block;
+    }
+    #scannerResult.autorizado { background:var(--verde); }
+    #scannerResult.negado { background:var(--vermelho); }
+
+    /* ver jogos status (novidade) */
+    #jogoStatusContainer { margin-top:12px; display:flex; gap:12px; flex-wrap:wrap; }
+    .team-card { flex:1; min-width:240px; border-radius:8px; border:1px solid var(--borda); padding:10px; background:#fff; }
+    .player-line { display:flex; justify-content:space-between; align-items:center; padding:6px 4px; border-radius:6px; }
+    .player-status { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:8px; }
+    .player-status.green { background:var(--verde); }
+    .player-status.red { background:var(--vermelho); }
+
+    /* pequena ajuda abaixo do crachá */
+    .help-small { font-size:0.82rem; color:#555; margin-top:6px; }
   </style>
 </head>
 <body>
@@ -767,6 +715,9 @@
     </div>
 
     <div id="listaJogosContainer"></div>
+
+    <!-- NOVO: área de status por jogo (Time A / Time B e status dos jogadores) -->
+    <div id="jogoStatusContainer"></div>
   </section>
 
   <!-- CLASSIFICAÇÃO / CLASSIFICADOS (ALUNO) -->
@@ -784,27 +735,76 @@
     <div id="placarAoVivoContainer"></div>
   </section>
 
-  <!-- CREDENCIAIS (ALUNO) - NOVO -->
-  <section class="card" id="secCredenciais" style="display:none;">
+  <!-- CREDENCIAIS (NOVO) -->
+  <section class="card" id="secCredenciais">
     <h2>Credenciais</h2>
-    <small>Acesse seus crachás por modalidade — cada crachá possui um QR Code exclusivo que deve ser escaneado antes de cada jogo.</small>
+    <small>Gerencie seu acesso ou crie um agora para gerar seus crachás com QR Code por modalidade.</small>
 
-    <div style="margin-top:8px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-      <div>
-        <label>Você já tem acesso?</label>
-        <div style="display:flex; gap:8px; margin-top:6px;">
-          <button class="btn btn-primaria" id="btnCredSim">Sim</button>
-          <button class="btn btn-primaria" id="btnCredNao">Não</button>
-        </div>
-      </div>
-      <div style="flex:1 1 320px;">
-        <div id="credFormArea"></div>
+    <div id="credEntry">
+      <p><strong>Você já tem acesso?</strong></p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-primaria" id="btnCredSim">Sim</button>
+        <button class="btn btn-primaria" id="btnCredNao">Não</button>
+        <button class="btn" id="btnCredVoltar" style="display:none;">⬅ Voltar</button>
       </div>
     </div>
 
-    <div id="credPainel" style="margin-top:14px; display:none;">
+    <div id="credCriar" style="margin-top:12px; display:none;">
+      <h3>Criar acesso</h3>
+      <div class="cred-form">
+        <div>
+          <label for="credTurno">Turno</label>
+          <select id="credTurno">
+            <option value="">Selecione...</option>
+            <option value="Matutino">Matutino</option>
+            <option value="Vespertino">Vespertino</option>
+            <option value="Noturno">Noturno</option>
+          </select>
+        </div>
+        <div>
+          <label for="credTurma">Turma</label>
+          <select id="credTurma">
+            <option value="">Selecione o turno primeiro...</option>
+          </select>
+        </div>
+        <div>
+          <label for="credNome">Nome</label>
+          <select id="credNome">
+            <option value="">Selecione o turno e turma primeiro...</option>
+          </select>
+        </div>
+        <div>
+          <label for="credSenha">Senha</label>
+          <input type="text" id="credSenha" placeholder="Senha que você vai usar">
+        </div>
+      </div>
+      <div style="margin-top:8px;">
+        <button class="btn btn-primaria" id="btnCriarAcessoAluno">Criar acesso agora</button>
+        <div class="help-small">Ao criar, o sistema verifica se já existe. Se não existir, gera credencial e crachás (um por modalidade inscrita).</div>
+      </div>
+    </div>
+
+    <div id="credLogin" style="margin-top:12px; display:none;">
+      <h3>Entrar com acesso</h3>
+      <div class="cred-form">
+        <div>
+          <label for="loginNome">Nome</label>
+          <input type="text" id="loginNome" placeholder="Seu nome completo">
+        </div>
+        <div>
+          <label for="loginSenha">Senha</label>
+          <input type="text" id="loginSenha" placeholder="Sua senha">
+        </div>
+      </div>
+      <div style="margin-top:8px;">
+        <button class="btn btn-primaria" id="btnLoginCred">Entrar</button>
+      </div>
+    </div>
+
+    <div id="credAreaAluno" style="margin-top:12px; display:none;">
       <h3>Seus crachás</h3>
-      <div class="crachas-lista" id="listaCrachas"></div>
+      <div id="credCardsContainer"></div>
+      <div class="help-small">Cada modalidade tem um crachá e um QR Code único. Apresente o QR para escanear no dia do jogo.</div>
     </div>
   </section>
 
@@ -1045,6 +1045,38 @@
       </div>
     </div>
 
+    <!-- TAB ESCANEADOR (NOVO) -->
+    <div class="admin-tab-content" id="tab-escaneador">
+      <div class="admin-bloco">
+        <strong>Escaneador por jogo</strong>
+        <small style="display:block;margin-top:2px;">Selecione o jogo do momento antes de ativar a câmera.</small>
+
+        <div style="margin-top:8px;">
+          <label for="selectJogoEscanear">Selecione o jogo</label>
+          <select id="selectJogoEscanear">
+            <option value="">Selecione um jogo...</option>
+          </select>
+        </div>
+
+        <div id="scannerArea" style="margin-top:10px;">
+          <div id="scannerPreview"></div>
+          <div style="margin-top:8px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <div id="scannerResult" style="display:none;"></div>
+            <button class="btn btn-primaria" id="btnStartScanner">Iniciar Leitura</button>
+            <button class="btn" id="btnStopScanner" style="display:none;">Parar Leitura</button>
+          </div>
+          <div style="margin-top:8px;">
+            <small>Após autorização, o jogador será marcado como presente neste jogo. Se o QR for inválido, o sistema sinaliza e não registra presença.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-bloco">
+        <strong>Últimas leituras</strong>
+        <div id="ultimasLeituras" style="margin-top:6px;"></div>
+      </div>
+    </div>
+
     <!-- TAB CONFIG -->
     <div class="admin-tab-content" id="tab-config">
       <div class="admin-bloco">
@@ -1122,53 +1154,6 @@
 
       <button class="btn btn-primaria" id="btnSalvarConfig">💾 Salvar configurações</button>
     </div>
-
-    <!-- TAB ESCANEADOR (ADMIN) - NOVO -->
-    <div class="admin-tab-content" id="tab-escaneador">
-      <div class="admin-bloco">
-        <strong>Escaneador por jogo</strong>
-        <small style="display:block;margin-top:2px;">Escolha o jogo que está ocorrendo e ative o leitor de QR. O sistema só aceitará crachás daquela modalidade e dos jogadores das turmas do jogo.</small>
-
-        <div style="margin-top:8px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-          <div style="flex:1 1 260px;">
-            <label for="selectJogoEscaneador">Selecione o jogo</label>
-            <select id="selectJogoEscaneador" style="width:100%;">
-              <option value="">Carregando jogos...</option>
-            </select>
-          </div>
-          <div>
-            <button class="btn btn-primaria" id="btnAtivarCamera">Ativar câmera</button>
-            <button class="btn" id="btnDesativarCamera" style="display:none;">Desativar</button>
-          </div>
-        </div>
-
-        <div id="scannerContainer" style="margin-top:10px;">
-          <div id="scannerPreview">
-            <!-- video ou preview aparecerá aqui -->
-            <div style="color:#fff; padding:10px;">Preview da câmera</div>
-          </div>
-          <div id="scannerControls">
-            <div id="scannerStatusBox" class="statusBox" style="display:none;">Aguardando...</div>
-            <div>
-              <label>Ou envie uma imagem do QR (fallback)</label>
-              <input type="file" id="fileQR" accept="image/*" />
-            </div>
-            <div class="presencas-lista" id="presencasLista">
-              <strong>Últimas leituras</strong>
-              <div id="ultimasLeituras"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="admin-bloco">
-        <strong>Status de escaneamento (ao vivo)</strong>
-        <small style="display:block;margin-top:2px;">Lista dos jogadores do Time A e Time B com indicação de presença para o jogo selecionado.</small>
-        <div style="margin-top:8px;" id="painelStatusJogo">
-          <!-- Listas Time A / Time B serão renderizadas aqui -->
-        </div>
-      </div>
-    </div>
   </section>
 
   <!-- PAINEL PARA PROFESSORES / COORDENADORES / GESTORES -->
@@ -1217,17 +1202,6 @@
   </section>
 
 </main>
-
-<!-- Modal presença (pública) -->
-<div id="modalPresenca">
-  <div id="modalPresencaCard">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 id="modalPresencaTitulo">Lista de presença</h3>
-      <button class="btn" id="btnFecharModalPresenca">Fechar</button>
-    </div>
-    <div style="margin-top:8px;" id="modalPresencaConteudo"></div>
-  </div>
-</div>
 
 <script>
 "use strict";
@@ -1315,6 +1289,12 @@ let todosJogos = [];
 let todosProfessores = []; // {id, nome, tipo, senha}
 let currentRole = null;    // "ADMIN", "Professor", "Coordenador", "Gestor"
 let currentProfessor = null; // objeto do professor logado
+
+/* credenciais (nova feature) */
+let todasCredenciais = []; // lista cache das credenciais (collection 'credenciais')
+/* presenças (cache) */
+let todasPresencas = []; // coleção 'presencas' (registros por jogo)
+let presencasPorJogo = {}; // mapa jogoId -> set de codeIds
 
 /* config evento */
 let configEvento = {
@@ -1934,4 +1914,485 @@ function renderAdmin(){
     tr.appendChild(tdN);
     tr.appendChild(tdE);
     tr.appendChild(tdS);
-    tr.appendChild(td
+    tr.appendChild(tdT);
+    tr.appendChild(tdTu);
+    tr.appendChild(tdC);
+    tr.appendChild(tdM);
+    tr.appendChild(tdO);
+    tr.appendChild(tdD);
+    corpo.appendChild(tr);
+  });
+}
+
+/* RELATÓRIO IMPRESSO */
+
+function renderRelatorio(){
+  const tbody = document.querySelector("#tabelaRelatorio tbody");
+  const turnoEl = document.getElementById("relatorioTurno");
+  const turmaEl = document.getElementById("relatorioTurma");
+  const modEl = document.getElementById("relatorioModalidade");
+  const tituloLinha1 = document.getElementById("relatorioTituloLinha1");
+  const tituloLinha2 = document.getElementById("relatorioTituloLinha2");
+
+  if (!tbody || !turnoEl || !turmaEl || !modEl) return;
+
+  const turno = turnoEl.value;
+  const turma = turmaEl.value;
+  const modalidade = modEl.value;
+
+  tbody.innerHTML = "";
+
+  tituloLinha1.textContent = "Relatório de inscritos – " + (configEvento.nomeEvento || "Movimenta Odisseia");
+
+  if (!turno || !turma || !modalidade){
+    tituloLinha2.textContent = "Selecione turno, turma e modalidade para gerar o relatório.";
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Selecione turno, turma e modalidade para gerar o relatório.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  let lista = todasInscricoes.filter(ins => {
+    if (ins.turno !== turno) return false;
+    if (ins.turma !== turma) return false;
+    if (!ins.modalidades || !ins.modalidades.includes(modalidade)) return false;
+    return true;
+  });
+
+  lista = lista.slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
+
+  if (!lista.length){
+    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – 0 inscritos.`; 
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Nenhuma inscrição para esses filtros.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – Total: ${lista.length} inscrito(s).`;
+
+  lista.forEach(ins => {
+    const tr = document.createElement("tr");
+
+    const tdNome = document.createElement("td");
+    const tdSexo = document.createElement("td");
+    const tdTurma = document.createElement("td");
+    const tdTurno = document.createElement("td");
+    const tdModalidades = document.createElement("td");
+    const tdEmail = document.createElement("td");
+    const tdCamisa = document.createElement("td");
+    const tdObs = document.createElement("td");
+
+    tdNome.textContent = ins.nome || "";
+    tdSexo.textContent = ins.sexo || "";
+    tdTurma.textContent = ins.turma || "";
+    tdTurno.textContent = ins.turno || "";
+    tdModalidades.textContent = modalidade;
+    tdEmail.textContent = ins.email || "";
+    tdCamisa.textContent = ins.camisaNumero || "";
+    tdObs.textContent = ins.observacoes || "";
+
+    tr.appendChild(tdNome);
+    tr.appendChild(tdSexo);
+    tr.appendChild(tdTurma);
+    tr.appendChild(tdTurno);
+    tr.appendChild(tdModalidades);
+    tr.appendChild(tdEmail);
+    tr.appendChild(tdCamisa);
+    tr.appendChild(tdObs);
+
+    tbody.appendChild(tr);
+  });
+}
+
+/* NOVA FUNÇÃO: Relatório de TODA TURMA (todas as modalidades) */
+function renderRelatorioTodaTurma(){
+  const tbody = document.querySelector("#tabelaRelatorio tbody");
+  const turnoEl = document.getElementById("relatorioTurno");
+  const turmaEl = document.getElementById("relatorioTurma");
+  const tituloLinha1 = document.getElementById("relatorioTituloLinha1");
+  const tituloLinha2 = document.getElementById("relatorioTituloLinha2");
+
+  if (!tbody || !turnoEl || !turmaEl) return;
+
+  const turno = turnoEl.value;
+  const turma = turmaEl.value;
+
+  tbody.innerHTML = "";
+  tituloLinha1.textContent = "Relatório completo da turma – " + (configEvento.nomeEvento || "Movimenta Odisseia");
+
+  if (!turno || !turma){
+    tituloLinha2.textContent = "Selecione turno e turma para gerar o relatório da turma inteira.";
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Selecione turno e turma para gerar o relatório da turma inteira.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  let lista = todasInscricoes.filter(ins => {
+    if (ins.turno !== turno) return false;
+    if (ins.turma !== turma) return false;
+    return true;
+  });
+
+  lista = lista.slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
+
+  if (!lista.length){
+    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} – Total: 0 inscritos.`;
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.textContent = "Nenhuma inscrição nesta turma.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} – Total: ${lista.length} inscrito(s).`;
+
+  lista.forEach(ins => {
+    const tr = document.createElement("tr");
+
+    const tdNome = document.createElement("td");
+    const tdSexo = document.createElement("td");
+    const tdTurma = document.createElement("td");
+    const tdTurno = document.createElement("td");
+    const tdModalidades = document.createElement("td");
+    const tdEmail = document.createElement("td");
+    const tdCamisa = document.createElement("td");
+    const tdObs = document.createElement("td");
+
+    tdNome.textContent = ins.nome || "";
+    tdSexo.textContent = ins.sexo || "";
+    tdTurma.textContent = ins.turma || "";
+    tdTurno.textContent = ins.turno || "";
+    tdModalidades.textContent = (ins.modalidades || []).join(", ");
+    tdEmail.textContent = ins.email || "";
+    tdCamisa.textContent = ins.camisaNumero || "";
+    tdObs.textContent = ins.observacoes || "";
+
+    tr.appendChild(tdNome);
+    tr.appendChild(tdSexo);
+    tr.appendChild(tdTurma);
+    tr.appendChild(tdTurno);
+    tr.appendChild(tdModalidades);
+    tr.appendChild(tdEmail);
+    tr.appendChild(tdCamisa);
+    tr.appendChild(tdObs);
+
+    tbody.appendChild(tr);
+  });
+}
+
+/* preencher selects (filtros e cancelar) */
+function atualizarSelectsAdminPublico(){
+  const filtroTurma = document.getElementById("filtroTurma");
+  const filtroMod = document.getElementById("filtroModalidade");
+  const adminTurma = document.getElementById("adminFiltroTurma");
+  const adminMod = document.getElementById("adminFiltroModalidade");
+  const selectCancel = document.getElementById("selectCancelar");
+
+  const turmasSet = new Set();
+  todasInscricoes.forEach(i => { if (i.turma) turmasSet.add(i.turma); });
+  const turmasOrd = Array.from(turmasSet).sort();
+
+  adminTurma.innerHTML = '<option value="">Todas</option>';
+  turmasOrd.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t; opt.textContent = t;
+    adminTurma.appendChild(opt);
+  });
+
+  filtroMod.innerHTML = '<option value="">Selecione a modalidade...</option>';
+  adminMod.innerHTML = '<option value="">Todas</option>';
+  MODALIDADES.forEach(m => {
+    const o1 = document.createElement("option");
+    o1.value = m; o1.textContent = m;
+    filtroMod.appendChild(o1);
+    const o2 = document.createElement("option");
+    o2.value = m; o2.textContent = m;
+    adminMod.appendChild(o2);
+  });
+
+  const nomeFiltro = (document.getElementById("adminFiltroNome").value || "").toLowerCase();
+  const turmaFiltro = document.getElementById("adminFiltroTurma").value;
+
+  selectCancel.innerHTML = '<option value="">Selecione uma inscrição...</option>';
+  todasInscricoes.forEach(ins => {
+    if (nomeFiltro && !(ins.nome || "").toLowerCase().includes(nomeFiltro)) return;
+    if (turmaFiltro && ins.turma !== turmaFiltro) return;
+
+    (ins.modalidades || []).forEach(mod => {
+      const opt = document.createElement("option");
+      opt.value = ins.id + "|||" + mod;
+      opt.textContent = ins.nome + " — " + ins.turma + " — " + mod;
+      selectCancel.appendChild(opt);
+    });
+  });
+}
+
+/* ========== JOGOS (ALUNO) ========== */
+
+function renderJogosAluno(){
+  const serieEl = document.getElementById("filtroSerieJogo");
+  const modalidadeEl = document.getElementById("filtroModalidadeJogo");
+  const dataEl = document.getElementById("filtroDataJogo");
+  const container = document.getElementById("listaJogosContainer");
+
+  if (!serieEl || !modalidadeEl || !dataEl || !container) return;
+
+  const serie = serieEl.value;
+  const modalidade = modalidadeEl.value;
+  const dataFiltro = dataEl.value;
+
+  container.innerHTML = "";
+
+  if (!serie || !modalidade){
+    container.textContent = "Selecione a série e a modalidade para ver os jogos.";
+    return;
+  }
+
+  let lista = todosJogos.filter(j => {
+    const s1 = getSerieFromTurma(j.turma1);
+    const s2 = getSerieFromTurma(j.turma2);
+    if (s1 !== serie && s2 !== serie) return false;
+    if (j.modalidade !== modalidade) return false;
+    if (dataFiltro && j.dataJogo !== dataFiltro) return false;
+    return true;
+  });
+
+  if (!lista.length){
+    container.textContent = "Nenhum jogo para esses filtros.";
+    return;
+  }
+
+  lista = lista.slice().sort((a,b) => {
+    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
+    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
+    return da.localeCompare(db);
+  });
+
+  lista.forEach(j => {
+    const div = document.createElement("div");
+    div.className = "jogo-bloco";
+    div.innerHTML =
+      "<strong>"+(j.modalidade || "-")+"</strong><br>"+
+      "Data: "+formatarDataBR(j.dataJogo)+" — Horário: "+(j.horarioJogo || "-")+"<br>"+
+      "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+"<br>"+
+      "Local: "+(j.localJogo || "-")+"<br>" +
+      "<button class='btn btn-primaria btnVerStatusJogo' data-id='"+j.id+"'>Ver status deste jogo</button>";
+    container.appendChild(div);
+  });
+
+  // adicionar listeners para botão "Ver status deste jogo"
+  container.querySelectorAll(".btnVerStatusJogo").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      const jogo = todosJogos.find(x => x.id === id);
+      if (!jogo) return;
+      // renderiza o status abaixo
+      renderStatusDoJogo(jogo);
+      // mostra a seção de jogos (se estiver escondida)
+      mostrarSecao("jogos");
+      // scroll suave até o status
+      setTimeout(() => {
+        const el = document.getElementById("jogoStatusContainer");
+        if (el) el.scrollIntoView({behavior:"smooth"});
+      }, 100);
+    });
+  });
+}
+
+/* ========= RENDER STATUS DO JOGO (Time A / Time B + lista inscritos) ========= */
+
+function renderStatusDoJogo(jogo){
+  const cont = document.getElementById("jogoStatusContainer");
+  if (!cont) return;
+  cont.innerHTML = "";
+
+  const teamA = document.createElement("div");
+  teamA.className = "team-card";
+  teamA.innerHTML = "<strong>Time A — " + (jogo.turma1 || "-") + "</strong>";
+  const teamAList = document.createElement("div");
+  teamAList.style.marginTop = "8px";
+
+  const teamB = document.createElement("div");
+  teamB.className = "team-card";
+  teamB.innerHTML = "<strong>Time B — " + (jogo.turma2 || "-") + "</strong>";
+  const teamBList = document.createElement("div");
+  teamBList.style.marginTop = "8px";
+
+  // buscar inscritos para a modalidade no jogo
+  const listaA = todasInscricoes.filter(i => i.turma === jogo.turma1 && i.modalidades && i.modalidades.includes(jogo.modalidade));
+  const listaB = todasInscricoes.filter(i => i.turma === jogo.turma2 && i.modalidades && i.modalidades.includes(jogo.modalidade));
+
+  listaA.sort((a,b)=> (a.nome||"").localeCompare(b.nome||"","pt-BR"));
+  listaB.sort((a,b)=> (a.nome||"").localeCompare(b.nome||"","pt-BR"));
+
+  const jogoId = jogo.id;
+  const presSet = presencasPorJogo[jogoId] || new Set();
+
+  if (!listaA.length){
+    const p = document.createElement("div");
+    p.textContent = "Nenhum jogador inscrito nessa modalidade para este time.";
+    teamAList.appendChild(p);
+  } else {
+    listaA.forEach(al => {
+      const line = document.createElement("div");
+      line.className = "player-line";
+      const left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.alignItems = "center";
+      const statusDot = document.createElement("span");
+      statusDot.className = "player-status " + (presSet.has(al._codeIds && al._codeIds[jogo.modalidade] ? al._codeIds[jogo.modalidade] : "") ? "green" : "red");
+      // but if _codeIds missing, fallback: check by student id presence in presencas
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = al.nome || "-";
+      left.appendChild(statusDot);
+      left.appendChild(nameSpan);
+
+      const right = document.createElement("div");
+      right.style.fontSize = "0.85rem";
+      right.textContent = presSet.has(al._codeIds && al._codeIds[jogo.modalidade] ? al._codeIds[jogo.modalidade] : "") ? "Escaneado" : "Não escaneado";
+
+      line.appendChild(left);
+      line.appendChild(right);
+      teamAList.appendChild(line);
+    });
+  }
+
+  if (!listaB.length){
+    const p = document.createElement("div");
+    p.textContent = "Nenhum jogador inscrito nessa modalidade para este time.";
+    teamBList.appendChild(p);
+  } else {
+    listaB.forEach(al => {
+      const line = document.createElement("div");
+      line.className = "player-line";
+      const left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.alignItems = "center";
+      const statusDot = document.createElement("span");
+      statusDot.className = "player-status " + (presSet.has(al._codeIds && al._codeIds[jogo.modalidade] ? al._codeIds[jogo.modalidade] : "") ? "green" : "red");
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = al.nome || "-";
+      left.appendChild(statusDot);
+      left.appendChild(nameSpan);
+
+      const right = document.createElement("div");
+      right.style.fontSize = "0.85rem";
+      right.textContent = presSet.has(al._codeIds && al._codeIds[jogo.modalidade] ? al._codeIds[jogo.modalidade] : "") ? "Escaneado" : "Não escaneado";
+
+      line.appendChild(left);
+      line.appendChild(right);
+      teamBList.appendChild(line);
+    });
+  }
+
+  teamA.appendChild(teamAList);
+  teamB.appendChild(teamBList);
+
+  cont.appendChild(teamA);
+  cont.appendChild(teamB);
+}
+
+/* ========== PLACAR AO VIVO (ALUNO) ========== */
+
+function renderPlacarAoVivo(){
+  const container = document.getElementById("placarAoVivoContainer");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const statusLabel = {
+    "AGENDADO": "Agendado",
+    "PRESTES": "Prestes a começar",
+    "EM_ANDAMENTO": "Em andamento",
+    "FINALIZADO": "Finalizado"
+  };
+
+  const jogosAoVivo = todosJogos.filter(j => j.status === "EM_ANDAMENTO" || j.status === "PRESTES");
+
+  if (!jogosAoVivo.length){
+    const p = document.createElement("p");
+    p.textContent = "Nenhum jogo em andamento ou prestes a começar neste momento.";
+    container.appendChild(p);
+    return;
+  }
+
+  jogosAoVivo.sort((a,b) => {
+    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
+    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
+    return da.localeCompare(db);
+  });
+
+  jogosAoVivo.forEach(j => {
+    const card = document.createElement("div");
+    card.className = "placar-card";
+
+    const topo = document.createElement("div");
+    topo.className = "placar-linha-principal";
+    topo.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-");
+    card.appendChild(topo);
+
+    const info = document.createElement("div");
+    info.innerHTML =
+      "Local: "+(j.localJogo || "-")+"<br>"+
+      (j.turma1 || "")+" <strong>"+(j.placar1 ?? 0)+"</strong> x <strong>"+(j.placar2 ?? 0)+"</strong> "+(j.turma2 || "");
+    card.appendChild(info);
+
+    const statusSpan = document.createElement("span");
+    statusSpan.className = "placar-status";
+    if (j.status === "EM_ANDAMENTO") statusSpan.classList.add("andamento");
+    if (j.status === "PRESTES") statusSpan.classList.add("prestes");
+    statusSpan.textContent = statusLabel[j.status] || j.status || "–";
+    card.appendChild(statusSpan);
+
+    container.appendChild(card);
+  });
+}
+
+/* ========== CLASSIFICAÇÃO / CLASSIFICADOS (ALUNO) ========== */
+
+function renderClassificacao(){
+  const container = document.getElementById("classificacaoContainer");
+  if (!container) return;
+  container.innerHTML = "";
+
+  if (!todosJogos.length){
+    container.textContent = "Nenhum jogo registrado ainda.";
+    return;
+  }
+
+  const finalizados = todosJogos.filter(j => j.status === "FINALIZADO");
+
+  if (!finalizados.length){
+    container.textContent = "Nenhum jogo finalizado ainda para mostrar classificados.";
+    return;
+  }
+
+  finalizados.sort((a,b) => {
+    const da = (a.dataJogo || "") + " " + (a.horarioJogo || "");
+    const db = (b.dataJogo || "") + " " + (b.horarioJogo || "");
+    return da.localeCompare(db);
+  });
+
+  finalizados.forEach(j => {
+    const card = document.createElement("div");
+    card.className = "jogo-bloco";
+
+    const header = document.createElement("div");
+    header.style.fontWeight = "600";
+    header.style.marginBottom = "4px";
+    header.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-");
+    card.appendChild(header);
+
+    const p1 = j.placar
