@@ -9,10 +9,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <!-- QR Code generator & QR scanner -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
-
   <style>
     :root {
       --azul: #0056b3;
@@ -468,81 +464,6 @@
         padding: 4px 6px;
       }
     }
-
-    /* ----------- ADIÇÕES VISUAIS: CREDENCIAL E ESCANEADOR ----------- */
-    /* credencial card (visual similar à referência) */
-    .cred-card {
-      display:flex;
-      gap:12px;
-      align-items:center;
-      padding:12px;
-      border-radius:12px;
-      border:3px solid #2f8bd1;
-      background:#fff;
-      width:100%;
-      max-width:800px;
-      box-shadow:0 4px 12px rgba(0,0,0,0.06);
-      margin-bottom:12px;
-    }
-    .cred-left {
-      flex:1;
-    }
-    .cred-nome {
-      color: #0b66b3;
-      font-weight:700;
-      font-size:1.25rem;
-      margin-bottom:6px;
-    }
-    .cred-info { font-size:0.92rem; color:#333; margin-bottom:4px; }
-    .cred-id { font-size:0.75rem; color:#666; margin-top:6px; word-break:break-all; }
-    .cred-qr {
-      width:150px;
-      height:150px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#fff;
-    }
-    .cred-actions { margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; }
-
-    /* página credenciais */
-    #secCredenciais { display:none; }
-    .cred-form { display:grid; gap:8px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
-
-    /* scanner UI */
-    #scannerArea { display:none; }
-    #scannerPreview {
-      width:100%;
-      max-width:720px;
-      height:420px;
-      background:#000;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:8px;
-      overflow:hidden;
-    }
-    #scannerResult {
-      margin-top:10px;
-      padding:10px;
-      border-radius:8px;
-      font-weight:700;
-      color:#fff;
-      display:inline-block;
-    }
-    #scannerResult.autorizado { background:var(--verde); }
-    #scannerResult.negado { background:var(--vermelho); }
-
-    /* ver jogos status (novidade) */
-    #jogoStatusContainer { margin-top:12px; display:flex; gap:12px; flex-wrap:wrap; }
-    .team-card { flex:1; min-width:240px; border-radius:8px; border:1px solid var(--borda); padding:10px; background:#fff; }
-    .player-line { display:flex; justify-content:space-between; align-items:center; padding:6px 4px; border-radius:6px; }
-    .player-status { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:8px; }
-    .player-status.green { background:var(--verde); }
-    .player-status.red { background:var(--vermelho); }
-
-    /* pequena ajuda abaixo do crachá */
-    .help-small { font-size:0.82rem; color:#555; margin-top:6px; }
   </style>
 </head>
 <body>
@@ -715,9 +636,6 @@
     </div>
 
     <div id="listaJogosContainer"></div>
-
-    <!-- NOVO: área de status por jogo (Time A / Time B e status dos jogadores) -->
-    <div id="jogoStatusContainer"></div>
   </section>
 
   <!-- CLASSIFICAÇÃO / CLASSIFICADOS (ALUNO) -->
@@ -734,28 +652,26 @@
 
     <div id="placarAoVivoContainer"></div>
   </section>
-
   <!-- CREDENCIAIS (NOVO) -->
-  <section class="card" id="secCredenciais">
-    <h2>Credenciais</h2>
-    <small>Gerencie seu acesso ou crie um agora para gerar seus crachás com QR Code por modalidade.</small>
+  <section class="card" id="secCredenciais" style="display:none;">
+    <h2>Credenciais &amp; Crachás</h2>
+    <small>Gerencie seu acesso e imprima seus crachás com QR Code.</small>
 
-    <div id="credEntry">
-      <p><strong>Você já tem acesso?</strong></p>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn btn-primaria" id="btnCredSim">Sim</button>
-        <button class="btn btn-primaria" id="btnCredNao">Não</button>
-        <button class="btn" id="btnCredVoltar" style="display:none;">⬅ Voltar</button>
+    <div style="margin-top:10px;">
+      <label>Você já tem acesso?</label>
+      <div style="display:flex; gap:8px; margin-top:6px;">
+        <button class="btn btn-primaria" id="credBtnSim">Sim</button>
+        <button class="btn btn-primaria" id="credBtnNao">Não</button>
       </div>
     </div>
 
+    <!-- Form: criar acesso -->
     <div id="credCriar" style="margin-top:12px; display:none;">
-      <h3>Criar acesso</h3>
-      <div class="cred-form">
+      <h3 style="margin:6px 0;">Criar acesso</h3>
+      <div class="grid-2">
         <div>
           <label for="credTurno">Turno</label>
-          <select id="credTurno">
-            <option value="">Selecione...</option>
+          <select id="credTurno"><option value="">Selecione...</option>
             <option value="Matutino">Matutino</option>
             <option value="Vespertino">Vespertino</option>
             <option value="Noturno">Noturno</option>
@@ -763,49 +679,50 @@
         </div>
         <div>
           <label for="credTurma">Turma</label>
-          <select id="credTurma">
-            <option value="">Selecione o turno primeiro...</option>
-          </select>
-        </div>
-        <div>
-          <label for="credNome">Nome</label>
-          <select id="credNome">
-            <option value="">Selecione o turno e turma primeiro...</option>
-          </select>
-        </div>
-        <div>
-          <label for="credSenha">Senha</label>
-          <input type="text" id="credSenha" placeholder="Senha que você vai usar">
+          <select id="credTurma"><option value="">Selecione o turno primeiro...</option></select>
         </div>
       </div>
+
       <div style="margin-top:8px;">
-        <button class="btn btn-primaria" id="btnCriarAcessoAluno">Criar acesso agora</button>
-        <div class="help-small">Ao criar, o sistema verifica se já existe. Se não existir, gera credencial e crachás (um por modalidade inscrita).</div>
+        <label for="credNome">Nome</label>
+        <select id="credNome"><option value="">Selecione turno e turma...</option></select>
       </div>
+
+      <div style="margin-top:8px;">
+        <label for="credSenha">Senha (crie uma)</label>
+        <input type="text" id="credSenha" placeholder="Senha para acessar seus crachás" />
+      </div>
+
+      <div style="margin-top:10px; display:flex; gap:8px;">
+        <button class="btn btn-primaria" id="btnCriarAcesso">➕ Criar acesso agora</button>
+      </div>
+
+      <div id="credCriarMsg" style="margin-top:8px;"></div>
     </div>
 
-    <div id="credLogin" style="margin-top:12px; display:none;">
-      <h3>Entrar com acesso</h3>
-      <div class="cred-form">
-        <div>
-          <label for="loginNome">Nome</label>
-          <input type="text" id="loginNome" placeholder="Seu nome completo">
-        </div>
-        <div>
-          <label for="loginSenha">Senha</label>
-          <input type="text" id="loginSenha" placeholder="Sua senha">
-        </div>
+    <!-- Form: entrar -->
+    <div id="credEntrar" style="margin-top:12px; display:none;">
+      <h3 style="margin:6px 0;">Entrar com nome e senha</h3>
+      <div style="margin-top:8px;">
+        <label for="credEntrarNome">Nome</label>
+        <select id="credEntrarNome"><option value="">Selecione seu nome...</option></select>
       </div>
       <div style="margin-top:8px;">
-        <button class="btn btn-primaria" id="btnLoginCred">Entrar</button>
+        <label for="credEntrarSenha">Senha</label>
+        <input type="text" id="credEntrarSenha" placeholder="Senha" />
       </div>
+      <div style="margin-top:10px; display:flex; gap:8px;">
+        <button class="btn btn-primaria" id="btnEntrarCred">Entrar</button>
+      </div>
+      <div id="credEntrarMsg" style="margin-top:8px;"></div>
     </div>
 
-    <div id="credAreaAluno" style="margin-top:12px; display:none;">
-      <h3>Seus crachás</h3>
-      <div id="credCardsContainer"></div>
-      <div class="help-small">Cada modalidade tem um crachá e um QR Code único. Apresente o QR para escanear no dia do jogo.</div>
+    <!-- Painel do aluno com Crachás -->
+    <div id="credPainelAluno" style="margin-top:12px; display:none;">
+      <h3 style="margin:6px 0;">Seus crachás</h3>
+      <div id="credBadgesContainer" style="display:grid; grid-template-columns: repeat(auto-fit,minmax(320px,1fr)); gap:12px;"></div>
     </div>
+
   </section>
 
   <!-- ADMIN -->
@@ -826,8 +743,8 @@
       <button class="admin-tab-btn" data-tab="jogos">🏆 Jogos</button>
       <button class="admin-tab-btn" data-tab="relatorio">🖨️ Imprimir relatório</button>
       <button class="admin-tab-btn" data-tab="professores">👩‍🏫 Professores</button>
-      <button class="admin-tab-btn" data-tab="config">⚙️ Configurações</button>
       <button class="admin-tab-btn" data-tab="escaneador">📷 Escaneador</button>
+      <button class="admin-tab-btn" data-tab="config">⚙️ Configurações</button>
     </div>
 
     <!-- TAB INSCRIÇÕES -->
@@ -997,6 +914,39 @@
         <tbody></tbody>
       </table>
     </div>
+    <!-- TAB ESCANEADOR (NOVO) -->
+    <div class="admin-tab-content" id="tab-escaneador">
+      <div class="admin-bloco">
+        <strong>Escaneador por jogo</strong>
+        <small style="display:block;margin-top:2px;">Selecione o jogo do momento antes de ativar a câmera.</small>
+
+        <div style="margin-top:6px;">
+          <label for="escJogoSelect">Selecionar jogo</label>
+          <select id="escJogoSelect" style="width:100%;">
+            <option value="">Selecione o jogo do dia/rodada...</option>
+          </select>
+        </div>
+
+        <div id="escStatus" style="margin-top:8px; font-size:0.9rem;"></div>
+
+        <div id="escCameraArea" style="margin-top:8px; display:none;">
+          <video id="escVideo" autoplay playsinline style="width:100%; max-height:360px; border-radius:8px; background:#000;"></video>
+          <canvas id="escCanvas" style="display:none;"></canvas>
+
+          <div id="escResult" style="margin-top:8px; font-weight:600;"></div>
+          <div id="escIndicator" style="margin-top:8px; height:40px;"></div>
+          <div style="margin-top:8px;">
+            <button class="btn btn-primaria" id="btnPararEscaneador">Parar leitor</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-bloco">
+        <strong>Status das turmas</strong>
+        <small style="display:block;margin-top:2px;">Tabela dos Times e lista de inscritos (marcadas automaticamente pelo escaneador).</small>
+        <div id="escResumoJogos"></div>
+      </div>
+    </div>
 
     <!-- TAB PROFESSORES (ADMIN GERENCIA SENHAS) -->
     <div class="admin-tab-content" id="tab-professores">
@@ -1042,38 +992,6 @@
           </thead>
           <tbody id="tabelaProfessoresAdmin"></tbody>
         </table>
-      </div>
-    </div>
-
-    <!-- TAB ESCANEADOR (NOVO) -->
-    <div class="admin-tab-content" id="tab-escaneador">
-      <div class="admin-bloco">
-        <strong>Escaneador por jogo</strong>
-        <small style="display:block;margin-top:2px;">Selecione o jogo do momento antes de ativar a câmera.</small>
-
-        <div style="margin-top:8px;">
-          <label for="selectJogoEscanear">Selecione o jogo</label>
-          <select id="selectJogoEscanear">
-            <option value="">Selecione um jogo...</option>
-          </select>
-        </div>
-
-        <div id="scannerArea" style="margin-top:10px;">
-          <div id="scannerPreview"></div>
-          <div style="margin-top:8px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-            <div id="scannerResult" style="display:none;"></div>
-            <button class="btn btn-primaria" id="btnStartScanner">Iniciar Leitura</button>
-            <button class="btn" id="btnStopScanner" style="display:none;">Parar Leitura</button>
-          </div>
-          <div style="margin-top:8px;">
-            <small>Após autorização, o jogador será marcado como presente neste jogo. Se o QR for inválido, o sistema sinaliza e não registra presença.</small>
-          </div>
-        </div>
-      </div>
-
-      <div class="admin-bloco">
-        <strong>Últimas leituras</strong>
-        <div id="ultimasLeituras" style="margin-top:6px;"></div>
       </div>
     </div>
 
@@ -1289,12 +1207,6 @@ let todosJogos = [];
 let todosProfessores = []; // {id, nome, tipo, senha}
 let currentRole = null;    // "ADMIN", "Professor", "Coordenador", "Gestor"
 let currentProfessor = null; // objeto do professor logado
-
-/* credenciais (nova feature) */
-let todasCredenciais = []; // lista cache das credenciais (collection 'credenciais')
-/* presenças (cache) */
-let todasPresencas = []; // coleção 'presencas' (registros por jogo)
-let presencasPorJogo = {}; // mapa jogoId -> set de codeIds
 
 /* config evento */
 let configEvento = {
@@ -1965,7 +1877,7 @@ function renderRelatorio(){
   lista = lista.slice().sort((a,b) => (a.nome || "").localeCompare(b.nome || "","pt-BR"));
 
   if (!lista.length){
-    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – 0 inscritos.`; 
+    tituloLinha2.textContent = `Turno: ${turno} | Turma: ${turma} | Modalidade: ${modalidade} – 0 inscritos.`;
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 8;
@@ -2188,121 +2100,9 @@ function renderJogosAluno(){
       "<strong>"+(j.modalidade || "-")+"</strong><br>"+
       "Data: "+formatarDataBR(j.dataJogo)+" — Horário: "+(j.horarioJogo || "-")+"<br>"+
       "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+"<br>"+
-      "Local: "+(j.localJogo || "-")+"<br>" +
-      "<button class='btn btn-primaria btnVerStatusJogo' data-id='"+j.id+"'>Ver status deste jogo</button>";
+      "Local: "+(j.localJogo || "-");
     container.appendChild(div);
   });
-
-  // adicionar listeners para botão "Ver status deste jogo"
-  container.querySelectorAll(".btnVerStatusJogo").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.id;
-      const jogo = todosJogos.find(x => x.id === id);
-      if (!jogo) return;
-      // renderiza o status abaixo
-      renderStatusDoJogo(jogo);
-      // mostra a seção de jogos (se estiver escondida)
-      mostrarSecao("jogos");
-      // scroll suave até o status
-      setTimeout(() => {
-        const el = document.getElementById("jogoStatusContainer");
-        if (el) el.scrollIntoView({behavior:"smooth"});
-      }, 100);
-    });
-  });
-}
-
-/* ========= RENDER STATUS DO JOGO (Time A / Time B + lista inscritos) ========= */
-
-function renderStatusDoJogo(jogo){
-  const cont = document.getElementById("jogoStatusContainer");
-  if (!cont) return;
-  cont.innerHTML = "";
-
-  const teamA = document.createElement("div");
-  teamA.className = "team-card";
-  teamA.innerHTML = "<strong>Time A — " + (jogo.turma1 || "-") + "</strong>";
-  const teamAList = document.createElement("div");
-  teamAList.style.marginTop = "8px";
-
-  const teamB = document.createElement("div");
-  teamB.className = "team-card";
-  teamB.innerHTML = "<strong>Time B — " + (jogo.turma2 || "-") + "</strong>";
-  const teamBList = document.createElement("div");
-  teamBList.style.marginTop = "8px";
-
-  // buscar inscritos para a modalidade no jogo
-  const listaA = todasInscricoes.filter(i => i.turma === jogo.turma1 && i.modalidades && i.modalidades.includes(jogo.modalidade));
-  const listaB = todasInscricoes.filter(i => i.turma === jogo.turma2 && i.modalidades && i.modalidades.includes(jogo.modalidade));
-
-  listaA.sort((a,b)=> (a.nome||"").localeCompare(b.nome||"","pt-BR"));
-  listaB.sort((a,b)=> (a.nome||"").localeCompare(b.nome||"","pt-BR"));
-
-  const jogoId = jogo.id;
-  const presSet = presencasPorJogo[jogoId] || new Set();
-
-  if (!listaA.length){
-    const p = document.createElement("div");
-    p.textContent = "Nenhum jogador inscrito nessa modalidade para este time.";
-    teamAList.appendChild(p);
-  } else {
-    listaA.forEach(al => {
-      const line = document.createElement("div");
-      line.className = "player-line";
-      const left = document.createElement("div");
-      left.style.display = "flex";
-      left.style.alignItems = "center";
-      const statusDot = document.createElement("span");
-      statusDot.className = "player-status " + (presSet.has(al._codeIds && al._codeIds[jogo.modalidade] ? al._codeIds[jogo.modalidade] : "") ? "green" : "red");
-      // but if _codeIds missing, fallback: check by student id presence in presencas
-      const nameSpan = document.createElement("span");
-      nameSpan.textContent = al.nome || "-";
-      left.appendChild(statusDot);
-      left.appendChild(nameSpan);
-
-      const right = document.createElement("div");
-      right.style.fontSize = "0.85rem";
-      right.textContent = presSet.has(al._codeIds && al._codeIds[jogo.modalidade] ? al._codeIds[jogo.modalidade] : "") ? "Escaneado" : "Não escaneado";
-
-      line.appendChild(left);
-      line.appendChild(right);
-      teamAList.appendChild(line);
-    });
-  }
-
-  if (!listaB.length){
-    const p = document.createElement("div");
-    p.textContent = "Nenhum jogador inscrito nessa modalidade para este time.";
-    teamBList.appendChild(p);
-  } else {
-    listaB.forEach(al => {
-      const line = document.createElement("div");
-      line.className = "player-line";
-      const left = document.createElement("div");
-      left.style.display = "flex";
-      left.style.alignItems = "center";
-      const statusDot = document.createElement("span");
-      statusDot.className = "player-status " + (presSet.has(al._codeIds && al._codeIds[jogo.modalidade] ? al._codeIds[jogo.modalidade] : "") ? "green" : "red");
-      const nameSpan = document.createElement("span");
-      nameSpan.textContent = al.nome || "-";
-      left.appendChild(statusDot);
-      left.appendChild(nameSpan);
-
-      const right = document.createElement("div");
-      right.style.fontSize = "0.85rem";
-      right.textContent = presSet.has(al._codeIds && al._codeIds[jogo.modalidade] ? al._codeIds[jogo.modalidade] : "") ? "Escaneado" : "Não escaneado";
-
-      line.appendChild(left);
-      line.appendChild(right);
-      teamBList.appendChild(line);
-    });
-  }
-
-  teamA.appendChild(teamAList);
-  teamB.appendChild(teamBList);
-
-  cont.appendChild(teamA);
-  cont.appendChild(teamB);
 }
 
 /* ========== PLACAR AO VIVO (ALUNO) ========== */
@@ -2395,4 +2195,1571 @@ function renderClassificacao(){
     header.textContent = (j.modalidade || "-") + " — " + formatarDataBR(j.dataJogo) + " às " + (j.horarioJogo || "-");
     card.appendChild(header);
 
-    const p1 = j.placar
+    const p1 = j.placar1 ?? 0;
+    const p2 = j.placar2 ?? 0;
+
+    let vencedor = null;
+    if (p1 > p2) vencedor = "t1";
+    else if (p2 > p1) vencedor = "t2";
+
+    function montarLinha(turma, placar, pos){
+      const linha = document.createElement("div");
+      linha.className = "linha-classificado";
+      const bol = document.createElement("span");
+      bol.className = "bolinha-resultado";
+
+      if (!vencedor){
+        bol.classList.add("bolinha-neutra");
+      } else if ((vencedor === "t1" && pos === 1) || (vencedor === "t2" && pos === 2)){
+        bol.classList.add("bolinha-verde");
+      } else {
+        bol.classList.add("bolinha-vermelha");
+      }
+
+      const nomeSpan = document.createElement("span");
+      nomeSpan.textContent = turma || "-";
+      nomeSpan.style.marginRight = "6px";
+
+      const placarSpan = document.createElement("strong");
+      placarSpan.textContent = placar;
+
+      linha.appendChild(bol);
+      linha.appendChild(nomeSpan);
+      linha.appendChild(document.createTextNode(" — "));
+      linha.appendChild(placarSpan);
+      return linha;
+    }
+
+    card.appendChild(montarLinha(j.turma1, p1, 1));
+    card.appendChild(montarLinha(j.turma2, p2, 2));
+
+    const info = document.createElement("div");
+    info.style.marginTop = "4px";
+    if (vencedor === "t1"){
+      info.textContent = "Classificado: " + (j.turma1 || "-");
+    } else if (vencedor === "t2"){
+      info.textContent = "Classificado: " + (j.turma2 || "-");
+    } else {
+      info.textContent = "Empate – sem classificado definido.";
+    }
+    card.appendChild(info);
+
+    container.appendChild(card);
+  });
+}
+
+/* ========== JOGOS ADMIN: CADASTRAR / EXCLUIR / EDITAR PLACAR ========== */
+
+async function cadastrarJogo(){
+  if (!isAdmin){
+    alert("Apenas o administrador pode cadastrar jogos.");
+    return;
+  }
+  const dataJogo = document.getElementById("jogoData").value;
+  const turma1 = document.getElementById("jogoTurma1").value;
+  const turma2 = document.getElementById("jogoTurma2").value;
+  const modalidade = document.getElementById("jogoModalidade").value;
+  const horario = document.getElementById("jogoHorario").value;
+  const local = (document.getElementById("jogoLocal").value || "").trim();
+
+  if (!dataJogo || !turma1 || !turma2 || !modalidade || !horario || !local){
+    alert("Preencha todos os campos do jogo.");
+    return;
+  }
+  if (turma1 === turma2){
+    alert("Turma 1 e Turma 2 devem ser diferentes.");
+    return;
+  }
+
+  try{
+    await db.collection("jogos").add({
+      dataJogo: dataJogo,
+      turma1: turma1,
+      turma2: turma2,
+      modalidade: modalidade,
+      horarioJogo: horario,
+      localJogo: local,
+      status: "AGENDADO",
+      placar1: 0,
+      placar2: 0,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    alert("Jogo cadastrado com sucesso.");
+    document.getElementById("jogoData").value = "";
+    document.getElementById("jogoTurma1").value = "";
+    document.getElementById("jogoTurma2").value = "";
+    document.getElementById("jogoModalidade").value = "";
+    document.getElementById("jogoHorario").value = "";
+    document.getElementById("jogoLocal").value = "";
+  }catch(e){
+    console.error(e);
+    alert("Erro ao cadastrar jogo.");
+  }
+}
+
+function atualizarSelectExcluirJogo(){
+  const sel = document.getElementById("selectExcluirJogo");
+  if (!sel) return;
+  const filtroInput = document.getElementById("filtroExcluirJogo");
+  const termo = filtroInput ? (filtroInput.value || "").toLowerCase() : "";
+
+  sel.innerHTML = '<option value="">Selecione um jogo...</option>';
+  todosJogos.forEach(j => {
+    const label = (j.modalidade || "")+" — "+formatarDataBR(j.dataJogo)+" "+(j.horarioJogo || "")+" — "+(j.turma1 || "")+" x "+(j.turma2 || "");
+    if (termo && !label.toLowerCase().includes(termo)) return;
+    const opt = document.createElement("option");
+    opt.value = j.id;
+    opt.textContent = label;
+    sel.appendChild(opt);
+  });
+}
+
+async function excluirJogo(){
+  if (!isAdmin){
+    alert("Apenas o administrador pode excluir jogos.");
+    return;
+  }
+  const sel = document.getElementById("selectExcluirJogo");
+  const id = sel.value;
+  if (!id){
+    alert("Selecione um jogo."); return;
+  }
+  const jogo = todosJogos.find(j => j.id === id);
+  const desc = jogo ? ((jogo.modalidade || "")+" — "+formatarDataBR(jogo.dataJogo)+" "+(jogo.horarioJogo || "")+" — "+(jogo.turma1 || "")+" x "+(jogo.turma2 || "")) : "";
+  if (!confirm("Excluir o jogo: "+desc+" ?")) return;
+  try{
+    await db.collection("jogos").doc(id).delete();
+    alert("Jogo excluído.");
+  }catch(e){
+    console.error(e);
+    alert("Erro ao excluir jogo.");
+  }
+}
+
+/* Painel de placar ao vivo / status (admin) */
+
+function renderAdminJogos(){
+  const container = document.getElementById("listaAdminJogos");
+  if (!container) return;
+  container.innerHTML = "";
+
+  if (!todosJogos.length){
+    container.textContent = "Nenhum jogo cadastrado.";
+    return;
+  }
+
+  const statusOptions = ["AGENDADO","PRESTES","EM_ANDAMENTO","FINALIZADO"];
+
+  todosJogos.forEach(j => {
+    const bloco = document.createElement("div");
+    bloco.className = "jogo-bloco";
+
+    const linha1 = document.createElement("div");
+    linha1.innerHTML = "<strong>"+(j.modalidade || "-")+"</strong> — "+formatarDataBR(j.dataJogo)+" às "+(j.horarioJogo || "-");
+    bloco.appendChild(linha1);
+
+    const linha2 = document.createElement("div");
+    linha2.textContent = "Jogo: "+(j.turma1 || "")+" x "+(j.turma2 || "")+" — Local: "+(j.localJogo || "-");
+    bloco.appendChild(linha2);
+
+    const controles = document.createElement("div");
+    controles.style.marginTop = "4px";
+    controles.style.display = "flex";
+    controles.style.flexWrap = "wrap";
+    controles.style.gap = "6px";
+    controles.style.alignItems = "center";
+
+    const selStatus = document.createElement("select");
+    selStatus.dataset.id = j.id;
+    statusOptions.forEach(st => {
+      const opt = document.createElement("option");
+      opt.value = st;
+      opt.textContent = st;
+      if (j.status === st) opt.selected = true;
+      selStatus.appendChild(opt);
+    });
+
+    const inpP1 = document.createElement("input");
+    inpP1.type = "number";
+    inpP1.min = "0";
+    inpP1.value = (j.placar1 ?? 0);
+    inpP1.style.width = "60px";
+    inpP1.dataset.id = j.id;
+    inpP1.dataset.tipo = "p1";
+
+    const inpP2 = document.createElement("input");
+    inpP2.type = "number";
+    inpP2.min = "0";
+    inpP2.value = (j.placar2 ?? 0);
+    inpP2.style.width = "60px";
+    inpP2.dataset.id = j.id;
+    inpP2.dataset.tipo = "p2";
+
+    const labelP1 = document.createElement("span");
+    labelP1.textContent = (j.turma1 || "T1")+":";
+    const labelP2 = document.createElement("span");
+    labelP2.textContent = (j.turma2 || "T2")+":"; 
+
+    const btnSalvar = document.createElement("button");
+    btnSalvar.className = "btn btn-primaria btnSalvarJogo";
+    btnSalvar.textContent = "Salvar";
+    btnSalvar.dataset.id = j.id;
+
+    controles.appendChild(document.createTextNode("Status:"));
+    controles.appendChild(selStatus);
+    controles.appendChild(labelP1);
+    controles.appendChild(inpP1);
+    controles.appendChild(labelP2);
+    controles.appendChild(inpP2);
+    controles.appendChild(btnSalvar);
+
+    bloco.appendChild(controles);
+    container.appendChild(bloco);
+  });
+
+  container.querySelectorAll(".btnSalvarJogo").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (!isAdmin){
+        alert("Apenas o administrador pode atualizar jogos.");
+        return;
+      }
+      const id = btn.dataset.id;
+      const bloco = btn.closest(".jogo-bloco");
+      const selStatus = bloco.querySelector("select");
+      const inpP1 = bloco.querySelector('input[data-tipo="p1"]');
+      const inpP2 = bloco.querySelector('input[data-tipo="p2"]');
+
+      const novoStatus = selStatus.value;
+      const placar1 = parseInt(inpP1.value,10) || 0;
+      const placar2 = parseInt(inpP2.value,10) || 0;
+
+      try{
+        await db.collection("jogos").doc(id).update({
+          status: novoStatus,
+          placar1: placar1,
+          placar2: placar2
+        });
+        alert("Jogo atualizado com sucesso.");
+      }catch(e){
+        console.error(e);
+        alert("Erro ao atualizar jogo.");
+      }
+    });
+  });
+}
+
+/* ========== PROFESSORES (ADMIN GERENCIA ACESSO) ========== */
+
+async function adicionarProfessorAcesso(){
+  if (!isAdmin){
+    alert("Apenas o administrador pode cadastrar acessos de professores.");
+    return;
+  }
+  const nome = (document.getElementById("profNomeCadastro").value || "").trim();
+  const tipo = document.getElementById("profTipoCadastro").value || "Professor";
+  const senha = (document.getElementById("profSenhaCadastro").value || "").trim();
+
+  if (!nome || !senha){
+    alert("Preencha nome e senha.");
+    return;
+  }
+
+  try{
+    await db.collection("professoresAcesso").add({
+      nome: nome,
+      tipo: tipo,
+      senha: senha
+    });
+    alert("Acesso cadastrado com sucesso.");
+    document.getElementById("profNomeCadastro").value = "";
+    document.getElementById("profSenhaCadastro").value = "";
+    document.getElementById("profTipoCadastro").value = "Professor";
+  }catch(e){
+    console.error(e);
+    alert("Erro ao cadastrar acesso.");
+  }
+}
+
+async function excluirProfessorAcesso(id){
+  if (!isAdmin){
+    alert("Apenas o administrador pode excluir acessos.");
+    return;
+  }
+  if (!confirm("Excluir este acesso de professor?")) return;
+  try{
+    await db.collection("professoresAcesso").doc(id).delete();
+    alert("Acesso excluído.");
+  }catch(e){
+    console.error(e);
+    alert("Erro ao excluir acesso.");
+  }
+}
+
+function renderProfessoresAdmin(){
+  const tbody = document.getElementById("tabelaProfessoresAdmin");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  if (!todosProfessores.length){
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 4;
+    td.textContent = "Nenhum acesso cadastrado.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  todosProfessores.forEach(p => {
+    const tr = document.createElement("tr");
+    const tdNome = document.createElement("td");
+    const tdTipo = document.createElement("td");
+    const tdSenha = document.createElement("td");
+    const tdAcoes = document.createElement("td");
+
+    tdNome.textContent = p.nome || "";
+    tdTipo.textContent = p.tipo || "";
+    tdSenha.textContent = p.senha || "";
+
+    const btn = document.createElement("button");
+    btn.className = "btn btn-primaria";
+    btn.style.padding = "3px 8px";
+    btn.textContent = "Excluir";
+    btn.addEventListener("click", () => excluirProfessorAcesso(p.id));
+
+    tdAcoes.appendChild(btn);
+
+    tr.appendChild(tdNome);
+    tr.appendChild(tdTipo);
+    tr.appendChild(tdSenha);
+    tr.appendChild(tdAcoes);
+    tbody.appendChild(tr);
+  });
+}
+
+/* ========== PAINEL PROFESSORES (MARCAR ALUNO) ========== */
+
+function renderPainelProfessores(){
+  const listaDiv = document.getElementById("profListaAlunos");
+  const turnoSel = document.getElementById("profTurnoSelect");
+  const turmaSel = document.getElementById("profTurmaSelect");
+  const labelProf = document.getElementById("profUsuarioAtivo");
+
+  if (!listaDiv || !turnoSel || !turmaSel) return;
+
+  if (currentProfessor && labelProf){
+    labelProf.textContent = currentProfessor.nome + " (" + currentProfessor.tipo + ")";
+  }
+
+  const turno = turnoSel.value;
+  const turma = turmaSel.value;
+
+  listaDiv.innerHTML = "";
+
+  if (!turno || !turma){
+    listaDiv.textContent = "Selecione turno e turma para ver os alunos inscritos.";
+    return;
+  }
+
+  const lista = todasInscricoes.filter(ins => ins.turno === turno && ins.turma === turma);
+
+  if (!lista.length){
+    listaDiv.textContent = "Nenhum inscrito nesta turma para estes filtros.";
+    return;
+  }
+
+  lista.forEach(ins => {
+    const bloqueios = Array.isArray(ins.naoAutorizadoPor) ? ins.naoAutorizadoPor : [];
+    const jaIndicou = currentProfessor ? bloqueios.includes(currentProfessor.id) : false;
+
+    const card = document.createElement("div");
+    card.className = "jogo-bloco";
+
+    const nome = document.createElement("div");
+    nome.innerHTML = "<strong>"+(ins.nome || "")+"</strong>";
+    card.appendChild(nome);
+
+    const detalhe = document.createElement("div");
+    detalhe.style.fontSize = "0.8rem";
+    detalhe.innerHTML =
+      "Turma: "+(ins.turma || "-")+" — Turno: "+(ins.turno || "-")+"<br>"+
+      "Modalidades: "+((ins.modalidades || []).join(", ") || "-");
+    card.appendChild(detalhe);
+
+    const info = document.createElement("div");
+    info.style.marginTop = "4px";
+    info.style.fontSize = "0.78rem";
+    info.textContent = "Já indicado por "+bloqueios.length+" professor(es).";
+    card.appendChild(info);
+
+    const btn = document.createElement("button");
+    btn.className = "btn btn-primaria";
+    btn.style.marginTop = "4px";
+    btn.textContent = jaIndicou ? "Você já indicou este aluno" : "Indicar que NÃO pode participar";
+    btn.disabled = jaIndicou;
+    btn.addEventListener("click", () => indicarAlunoNaoParticipa(ins.id));
+
+    card.appendChild(btn);
+    listaDiv.appendChild(card);
+  });
+}
+
+function configurarSelectTurmaProfessor(){
+  const turnoSel = document.getElementById("profTurnoSelect");
+  const turmaSel = document.getElementById("profTurmaSelect");
+  if (!turnoSel || !turmaSel) return;
+
+  const turno = turnoSel.value;
+  turmaSel.innerHTML = "";
+  const optDefault = document.createElement("option");
+  if (!turno){
+    optDefault.value = "";
+    optDefault.textContent = "Selecione o turno primeiro...";
+    turmaSel.appendChild(optDefault);
+  } else {
+    optDefault.value = "";
+    optDefault.textContent = "Selecione a turma...";
+    turmaSel.appendChild(optDefault);
+    const turmasTurno = getTurmasPorTurno(turno);
+    turmasTurno.forEach(t => {
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t;
+      turmaSel.appendChild(opt);
+    });
+  }
+}
+
+async function indicarAlunoNaoParticipa(inscricaoId){
+  if (!currentProfessor){
+    alert("Faça login como professor/coordenador/gestor para indicar alunos.");
+    return;
+  }
+  if (!confirm("Confirmar indicação de que este aluno NÃO pode participar?")){
+    return;
+  }
+
+  const ref = db.collection("inscricoes").doc(inscricaoId);
+  try{
+    await db.runTransaction(function(tx){
+      return tx.get(ref).then(doc => {
+        if (!doc.exists) return;
+        const data = doc.data();
+        let lista = Array.isArray(data.naoAutorizadoPor) ? data.naoAutorizadoPor.slice() : [];
+        if (!lista.includes(currentProfessor.id)){
+          lista.push(currentProfessor.id);
+        }
+
+        if (lista.length >= 2){
+          // Dois ou mais professores indicaram -> remove a inscrição inteira
+          tx.delete(ref);
+        } else {
+          tx.update(ref, { naoAutorizadoPor: lista });
+        }
+      });
+    });
+    alert("Indicação registrada. Se mais um professor indicar este aluno, a inscrição será cancelada automaticamente.");
+  }catch(e){
+    console.error(e);
+    alert("Erro ao registrar indicação.");
+  }
+}
+
+/* ========== TROCA DE TELAS ========== */
+
+function mostrarSecao(sec){
+  document.getElementById("secInscricao").style.display = (sec==="inscricao"?"block":"none");
+  document.getElementById("secInscritos").style.display = (sec==="inscritos"?"block":"none");
+  document.getElementById("secJogos").style.display = (sec==="jogos"?"block":"none");
+  document.getElementById("secClassificados").style.display = (sec==="classificados"?"block":"none");
+  document.getElementById("secPlacarAoVivo").style.display = (sec==="placar"?"block":"none");
+  document.getElementById("adminSection").style.display = (sec==="admin"?"block":"none");
+  document.getElementById("professoresSection").style.display = (sec==="professores"?"block":"none");
+}
+
+function abrirAdmin(){
+  // Seleciona tipo de acesso primeiro
+  const opcao = prompt(
+    "Selecione o tipo de acesso:\n" +
+    "1 - Administrador\n" +
+    "2 - Professor\n" +
+    "3 - Coordenador\n" +
+    "4 - Gestor"
+  );
+  if (opcao === null) return;
+
+  let role = null;
+  if (opcao === "1") role = "ADMIN";
+  else if (opcao === "2") role = "Professor";
+  else if (opcao === "3") role = "Coordenador";
+  else if (opcao === "4") role = "Gestor";
+  else {
+    alert("Opção inválida.");
+    return;
+  }
+
+  const senha = prompt("Digite a senha:");
+  if (senha === null || senha === "") return;
+
+  if (role === "ADMIN"){
+    if (senha !== ADMIN_PASSWORD){
+      alert("Senha incorreta.");
+      return;
+    }
+    isAdmin = true;
+    currentRole = "ADMIN";
+    currentProfessor = null;
+    mostrarSecao("admin");
+    renderAdmin();
+    renderAdminJogos();
+    return;
+  }
+
+  // Professor / Coordenador / Gestor
+  const prof = todosProfessores.find(p => p.senha === senha && p.tipo === role);
+  if (!prof){
+    alert("Senha incorreta ou acesso não encontrado para este tipo.");
+    return;
+  }
+
+  isAdmin = false;
+  currentRole = role;
+  currentProfessor = prof;
+  mostrarSecao("professores");
+  renderPainelProfessores();
+}
+
+function fecharAdmin(){
+  mostrarSecao("inscricao");
+  currentRole = null;
+  isAdmin = false;
+}
+
+function fecharProfessores(){
+  mostrarSecao("inscricao");
+  currentRole = null;
+  currentProfessor = null;
+}
+
+/* abas admin */
+function configurarAbasAdmin(){
+  const botoes = document.querySelectorAll(".admin-tab-btn");
+  botoes.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tab = btn.dataset.tab;
+      botoes.forEach(b => b.classList.remove("ativo"));
+      btn.classList.add("ativo");
+      document.querySelectorAll(".admin-tab-content").forEach(c => c.classList.remove("ativo"));
+      document.getElementById("tab-"+tab).classList.add("ativo");
+    });
+  });
+}
+
+/* ========== LISTENERS FIRESTORE ========== */
+
+function iniciarListeners(){
+  // Professores (acesso)
+  db.collection("professoresAcesso").onSnapshot(snap => {
+    todosProfessores = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      todosProfessores.push({
+        id: doc.id,
+        nome: d.nome || "",
+        tipo: d.tipo || "Professor",
+        senha: d.senha || ""
+      });
+    });
+    renderProfessoresAdmin();
+  });
+
+  db.collection("inscricoes").orderBy("timestamp","asc").onSnapshot(snap => {
+    todasInscricoes = [];
+    countsPorTurmaModalidade = {};
+    countsQueimadaGenero = {};
+    snap.forEach(doc => {
+      const d = doc.data();
+      const ins = {
+        id: doc.id,
+        nome: d.nome || "",
+        nomeNormalizado: d.nomeNormalizado || normalizarNome(d.nome || ""),
+        email: d.email || "",
+        sexo: d.sexo || "",
+        turno: d.turno || "",
+        turma: d.turma || "",
+        camisaNumero: d.camisaNumero || "",
+        modalidades: d.modalidades || [],
+        observacoes: d.observacoes || "",
+        naoAutorizadoPor: d.naoAutorizadoPor || [],
+        timestamp: d.timestamp
+      };
+      todasInscricoes.push(ins);
+
+      if (!countsPorTurmaModalidade[ins.turma]) countsPorTurmaModalidade[ins.turma] = {};
+      ins.modalidades.forEach(m => {
+        if (!countsPorTurmaModalidade[ins.turma][m]) countsPorTurmaModalidade[ins.turma][m] = 0;
+        countsPorTurmaModalidade[ins.turma][m]++;
+        if (m === "QUEIMADA MISTA"){
+          if (!countsQueimadaGenero[ins.turma]) countsQueimadaGenero[ins.turma] = {Masculino:0, Feminino:0};
+          if (ins.sexo === "Masculino") countsQueimadaGenero[ins.turma].Masculino++;
+          if (ins.sexo === "Feminino") countsQueimadaGenero[ins.turma].Feminino++;
+        }
+      });
+    });
+    atualizarDisponibilidadeModalidades();
+    atualizarSelectsAdminPublico();
+    renderPublico();
+    renderAdmin();
+    renderRelatorio();
+    if (currentRole && currentRole !== "ADMIN"){
+      renderPainelProfessores();
+    }
+  });
+
+  db.collection("jogos").orderBy("dataJogo","asc").onSnapshot(snap => {
+    todosJogos = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      let p1 = d.placar1;
+      let p2 = d.placar2;
+      if (typeof p1 === "string") p1 = parseInt(p1,10);
+      if (typeof p2 === "string") p2 = parseInt(p2,10);
+      todosJogos.push({
+        id: doc.id,
+        turno: d.turno || "",
+        serie: d.serie || "",
+        turma1: d.turma1 || "",
+        turma2: d.turma2 || "",
+        dataJogo: d.dataJogo || "",
+        modalidade: d.modalidade || "",
+        horarioJogo: d.horarioJogo || "",
+        localJogo: d.localJogo || "",
+        status: d.status || "AGENDADO",
+        placar1: Number.isFinite(p1) ? p1 : 0,
+        placar2: Number.isFinite(p2) ? p2 : 0
+      });
+    });
+    atualizarSelectExcluirJogo();
+    renderJogosAluno();
+    renderPlacarAoVivo();
+    renderClassificacao();
+    renderAdminJogos();
+  });
+}
+
+/* ========== INIT ========== */
+
+function init(){
+  // Overlay fallback: se já houver e-mail em localStorage, fecha imediatamente
+  try {
+    const saved = localStorage.getItem('insc_email');
+    if (saved && saved.includes('@')){
+      emailAtual = saved;
+      const ov = document.getElementById('emailOverlay');
+      if (ov) ov.style.display = 'none';
+    }
+  } catch(e){ /* ignore */ }
+
+  const overlay = document.getElementById("emailOverlay");
+  const emailInput = document.getElementById("emailAluno");
+  const msgEmail = document.getElementById("msgEmailOverlay");
+
+  function liberarEmail(){
+    const val = (emailInput.value || '').trim();
+    if (!validarEmail(val)){
+      msgEmail.textContent = "Digite um e-mail válido.";
+      return;
+    }
+    emailAtual = val;
+    try { localStorage.setItem('insc_email', val); } catch(e){}
+    // definir fallback global também (caso outros scripts precisem)
+    try { window._inscricao_email_fallback = val; } catch(e){}
+    if (overlay) overlay.style.display = "none";
+  }
+  const btnEntrar = document.getElementById("btnEntrarEmail");
+  if (btnEntrar) btnEntrar.addEventListener("click", liberarEmail);
+  if (emailInput){
+    emailInput.addEventListener("keydown", e => {
+      if (e.key === "Enter"){
+        e.preventDefault();
+        liberarEmail();
+      }
+    });
+  }
+
+  const contMods = document.getElementById("modalidadesContainer");
+  MODALIDADES.forEach(m => {
+    const item = document.createElement("div");
+    item.className = "modalidade-item";
+    const chk = document.createElement("input");
+    chk.type = "checkbox";
+    chk.className = "chkModalidade";
+    chk.value = m;
+    const info = document.createElement("div");
+    const lbl = document.createElement("span");
+    lbl.className = "modalidade-label";
+    lbl.textContent = m;
+    const vagas = document.createElement("span");
+    vagas.className = "modalidade-vagas";
+    vagas.dataset.mod = m;
+    vagas.textContent = "Selecione turno e turma para ver vagas.";
+    info.appendChild(lbl);
+    info.appendChild(vagas);
+    item.appendChild(chk);
+    item.appendChild(info);
+    contMods.appendChild(item);
+  });
+
+  contMods.addEventListener("change", e => {
+    if (e.target.classList.contains("chkModalidade")){
+      const marcados = contMods.querySelectorAll(".chkModalidade:checked");
+      if (marcados.length > LIMITE_MODALIDADES_POR_ALUNO){
+        e.target.checked = false;
+        alert("Máximo de "+LIMITE_MODALIDADES_POR_ALUNO+" modalidades por aluno.");
+      }
+    }
+  });
+
+  const turnoSel = document.getElementById("turno");
+  const turmaSel = document.getElementById("turma");
+  turmaSel.disabled = true;
+  turnoSel.addEventListener("change", () => {
+    const turno = turnoSel.value;
+    turmaSel.innerHTML = "";
+    if (!turno){
+      turmaSel.disabled = true;
+      turmaSel.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
+    } else {
+      turmaSel.disabled = false;
+      const turmasTurno = getTurmasPorTurno(turno);
+      const optDefault = document.createElement("option");
+      optDefault.value = "";
+      optDefault.textContent = "Selecione a turma...";
+      turmaSel.appendChild(optDefault);
+      turmasTurno.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t; opt.textContent = t;
+        turmaSel.appendChild(opt);
+      });
+    }
+    atualizarDisponibilidadeModalidades();
+  });
+  turmaSel.addEventListener("change", atualizarDisponibilidadeModalidades);
+  document.getElementById("sexo").addEventListener("change", atualizarDisponibilidadeModalidades);
+
+  const filtroTurno = document.getElementById("filtroTurno");
+  const filtroTurma = document.getElementById("filtroTurma");
+  const filtroModalidade = document.getElementById("filtroModalidade");
+
+  filtroTurma.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
+  filtroModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
+
+  filtroTurno.addEventListener("change", () => {
+    const turno = filtroTurno.value;
+    filtroTurma.innerHTML = "";
+    const optDefault = document.createElement("option");
+    if (!turno){
+      optDefault.value = "";
+      optDefault.textContent = "Selecione o turno primeiro...";
+      filtroTurma.appendChild(optDefault);
+    } else {
+      optDefault.value = "";
+      optDefault.textContent = "Selecione a turma...";
+      filtroTurma.appendChild(optDefault);
+      const turmasTurno = getTurmasPorTurno(turno);
+      turmasTurno.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        filtroTurma.appendChild(opt);
+      });
+    }
+    renderPublico();
+  });
+
+  filtroTurma.addEventListener("change", renderPublico);
+  filtroModalidade.addEventListener("change", renderPublico);
+
+  /* NOVA LÓGICA: JOGOS ADMIN SEM SÉRIE – TURMAS LIVRES (QUALQUER TURNO) */
+  const jogoTurma1 = document.getElementById("jogoTurma1");
+  const jogoTurma2 = document.getElementById("jogoTurma2");
+
+  if (jogoTurma1 && jogoTurma2){
+    jogoTurma1.innerHTML = '<option value="">Selecione a turma 1...</option>';
+    jogoTurma2.innerHTML = '<option value="">Selecione a turma 2...</option>';
+
+    TODAS_TURMAS.forEach(t => {
+      const o1 = document.createElement("option");
+      o1.value = t;
+      o1.textContent = t;
+      jogoTurma1.appendChild(o1);
+
+      const o2 = document.createElement("option");
+      o2.value = t;
+      o2.textContent = t;
+      jogoTurma2.appendChild(o2);
+    });
+  }
+
+  const jogoModalidade = document.getElementById("jogoModalidade");
+  MODALIDADES.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m; opt.textContent = m;
+    jogoModalidade.appendChild(opt);
+  });
+
+  const relatorioTurno = document.getElementById("relatorioTurno");
+  const relatorioTurma = document.getElementById("relatorioTurma");
+  const relatorioModalidade = document.getElementById("relatorioModalidade");
+
+  if (relatorioModalidade){
+    relatorioModalidade.innerHTML = '<option value="">Selecione a modalidade...</option>';
+    MODALIDADES.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = m;
+      relatorioModalidade.appendChild(opt);
+    });
+  }
+
+  if (relatorioTurno && relatorioTurma){
+    relatorioTurno.addEventListener("change", () => {
+      const turno = relatorioTurno.value;
+      relatorioTurma.innerHTML = "";
+      const optDefault = document.createElement("option");
+      if (!turno){
+        optDefault.value = "";
+        optDefault.textContent = "Selecione o turno primeiro...";
+        relatorioTurma.appendChild(optDefault);
+      } else {
+        optDefault.value = "";
+        optDefault.textContent = "Selecione a turma...";
+        relatorioTurma.appendChild(optDefault);
+        const turmasTurno = getTurmasPorTurno(turno);
+        turmasTurno.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t;
+          opt.textContent = t;
+          relatorioTurma.appendChild(opt);
+        });
+      }
+      renderRelatorio();
+    });
+
+    relatorioTurma.addEventListener("change", renderRelatorio);
+  }
+
+  if (relatorioModalidade){
+    relatorioModalidade.addEventListener("change", renderRelatorio);
+  }
+
+  const btnImprimirRelatorio = document.getElementById("btnImprimirRelatorio");
+  if (btnImprimirRelatorio){
+    btnImprimirRelatorio.addEventListener("click", () => {
+      // renderRelatorio() já atualiza a tabela com base nos selects
+      renderRelatorio();
+      window.print();
+    });
+  }
+
+  const btnImprimirTodaTurma = document.getElementById("btnImprimirTodaTurma");
+  if (btnImprimirTodaTurma){
+    btnImprimirTodaTurma.addEventListener("click", () => {
+      // renderiza relatório completo da turma (todas as modalidades)
+      renderRelatorioTodaTurma();
+      window.print();
+    });
+  }
+
+  document.getElementById("btnToggleInscritos").addEventListener("click", () => {
+    const sec = document.getElementById("secInscritos").style.display === "block";
+    const btn = document.getElementById("btnToggleInscritos");
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "👀 Ver inscritos";
+    } else {
+      mostrarSecao("inscritos");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
+  });
+
+  document.getElementById("btnVerJogos").addEventListener("click", () => {
+    const sec = document.getElementById("secJogos").style.display === "block";
+    const btn = document.getElementById("btnVerJogos");
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "🏆 Ver jogos";
+    } else {
+      mostrarSecao("jogos");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
+  });
+
+  document.getElementById("btnClassificados").addEventListener("click", () => {
+    const sec = document.getElementById("secClassificados").style.display === "block";
+    const btn = document.getElementById("btnClassificados");
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "✅ Classificados";
+    } else {
+      mostrarSecao("classificados");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
+  });
+
+  document.getElementById("btnPlacarAoVivo").addEventListener("click", () => {
+    const sec = document.getElementById("secPlacarAoVivo").style.display === "block";
+    const btn = document.getElementById("btnPlacarAoVivo");
+    if (sec){
+      mostrarSecao("inscricao");
+      btn.textContent = "⚡ Placar ao vivo";
+    } else {
+      mostrarSecao("placar");
+      btn.textContent = "⬅ Voltar para inscrição";
+    }
+  });
+
+  document.getElementById("btnAdminArea").addEventListener("click", abrirAdmin);
+  document.getElementById("btnFecharAdmin").addEventListener("click", fecharAdmin);
+  document.getElementById("btnFecharProfessores").addEventListener("click", fecharProfessores);
+
+  document.getElementById("formInscricao").addEventListener("submit", handleSubmitInscricao);
+
+  document.getElementById("adminFiltroNome").addEventListener("input", () => {
+    renderAdmin();
+    atualizarSelectsAdminPublico();
+  });
+  document.getElementById("adminFiltroTurma").addEventListener("change", () => {
+    renderAdmin();
+    atualizarSelectsAdminPublico();
+  });
+  document.getElementById("adminFiltroModalidade").addEventListener("change", renderAdmin);
+  document.getElementById("btnCancelarInscricao").addEventListener("click", cancelarInscricao);
+
+  // filtro modalidades para jogos (aluno)
+  const filtroModalidadeJogo = document.getElementById("filtroModalidadeJogo");
+  if (filtroModalidadeJogo){
+    filtroModalidadeJogo.innerHTML = '<option value="">Selecione...</option>';
+    MODALIDADES.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = m;
+      filtroModalidadeJogo.appendChild(opt);
+    });
+    filtroModalidadeJogo.addEventListener("change", renderJogosAluno);
+  }
+
+  // filtros jogos (aluno)
+  document.getElementById("filtroSerieJogo").addEventListener("change", renderJogosAluno);
+  document.getElementById("filtroDataJogo").addEventListener("change", renderJogosAluno);
+
+  // filtro de pesquisa para excluir jogo (admin)
+  const filtroExcluirJogo = document.getElementById("filtroExcluirJogo");
+  if (filtroExcluirJogo){
+    filtroExcluirJogo.addEventListener("input", atualizarSelectExcluirJogo);
+  }
+
+  document.getElementById("btnCadastrarJogo").addEventListener("click", cadastrarJogo);
+  document.getElementById("btnExcluirJogo").addEventListener("click", excluirJogo);
+
+  document.getElementById("btnSalvarConfig").addEventListener("click", e => {
+    e.preventDefault();
+    salvarConfiguracoes();
+  });
+
+  // Botão de adicionar professor (admin)
+  document.getElementById("btnAdicionarProfessor").addEventListener("click", e => {
+    e.preventDefault();
+    adicionarProfessorAcesso();
+  });
+
+  // Botão Gerar Senha (professores)
+  const btnGerarSenha = document.getElementById("btnGerarSenhaProfessor");
+  if (btnGerarSenha){
+    btnGerarSenha.addEventListener("click", e => {
+      e.preventDefault();
+      let senha = "";
+      for (let i = 0; i < 5; i++) {
+        senha += Math.floor(Math.random() * 10);
+      }
+      document.getElementById("profSenhaCadastro").value = senha;
+    });
+  }
+
+  // selects do painel de professores
+  const profTurnoSelect = document.getElementById("profTurnoSelect");
+  const profTurmaSelect = document.getElementById("profTurmaSelect");
+  if (profTurnoSelect && profTurmaSelect){
+    profTurnoSelect.addEventListener("change", () => {
+      configurarSelectTurmaProfessor();
+      renderPainelProfessores();
+    });
+    profTurmaSelect.addEventListener("change", renderPainelProfessores);
+  }
+
+  configurarAbasAdmin();
+  iniciarListeners();
+  carregarConfiguracoes();
+
+  mostrarSecao("inscricao");
+}
+/* ================= CREDENCIAIS / CRACHÁS / ESCANEADOR ================= */
+
+/* helper: cria ID simples único */
+function gerarIdCurto(){
+  return 'c' + Math.random().toString(36).slice(2,10);
+}
+
+/* --- Credenciais: UI wiring --- */
+document.getElementById("btnCredenciais").addEventListener("click", () => {
+  // alterna para a seção credenciais
+  mostrarSecao("credenciais");
+  // esconder os outros painéis
+  document.getElementById("secCredenciais").style.display = "block";
+  // atualiza selects
+  atualizarCredSelectsInit();
+});
+
+/* fazer o "mostrarSecao" reconhecer a nova opção (não modifica a função original) */
+function mostrarSecao(sec){
+  // manter comportamento anterior
+  document.getElementById("secInscricao").style.display = (sec==="inscricao"?"block":"none");
+  document.getElementById("secInscritos").style.display = (sec==="inscritos"?"block":"none");
+  document.getElementById("secJogos").style.display = (sec==="jogos"?"block":"none");
+  document.getElementById("secClassificados").style.display = (sec==="classificados"?"block":"none");
+  document.getElementById("secPlacarAoVivo").style.display = (sec==="placar"?"block":"none");
+  document.getElementById("adminSection").style.display = (sec==="admin"?"block":"none");
+  document.getElementById("professoresSection").style.display = (sec==="professores"?"block":"none");
+  // nova seção credenciais
+  const credSec = document.getElementById("secCredenciais");
+  if (credSec) credSec.style.display = (sec==="credenciais"?"block":"none");
+}
+
+/* UI toggles do credenciais */
+document.getElementById("credBtnNao").addEventListener("click", () => {
+  document.getElementById("credCriar").style.display = "block";
+  document.getElementById("credEntrar").style.display = "none";
+  document.getElementById("credPainelAluno").style.display = "none";
+});
+document.getElementById("credBtnSim").addEventListener("click", () => {
+  document.getElementById("credCriar").style.display = "none";
+  document.getElementById("credEntrar").style.display = "block";
+  document.getElementById("credPainelAluno").style.display = "none";
+});
+
+/* preencher turmas/nome no criar acesso (usa mesmas turmas do site) */
+function atualizarCredSelectsInit(){
+  // credTurno -> credTurma
+  const selTurno = document.getElementById("credTurno");
+  const selTurma = document.getElementById("credTurma");
+  const selNome = document.getElementById("credNome");
+  selTurma.innerHTML = '<option value="">Selecione o turno primeiro...</option>';
+  selNome.innerHTML = '<option value="">Selecione turno e turma...</option>';
+  if (selTurno.value){
+    const turmas = getTurmasPorTurno(selTurno.value);
+    selTurma.innerHTML = '<option value="">Selecione a turma...</option>';
+    turmas.forEach(t => {
+      const o = document.createElement("option"); o.value = t; o.textContent = t;
+      selTurma.appendChild(o);
+    });
+  }
+
+  // preencher lista de nomes para entrar (com todos os alunos cadastrados)
+  const entrarNome = document.getElementById("credEntrarNome");
+  entrarNome.innerHTML = '<option value="">Selecione seu nome...</option>';
+  // usa todasInscricoes para popular
+  const nomes = {};
+  todasInscricoes.forEach(i => { nomes[i.nome] = true; });
+  Object.keys(nomes).sort().forEach(n => {
+    const o = document.createElement("option"); o.value = n; o.textContent = n;
+    entrarNome.appendChild(o);
+  });
+}
+
+/* atualiza lista de nomes no select de criar com filtro turno/turma */
+document.getElementById("credTurno").addEventListener("change", atualizarCredSelectsInit);
+document.getElementById("credTurma").addEventListener("change", () => {
+  const turno = document.getElementById("credTurno").value;
+  const turma = document.getElementById("credTurma").value;
+  const selNome = document.getElementById("credNome");
+  selNome.innerHTML = '<option value="">Selecione...</option>';
+  if (!turno || !turma) return;
+  const lista = todasInscricoes.filter(ins => ins.turno === turno && ins.turma === turma);
+  const nomesSet = {};
+  lista.forEach(i => { if (i.nome) nomesSet[i.nome] = true; });
+  Object.keys(nomesSet).sort().forEach(n => {
+    const o = document.createElement("option"); o.value = n; o.textContent = n;
+    selNome.appendChild(o);
+  });
+});
+
+/* Criar acesso: cria credenciais no Firestore (uma por modalidade inscrita) */
+document.getElementById("btnCriarAcesso").addEventListener("click", async () => {
+  const nome = document.getElementById("credNome").value;
+  const turno = document.getElementById("credTurno").value;
+  const turma = document.getElementById("credTurma").value;
+  const senha = (document.getElementById("credSenha").value || "").trim();
+  const msgDiv = document.getElementById("credCriarMsg");
+  msgDiv.innerHTML = "";
+
+  if (!nome || !turno || !turma || !senha){
+    msgDiv.innerHTML = '<div class="msg-erro">Preencha turno, turma, nome e senha.</div>'; return;
+  }
+
+  // encontrar inscrição do aluno
+  const inscr = todasInscricoes.find(i => i.nome === nome && i.turno === turno && i.turma === turma);
+  if (!inscr){
+    msgDiv.innerHTML = '<div class="msg-erro">Inscrição não encontrada para este aluno (verifique nome/turno/turma).</div>'; return;
+  }
+  if (!inscr.modalidades || !inscr.modalidades.length){
+    msgDiv.innerHTML = '<div class="msg-erro">Aluno sem modalidades inscritas.</div>'; return;
+  }
+
+  try{
+    // cria credenciais por modalidade (se já não existir)
+    const created = [];
+    for (const mod of inscr.modalidades){
+      // buscar se já existe credencial para este aluno+modalidade
+      const q = await db.collection("credenciais")
+        .where("inscricaoId","==",inscr.id)
+        .where("modalidade","==",mod)
+        .get();
+
+      if (!q.empty) continue; // já tem credencial para essa modalidade
+
+      const credId = gerarIdCurto();
+      const docRef = await db.collection("credenciais").add({
+        inscricaoId: inscr.id,
+        nome: inscr.nome,
+        turno: inscr.turno,
+        turma: inscr.turma,
+        modalidade: mod,
+        senha: senha,
+        credId: credId,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      created.push({id: docRef.id, credId: credId, modalidade: mod});
+    }
+
+    if (!created.length){
+      msgDiv.innerHTML = '<div class="msg-sucesso">Já existem credenciais para as modalidades deste aluno. Tente entrar com o nome e senha.</div>';
+    } else {
+      msgDiv.innerHTML = '<div class="msg-sucesso">Credenciais criadas com sucesso para: '+created.map(c=>c.modalidade).join(", ")+'</div>';
+    }
+
+    // abrir painel do aluno automaticamente (mostra crachás)
+    await carregarPainelAlunoPorNomeESenha(nome, senha);
+  }catch(e){
+    console.error(e);
+    msgDiv.innerHTML = '<div class="msg-erro">Erro ao criar credenciais.</div>';
+  }
+});
+
+/* Entrar (aluno) com nome + senha */
+document.getElementById("btnEntrarCred").addEventListener("click", async () => {
+  const nome = document.getElementById("credEntrarNome").value;
+  const senha = (document.getElementById("credEntrarSenha").value || "").trim();
+  const msgDiv = document.getElementById("credEntrarMsg");
+  msgDiv.innerHTML = "";
+  if (!nome || !senha){ msgDiv.innerHTML = '<div class="msg-erro">Preencha nome e senha.</div>'; return; }
+
+  await carregarPainelAlunoPorNomeESenha(nome, senha);
+});
+
+/* carregar painel do aluno: buscar credenciais no Firestore e renderizar crachás */
+async function carregarPainelAlunoPorNomeESenha(nome, senha){
+  const q = await db.collection("credenciais").where("nome","==",nome).where("senha","==",senha).get();
+  const painel = document.getElementById("credPainelAluno");
+  const badgCont = document.getElementById("credBadgesContainer");
+  const entrarMsg = document.getElementById("credEntrarMsg");
+  const criarMsg = document.getElementById("credCriarMsg");
+  entrarMsg.innerHTML = ""; if (criarMsg) criarMsg.innerHTML = "";
+
+  if (q.empty){
+    entrarMsg.innerHTML = '<div class="msg-erro">Nenhuma credencial encontrada para este nome/senha.</div>'; return;
+  }
+
+  painel.style.display = "block";
+  badgCont.innerHTML = "";
+
+  // para cada credencial do aluno, montar um crachá
+  q.forEach(doc => {
+    const d = doc.data();
+    const credDocId = doc.id;
+    // QR payload: JSON simplificado com credId e modalidade
+    const payload = JSON.stringify({ tipo: "cracha", credId: d.credId, modalidade: d.modalidade, inscricaoId: d.inscricaoId });
+    const qrUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=220x220&chl=' + encodeURIComponent(payload);
+
+    // layout do crachá (segue a referência visual: nome, turno, turma, modalidade, QR)
+    const card = document.createElement("div");
+    card.style.border = "2px solid #2f86d6";
+    card.style.borderRadius = "12px";
+    card.style.padding = "12px";
+    card.style.display = "flex";
+    card.style.justifyContent = "space-between";
+    card.style.alignItems = "center";
+    card.style.background = "#fff";
+    card.style.boxShadow = "0 2px 6px rgba(0,0,0,0.06)";
+
+    const left = document.createElement("div");
+    left.style.flex = "1";
+    left.style.paddingRight = "8px";
+
+    const nomeEl = document.createElement("div");
+    nomeEl.innerHTML = "<div style='font-weight:800; font-size:1.05rem; color:var(--azul);'>"+ (d.nome || "") +"</div>";
+    left.appendChild(nomeEl);
+
+    const infoList = document.createElement("div");
+    infoList.style.marginTop = "8px";
+    infoList.innerHTML =
+      "<div>Turno: <strong>"+(d.turno || "-")+"</strong></div>" +
+      "<div>Turma: <strong>"+(d.turma || "-")+"</strong></div>" +
+      "<div>Modalidade: <strong>"+(d.modalidade || "-")+"</strong></div>" +
+      "<div style='font-size:0.75rem; color:#666;'>ID: "+(d.credId || "")+"</div>";
+    left.appendChild(infoList);
+
+    const right = document.createElement("div");
+    right.style.width = "220px";
+    right.style.flex = "0 0 220px";
+    right.style.display = "flex";
+    right.style.justifyContent = "center";
+    right.style.alignItems = "center";
+    const img = document.createElement("img");
+    img.src = qrUrl;
+    img.style.maxWidth = "100%";
+    img.style.height = "auto";
+    img.alt = "QR Code";
+    right.appendChild(img);
+
+    card.appendChild(left);
+    card.appendChild(right);
+
+    // botão para imprimir/baixar (gera janela com apenas o crachá)
+    const btnRow = document.createElement("div");
+    btnRow.style.marginTop = "8px";
+    const btnImp = document.createElement("button");
+    btnImp.className = "btn btn-primaria";
+    btnImp.textContent = "Imprimir / Abrir crachá";
+    btnImp.addEventListener("click", () => {
+      const w = window.open("");
+      w.document.write("<html><head><title>Crachá</title></head><body style='font-family:Arial,Helvetica,sans-serif;margin:20px;'>");
+      w.document.write(card.outerHTML);
+      w.document.write("</body></html>");
+      w.document.close();
+      w.print();
+    });
+    btnRow.appendChild(btnImp);
+
+    const wrap = document.createElement("div");
+    wrap.appendChild(card);
+    wrap.appendChild(btnRow);
+    badgCont.appendChild(wrap);
+  });
+}
+
+/* ========== ESCANEADOR (ADMIN) ========== */
+
+let escVideoStream = null;
+let escScanning = false;
+
+function popularSelectJogosParaEscaneador(){
+  const sel = document.getElementById("escJogoSelect");
+  sel.innerHTML = '<option value="">Selecione o jogo do momento...</option>';
+  // listar jogos do array todosJogos
+  todosJogos.forEach(j => {
+    const label = (j.modalidade || "")+" — "+formatarDataBR(j.dataJogo)+" "+(j.horarioJogo||"")+" — "+(j.turma1||"")+" x "+(j.turma2||"");
+    const opt = document.createElement("option");
+    opt.value = j.id;
+    opt.textContent = label;
+    sel.appendChild(opt);
+  });
+}
+document.addEventListener("click", (e) => {
+  if (e.target && e.target.matches('[data-tab="escaneador"], .admin-tab-btn')) {
+    // when admin opens tab, populate select — but safer to call when tab shown
+  }
+});
+
+// quando o usuário muda o jogo selecionado
+document.addEventListener("change", (e) => {
+  if (e.target && e.target.id === 'escJogoSelect'){
+    const id = e.target.value;
+    const area = document.getElementById("escCameraArea");
+    const status = document.getElementById("escStatus");
+    document.getElementById("escResult").textContent = "";
+    document.getElementById("escIndicator").innerHTML = "";
+    if (!id){
+      area.style.display = "none";
+      stopEscaneador();
+      status.textContent = "Selecione um jogo para ativar o leitor.";
+      renderResumoEsc(id);
+      return;
+    }
+    // habilitar área e iniciar câmera
+    area.style.display = "block";
+    status.textContent = "Leitor pronto. Ative a câmera — o navegador pode pedir permissão.";
+    startEscaneador(id);
+    renderResumoEsc(id);
+  }
+});
+
+async function startEscaneador(jogoId){
+  stopEscaneador();
+  const video = document.getElementById("escVideo");
+  if (!video) return;
+  // pedir câmera
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio:false });
+    escVideoStream = stream;
+    video.srcObject = stream;
+    await video.play();
+    escScanning = true;
+    scanLoopForQR(jogoId);
+  }catch(e){
+    console.error(e);
+    document.getElementById("escStatus").textContent = "Erro ao ativar câmera. Verifique permissões e dispositivo.";
+  }
+}
+
+function stopEscaneador(){
+  escScanning = false;
+  if (escVideoStream){
+    escVideoStream.getTracks().forEach(t => t.stop());
+    escVideoStream = null;
+  }
+  const v = document.getElementById("escVideo");
+  if (v) { try{ v.pause(); v.srcObject = null; }catch(e){} }
+}
+
+/* botão parar */
+document.getElementById("btnPararEscaneador").addEventListener("click", () => {
+  stopEscaneador();
+  document.getElementById("escCameraArea").style.display = "none";
+  document.getElementById("escStatus").textContent = "Leitor parado.";
+});
+
+/* loop de captura e detecção (usa BarcodeDetector quando disponível; fallback: tentar ler via canvas + BarcodeDetector se suportado) */
+async function scanLoopForQR(jogoId){
+  const video = document.getElementById("escVideo");
+  const canvas = document.getElementById("escCanvas");
+  const ctx = canvas.getContext ? canvas.getContext('2d') : null;
+  const status = document.getElementById("escStatus");
+  const resultDiv = document.getElementById("escResult");
+  const indicator = document.getElementById("escIndicator");
+
+  // preparar detector se disponível
+  let detector = null;
+  if (window.BarcodeDetector){
+    try { detector = new BarcodeDetector({formats: ['qr_code']}); }
+    catch(e){ detector = null; }
+  }
+
+  while(escScanning){
+    try{
+      if (video.readyState >= 2 && ctx){
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        if (detector){
+          try {
+            const barcodes = await detector.detect(canvas);
+            if (barcodes && barcodes.length){
+              const payload = barcodes[0].rawValue || barcodes[0].rawData || "";
+              await processarPayloadQRCode(payload, jogoId);
+            }
+          } catch(e){
+            // detector falhou em frame específico
+          }
+        } else {
+          // sem BarcodeDetector: tentar ler via canvas -> usar leitura por URL não é trivial aqui
+          // indicar que navegador talvez não suporte detecção automática
+          indicator.innerHTML = '<div class="msg-erro">Leitura automática indisponível neste navegador. Use um navegador com BarcodeDetector (Chrome/Edge recentes).</div>';
+          // para evitar CPU alta, pausa loop
+          await new Promise(res => setTimeout(res, 1200));
+        }
+      }
+    }catch(e){}
+    await new Promise(res => setTimeout(res, 250));
+  }
+}
+
+/* Processa o conteúdo do QR Code lido */
+async function processarPayloadQRCode(payload, jogoId){
+  const resultDiv = document.getElementById("escResult");
+  const indicator = document.getElementById("escIndicator");
+  try{
+    // alguns QR podem vir percent-encoded se gerados externamente; tentar decodificar
+    let texto = payload;
+    try { texto = decodeURIComponent(payload); } catch(e){ texto = payload; }
+
+    let obj = null;
+    try { obj = JSON.parse(texto); } catch(e){ obj = null; }
+
+    if (!obj || obj.tipo !== 'cracha' || !obj.credId){
+      // QR inválido
+      indicator.innerHTML = '<div style="background:#ffdede; padding:8px; border-radius:6px; color:#b30000;">Entrada não autorizada — QR inválido</div>';
+      resultDiv.textContent = 'Entrada não autorizada';
+      return;
+    }
+
+    // buscar credencial pelo credId
+    const q = await db.collection("credenciais").where("credId","==",obj.credId).limit(1).get();
+    if (q.empty){
+      indicator.innerHTML = '<div style="background:#ffdede; padding:8px; border-radius:6px; color:#b30000;">Entrada não autorizada — credencial não encontrada</div>';
+      resultDiv.textContent = 'Entrada não autorizada';
+      return;
+    }
+    const doc = q.docs[0];
+    const d = doc.data();
+
+    // buscar o jogo
+    const jogo = todosJogos.find(j => j.id === jogoId);
+    if (!jogo){
+      indicator.innerHTML = '<div class="msg-erro">Jogo não encontrado.</div>'; return;
+    }
+
+    // verificar turma/modalidade
+    const alunoTurma = d.turma;
+    const modCred = d.modalidade;
+    const modalidadeJogo = jogo.modalidade;
+    const turmaValida = (alunoTurma === jogo.turma1) || (alunoTurma === jogo.turma2);
+
+    // verificar se já foi escaneado para este jogo (coleção jogos/{jogoId}/presencas com campo credId)
+    const presRef = db.collection("jogos").doc(jogoId).collection("presencas");
+    const presQuery = await presRef.where("credId","==",d.credId).limit(1).get();
+    if (!turmaValida){
+      indicator.innerHTML = '<div style="background:#ffdede; padding:8px; border-radius:6px; color:#b30000;">Entrada não autorizada — aluno não pertence às turmas do jogo</div>';
+      resultDiv.textContent = 'Entrada não autorizada';
+      return;
+    }
+    if (modCred !== modalidadeJogo){
+      indicator.innerHTML = '<div style="background:#ffdede; padding:8px; border-radius:6px; color:#b30000;">Entrada não autorizada — crachá de outra modalidade</div>';
+      resultDiv.textContent = 'Entrada não autorizada';
+      return;
+    }
+    if (!presQuery.empty){
+      indicator.innerHTML = '<div style="background:#ffdede; padding:8px; border-radius:6px; color:#b30000;">Entrada não autorizada — crachá já escaneado para este jogo</div>';
+      resultDiv.textContent = 'Entrada não autorizada';
+      return;
+    }
+
+    // tudo ok -> registrar presença
+    await presRef.add({
+      credId: d.credId,
+      inscricaoId: d.inscricaoId || null,
+      nome: d.nome || null,
+      turma: d.turma || null,
+      modalidade: d.modalidade || null,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    indicator.innerHTML = '<div style="background:#e7ffea; padding:8px; border-radius:6px; color:#0c7a2a;">Entrada autorizada — '+(d.nome || '')+'</div>';
+    resultDiv.textContent = 'Entrada autorizada';
+    // atualizar resumo
+    renderResumoEsc(jogoId);
+  }catch(e){
+    console.error(e);
+    document.getElementById("escIndicator").innerHTML = '<div class="msg-erro">Erro ao processar QR.</div>';
+  }
+}
+
+/* renderizar resumo das turmas / jogadores com status de presença para o jogo selecionado */
+async function renderResumoEsc(jogoId){
+  const cont = document.getElementById("escResumoJogos") || document.getElementById("escResumoJogos");
+  if (!cont) return;
+  cont.innerHTML = "";
+  if (!jogoId) { cont.textContent = "Selecione um jogo para ver o resumo."; return; }
+
+  const jogo = todosJogos.find(j => j.id === jogoId);
+  if (!jogo){ cont.textContent = "Jogo não encontrado."; return; }
+
+  // buscar presencas
+  const pres = [];
+  const presSnap = await db.collection("jogos").doc(jogoId).collection("presencas").get();
+  presSnap.forEach(d => pres.push(d.data()));
+
+  // Time A (turma1) e Time B (turma2)
+  const turmas = [jogo.turma1, jogo.turma2];
+  turmas.forEach(t => {
+    const bloco = document.createElement("div");
+    bloco.style.marginTop = "8px";
+    bloco.innerHTML = "<strong>Time: "+(t||"-")+"</strong>";
+    const tabela = document.createElement("table");
+    tabela.style.marginTop = "6px";
+    tabela.innerHTML = "<thead><tr><th>Nome</th><th>Status</th></tr></thead>";
+    const tbody = document.createElement("tbody");
+
+    // lista de inscritos na modalidade para esta turma
+    const inscritos = todasInscricoes.filter(ins => ins.turma === t && (ins.modalidades || []).includes(jogo.modalidade));
+    if (!inscritos.length){
+      const tr = document.createElement("tr");
+      const td = document.createElement("td"); td.colSpan=2; td.textContent = "Nenhum inscrito nesta turma para a modalidade.";
+      tr.appendChild(td); tbody.appendChild(tr);
+    } else {
+      inscritos.forEach(ins => {
+        const ja = pres.some(p => p.inscricaoId === ins.id || p.credId && p.credId === ins.id);
+        const tr = document.createElement("tr");
+        const tdN = document.createElement("td"); tdN.textContent = ins.nome || "-";
+        const tdS = document.createElement("td");
+        tdS.innerHTML = ja ? '<span style="color:var(--verde); font-weight:600;">● escaneado</span>' : '<span style="color:var(--vermelho); font-weight:600;">● não escaneado</span>';
+        tr.appendChild(tdN); tr.appendChild(tdS); tbody.appendChild(tr);
+      });
+    }
+    tabela.appendChild(tbody);
+    bloco.appendChild(tabela);
+    cont.appendChild(bloco);
+  });
+
+  // lista geral de inscritos na modalidade (ambas turmas)
+  const listBlock = document.createElement("div");
+  listBlock.style.marginTop = "10px";
+  listBlock.innerHTML = "<strong>Lista geral de inscritos na modalidade "+(jogo.modalidade||"-")+"</strong>";
+  const tbl = document.createElement("table");
+  tbl.style.marginTop = "6px";
+  tbl.innerHTML = "<thead><tr><th>Nome</th><th>Turma</th><th>Status</th></tr></thead>";
+  const tb = document.createElement("tbody");
+  const inscritosGeral = todasInscricoes.filter(ins => (ins.modalidades || []).includes(jogo.modalidade) && (ins.turma === jogo.turma1 || ins.turma === jogo.turma2));
+  if (!inscritosGeral.length){
+    const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan=3; td.textContent = "Nenhum inscrito."; tr.appendChild(td); tb.appendChild(tr);
+  } else {
+    inscritosGeral.forEach(ins => {
+      const ja = pres.some(p => p.inscricaoId === ins.id || p.credId && p.credId === ins.id);
+      const tr = document.createElement("tr");
+      const td1 = document.createElement("td"); td1.textContent = ins.nome || "-";
+      const td2 = document.createElement("td"); td2.textContent = ins.turma || "-";
+      const td3 = document.createElement("td"); td3.innerHTML = ja ? '<span style="color:var(--verde); font-weight:600;">● escaneado</span>' : '<span style="color:var(--vermelho); font-weight:600;">● não escaneado</span>';
+      tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+      tb.appendChild(tr);
+    });
+  }
+  tbl.appendChild(tb);
+  listBlock.appendChild(tbl);
+  cont.appendChild(listBlock);
+}
+
+/* Quando os listeners de jogos/incrições atualizarem os arrays, manter escaneador e selects sincronizados */
+function sincronizarEscaneadorECreds(){
+  popularSelectJogosParaEscaneador();
+  atualizarCredSelectsInit();
+}
+window.sincronizarEscaneadorECreds = sincronizarEscaneadorECreds;
+
+/* Adiciona hook após listeners carregarem dados: */
+const origIniciarListeners = iniciarListeners;
+iniciarListeners = function(){
+  origIniciarListeners();
+  // garantir selects e escaneador sincronizados
+  setTimeout(sincronizarEscaneadorECreds, 600);
+};
+
+/* DOM ready */
+if (document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
+</script>
+
+</body>
+</html>
